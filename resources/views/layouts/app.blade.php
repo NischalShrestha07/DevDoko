@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'DevDoko') - Developer Social Network</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'DevDoko') - Developer's Instagram</title>
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -12,196 +13,618 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 
     <style>
-        body {
-            background-color: #fafafa;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        :root {
+            --primary-color: #0095f6;
+            --border-color: #dbdbdb;
+            --bg-color: #fafafa;
+            --text-color: #262626;
         }
 
-        .sidebar {
+        body {
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main Layout */
+        .app-container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px 0;
+        }
+
+        /* Left Sidebar - Navigation */
+        .sidebar-left {
             position: fixed;
-            left: 0;
             top: 0;
+            left: 0;
             height: 100vh;
             width: 245px;
-            border-right: 1px solid #dbdbdb;
-            padding: 20px 12px;
+            border-right: 1px solid var(--border-color);
+            padding: 30px 20px;
             background: white;
-            overflow-y: auto;
-            z-index: 1000;
+            z-index: 10;
         }
 
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            padding-left: 12px;
+        }
+
+        .logo a {
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .logo a:hover {
+            color: var(--text-color);
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: #f2f2f2;
+            color: var(--text-color);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-right: 16px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-text {
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .nav-link.active .nav-text {
+            font-weight: 600;
+        }
+
+        /* Main Content Area */
         .main-content {
             margin-left: 245px;
-            padding: 30px;
-            max-width: 600px;
-            margin: 0 auto;
+            flex: 1;
+            max-width: 630px;
+            min-height: 100vh;
         }
 
-        .suggestions-sidebar {
+        /* Right Sidebar - Suggestions */
+        .sidebar-right {
             position: fixed;
-            top: 100px;
+            top: 30px;
             right: 20px;
             width: 319px;
         }
 
-        .post-card {
-            border: 1px solid #dbdbdb;
-            border-radius: 8px;
+        /* Mobile Navigation */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
             background: white;
+            border-top: 1px solid var(--border-color);
+            z-index: 100;
+        }
+
+        .mobile-nav-items {
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+        }
+
+        .mobile-nav-icon {
+            font-size: 24px;
+            color: var(--text-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 1260px) {
+            .sidebar-right {
+                display: none;
+            }
+        }
+
+        @media (max-width: 1000px) {
+            .sidebar-left {
+                width: 72px;
+                padding: 30px 12px;
+            }
+
+            .nav-text {
+                display: none;
+            }
+
+            .nav-icon {
+                margin-right: 0;
+            }
+
+            .logo span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 72px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-left {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                margin-bottom: 60px;
+                padding: 0 16px;
+            }
+
+            .mobile-nav {
+                display: block;
+            }
+        }
+
+        /* Post Card Styles */
+        .post-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             margin-bottom: 24px;
+        }
+
+        .post-header {
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .post-user {
+            display: flex;
+            align-items: center;
+        }
+
+        .post-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 12px;
+        }
+
+        .post-username {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .post-username:hover {
+            color: var(--text-color);
+            text-decoration: underline;
+        }
+
+        .post-more {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-color);
+            cursor: pointer;
         }
 
         .post-image {
             width: 100%;
-            max-height: 585px;
-            object-fit: cover;
+            height: auto;
+            display: block;
+        }
+
+        .post-actions {
+            padding: 12px 16px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .action-left {
+            display: flex;
+            gap: 16px;
+        }
+
+        .post-action-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .post-action-btn.liked {
+            color: #ed4956;
+        }
+
+        .post-likes {
+            padding: 0 16px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .post-caption {
+            padding: 0 16px;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .post-caption-user {
+            font-weight: 600;
+            margin-right: 4px;
+        }
+
+        .post-comments {
+            padding: 0 16px;
+            color: #8e8e8e;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .post-timestamp {
+            padding: 0 16px 12px;
+            color: #8e8e8e;
+            font-size: 10px;
+            text-transform: uppercase;
+            margin-bottom: 0;
+        }
+
+        .add-comment {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .comment-form {
+            display: flex;
+            align-items: center;
+        }
+
+        .comment-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            padding: 0;
+        }
+
+        .comment-submit {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 14px;
+            opacity: 0.3;
+            cursor: default;
+        }
+
+        .comment-submit.active {
+            opacity: 1;
+            cursor: pointer;
+        }
+
+        /* Stories */
+        .stories-container {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .story-item {
+            display: inline-block;
+            text-align: center;
+            margin-right: 20px;
+            cursor: pointer;
         }
 
         .story-avatar {
-            width: 56px;
-            height: 56px;
+            width: 66px;
+            height: 66px;
             border-radius: 50%;
-            padding: 2px;
+            padding: 3px;
             background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            margin-bottom: 6px;
         }
 
-        .footer-links {
+        .story-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid white;
+            object-fit: cover;
+        }
+
+        .story-username {
             font-size: 12px;
-            color: #c7c7c7;
-            line-height: 1.8;
+            color: var(--text-color);
+        }
+
+        /* Create Post Card */
+        .create-post-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .create-post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .create-post-input {
+            flex: 1;
+            margin-left: 12px;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background: #fafafa;
+            font-size: 14px;
+            color: #8e8e8e;
+            cursor: pointer;
+        }
+
+        .create-post-options {
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+        }
+
+        .create-post-option {
+            display: flex;
+            align-items: center;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .create-post-option i {
+            margin-right: 8px;
+            font-size: 20px;
+        }
+
+        .create-post-option.photo i {
+            color: #45bd62;
+        }
+
+        .create-post-option.video i {
+            color: #f02849;
+        }
+
+        .create-post-option.code i {
+            color: #f7b928;
+        }
+
+        .create-post-option.article i {
+            color: #0095f6;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .profile-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            padding: 16px 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .stat-value {
+            font-weight: 600;
+            font-size: 16px;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #8e8e8e;
+        }
+
+        /* Suggestions */
+        .suggestions-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .suggestions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .suggestion-user {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .suggestion-info {
+            flex: 1;
+            margin-left: 12px;
+        }
+
+        .suggestion-username {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .suggestion-text {
+            font-size: 12px;
+            color: #8e8e8e;
+        }
+
+        .follow-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* Footer Links */
+        .footer-links {
+            margin-top: 16px;
         }
 
         .footer-links a {
-            text-decoration: none;
             color: #c7c7c7;
+            font-size: 12px;
+            text-decoration: none;
+            margin-right: 8px;
         }
 
         .footer-links a:hover {
             text-decoration: underline;
         }
 
-        @media (max-width: 1264px) {
-            .suggestions-sidebar {
-                display: none;
-            }
-        }
-
-        @media (max-width: 992px) {
-            .sidebar {
-                display: none;
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 0;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 0;
-                margin-bottom: 60px;
-            }
+        .footer-copyright {
+            color: #c7c7c7;
+            font-size: 12px;
+            margin-top: 8px;
         }
     </style>
 </head>
 
 <body>
-    <!-- Mobile Bottom Navigation -->
-    @auth
-    <nav class="navbar navbar-light bg-white d-lg-none fixed-bottom border-top">
-        <div class="container-fluid justify-content-around">
-            <a class="navbar-brand" href="{{ route('home') }}">
-                <i class="bi bi-house-door-fill fs-4"></i>
-            </a>
-            <a href="{{ route('explore') }}" class="text-dark">
-                <i class="bi bi-search fs-4"></i>
-            </a>
-            <a href="{{ route('posts.create') }}" class="text-dark">
-                <i class="bi bi-plus-square fs-4"></i>
-            </a>
-            <a href="{{ route('notifications.index') }}" class="text-dark position-relative">
-                <i class="bi bi-heart fs-4"></i>
-            </a>
-            <a href="{{ route('profile.show', auth()->user()->profile->username) }}" class="text-dark">
-                @if(auth()->user()->profile->avatar)
-                <img src="{{ auth()->user()->profile->avatar_url }}" class="rounded-circle"
-                    style="width: 24px; height: 24px; object-fit: cover;">
-                @else
-                <i class="bi bi-person-circle fs-4"></i>
-                @endif
+    <!-- Desktop Navigation Sidebar -->
+    <div class="sidebar-left">
+        <div class="logo">
+            <a href="{{ route('home') }}">
+                <i class="bi bi-code-slash"></i>
+                <span>DevDoko</span>
             </a>
         </div>
-    </nav>
-    @endauth
 
-    <div class="container-fluid">
-        <!-- Desktop Sidebar -->
-        @auth
-        <div class="sidebar d-none d-lg-block">
-            <div class="mb-5">
-                <a href="{{ route('home') }}" class="text-decoration-none text-dark">
-                    <h4 class="mb-4">
-                        <i class="bi bi-code-slash me-2"></i>
-                        <span class="fw-bold">DevDoko</span>
-                    </h4>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">
+                    <i class="bi bi-house-door{{ request()->routeIs('home') ? '-fill' : '' }} nav-icon"></i>
+                    <span class="nav-text">Home</span>
                 </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('search') }}" class="nav-link {{ request()->routeIs('search') ? 'active' : '' }}">
+                    <i class="bi bi-search nav-icon"></i>
+                    <span class="nav-text">Search</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('explore') }}" class="nav-link {{ request()->routeIs('explore') ? 'active' : '' }}">
+                    <i class="bi bi-compass nav-icon"></i>
+                    <span class="nav-text">Explore</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('messages.index') }}"
+                    class="nav-link {{ request()->routeIs('messages.*') ? 'active' : '' }}">
+                    <i class="bi bi-chat nav-icon"></i>
+                    <span class="nav-text">Messages</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('notifications.index') }}"
+                    class="nav-link {{ request()->routeIs('notifications.*') ? 'active' : '' }}">
+                    <i class="bi bi-heart nav-icon"></i>
+                    <span class="nav-text">Notifications</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('posts.create') }}"
+                    class="nav-link {{ request()->routeIs('posts.create') ? 'active' : '' }}">
+                    <i class="bi bi-plus-square nav-icon"></i>
+                    <span class="nav-text">Create</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('profile.show', auth()->user()->profile->username) }}"
+                    class="nav-link {{ request()->routeIs('profile.show') ? 'active' : '' }}">
+                    @if(auth()->user()->profile->avatar)
+                    <img src="{{ auth()->user()->profile->avatar_url }}" class="nav-icon rounded-circle"
+                        style="width: 24px; height: 24px; object-fit: cover;">
+                    @else
+                    <i class="bi bi-person-circle nav-icon"></i>
+                    @endif
+                    <span class="nav-text">Profile</span>
+                </a>
+            </li>
+        </ul>
 
-                <nav class="nav flex-column">
-                    <a class="nav-link py-3 {{ request()->routeIs('home') ? 'active fw-bold' : '' }}"
-                        href="{{ route('home') }}">
-                        <i class="bi bi-house-door{{ request()->routeIs('home') ? '-fill' : '' }} me-3 fs-5"></i>
-                        Home
-                    </a>
-
-                    <a class="nav-link py-3 {{ request()->routeIs('explore') ? 'active fw-bold' : '' }}"
-                        href="{{ route('explore') }}">
-                        <i class="bi bi-compass me-3 fs-5"></i>
-                        Explore
-                    </a>
-
-                    <a class="nav-link py-3" href="{{ route('notifications.index') }}">
-                        <i class="bi bi-heart me-3 fs-5"></i>
-                        Notifications
-                    </a>
-
-                    <a class="nav-link py-3" href="{{ route('messages.index') }}">
-                        <i class="bi bi-chat me-3 fs-5"></i>
-                        Messages
-                    </a>
-
-                    <a class="nav-link py-3" href="{{ route('posts.create') }}">
-                        <i class="bi bi-plus-square me-3 fs-5"></i>
-                        Create
-                    </a>
-
-                    <a class="nav-link py-3 {{ request()->routeIs('profile.show') ? 'active fw-bold' : '' }}"
-                        href="{{ route('profile.show', auth()->user()->profile->username) }}">
-                        @if(auth()->user()->profile->avatar)
-                        <img src="{{ auth()->user()->profile->avatar_url }}" class="rounded-circle me-2" width="24"
-                            height="24" style="object-fit: cover;">
-                        @else
-                        <i class="bi bi-person-circle me-3 fs-5"></i>
-                        @endif
-                        Profile
-                    </a>
-                </nav>
-            </div>
-
-            <div class="mt-auto">
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="nav-link py-3 w-100 text-start bg-transparent border-0 text-dark">
-                        <i class="bi bi-box-arrow-right me-3 fs-5"></i>
-                        Logout
-                    </button>
-                </form>
-            </div>
+        <div style="position: absolute; bottom: 30px; width: calc(100% - 40px);">
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="nav-link w-100 text-start bg-transparent border-0 p-0">
+                    <i class="bi bi-box-arrow-right nav-icon"></i>
+                    <span class="nav-text">Logout</span>
+                </button>
+            </form>
         </div>
-        @endauth
+    </div>
 
-        <!-- Main Content -->
-        <main class="main-content">
+    <!-- Main Content -->
+    <div class="app-container">
+        <div class="main-content">
             <!-- Flash Messages -->
             @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -218,91 +641,117 @@
             @endif
 
             @yield('content')
-        </main>
+        </div>
 
-        <!-- Right Sidebar Suggestions (Desktop Only) -->
-        @auth
-        <div class="suggestions-sidebar d-none d-xl-block">
+        <!-- Right Sidebar (Desktop Only) -->
+        <div class="sidebar-right">
             <!-- Current User Profile -->
-            <div class="card border-0 mb-4">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <img src="{{ auth()->user()->profile->avatar_url }}" alt="{{ auth()->user()->name }}"
-                            class="rounded-circle me-3" width="56" height="56" style="object-fit: cover;">
-                        <div class="flex-grow-1">
-                            <a href="{{ route('profile.show', auth()->user()->profile->username) }}"
-                                class="text-decoration-none text-dark fw-bold">
-                                {{ auth()->user()->profile->username }}
-                            </a>
-                            <div class="text-muted small">{{ auth()->user()->name }}</div>
-                        </div>
+            <div class="profile-card">
+                <div class="profile-info">
+                    <img src="{{ auth()->user()->profile->avatar_url }}" alt="{{ auth()->user()->name }}"
+                        class="rounded-circle" style="width: 56px; height: 56px; object-fit: cover;">
+                    <div style="margin-left: 12px;">
+                        <a href="{{ route('profile.show', auth()->user()->profile->username) }}"
+                            class="text-decoration-none text-dark fw-bold d-block">
+                            {{ auth()->user()->profile->username }}
+                        </a>
+                        <small class="text-muted">{{ auth()->user()->name }}</small>
+                    </div>
+                </div>
+                <div class="profile-stats">
+                    <div>
+                        <span class="stat-value">{{ auth()->user()->posts->count() ?? 0 }}</span>
+                        <span class="stat-label">Posts</span>
+                    </div>
+                    <div>
+                        <span class="stat-value">{{ auth()->user()->followers->count() ?? 0 }}</span>
+                        <span class="stat-label">Followers</span>
+                    </div>
+                    <div>
+                        <span class="stat-value">{{ auth()->user()->following->count() ?? 0 }}</span>
+                        <span class="stat-label">Following</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Suggestions For You -->
+            <!-- Suggestions -->
             @if(isset($suggestedUsers) && $suggestedUsers->count() > 0)
-            <div class="card border-0">
-                <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
-                    <div class="fw-bold text-muted">Suggestions For You</div>
+            <div class="suggestions-card">
+                <div class="suggestions-header">
+                    <span class="fw-bold text-muted">Suggestions For You</span>
                     <a href="{{ route('explore') }}" class="text-decoration-none fw-bold small">See All</a>
                 </div>
-                <div class="card-body">
-                    @foreach($suggestedUsers as $user)
-                    <div class="d-flex align-items-center mb-3 suggestion-user">
-                        <a href="{{ route('profile.show', $user->profile->username) }}" class="text-decoration-none">
-                            <img src="{{ $user->profile->avatar_url }}" alt="{{ $user->name }}"
-                                class="rounded-circle me-3" width="32" height="32" style="object-fit: cover;">
+
+                @foreach($suggestedUsers as $user)
+                <div class="suggestion-user">
+                    <a href="{{ route('profile.show', $user->profile->username) }}" class="text-decoration-none">
+                        <img src="{{ $user->profile->avatar_url }}" alt="{{ $user->name }}" class="rounded-circle"
+                            style="width: 32px; height: 32px; object-fit: cover;">
+                    </a>
+                    <div class="suggestion-info">
+                        <a href="{{ route('profile.show', $user->profile->username) }}" class="suggestion-username">
+                            {{ $user->profile->username }}
                         </a>
-                        <div class="flex-grow-1">
-                            <a href="{{ route('profile.show', $user->profile->username) }}"
-                                class="text-decoration-none text-dark fw-bold d-block">
-                                {{ $user->profile->username }}
-                            </a>
-                            <div class="text-muted small">
-                                {{ $user->followers_count ?? 0 }} followers
-                            </div>
+                        <div class="suggestion-text">
+                            {{ $user->followers->count() ?? 0 }} followers
                         </div>
-                        <form action="{{ route('users.follow', $user) }}" method="POST">
-                            @csrf
-                            <button type="submit"
-                                class="text-primary text-decoration-none fw-bold small btn btn-link p-0">
-                                Follow
-                            </button>
-                        </form>
                     </div>
-                    @endforeach
+                    <form action="{{ route('users.follow', $user) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="follow-btn">Follow</button>
+                    </form>
                 </div>
+                @endforeach
             </div>
             @endif
 
             <!-- Footer Links -->
-            <div class="mt-4">
-                <div class="footer-links">
-                    <a href="#">About</a> ·
-                    <a href="#">Help</a> ·
-                    <a href="#">Press</a> ·
-                    <a href="#">API</a> ·
-                    <a href="#">Jobs</a> ·
-                    <a href="#">Privacy</a> ·
-                    <a href="#">Terms</a> ·
-                    <a href="#">Locations</a> ·
-                    <a href="#">Language</a> ·
-                    <a href="#">Meta Verified</a>
-                    <div class="mt-2 text-muted">
-                        © {{ date('Y') }} DevDoko from Meta
-                    </div>
+            <div class="footer-links">
+                <a href="#">About</a>·
+                <a href="#">Help</a>·
+                <a href="#">Press</a>·
+                <a href="#">API</a>·
+                <a href="#">Jobs</a>·
+                <a href="#">Privacy</a>·
+                <a href="#">Terms</a>·
+                <a href="#">Locations</a>·
+                <a href="#">Language</a>·
+                <a href="#">Meta Verified</a>
+                <div class="footer-copyright">
+                    © {{ date('Y') }} DevDoko from Meta
                 </div>
             </div>
         </div>
-        @endauth
     </div>
 
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-items">
+            <a href="{{ route('home') }}" class="mobile-nav-icon">
+                <i class="bi bi-house-door{{ request()->routeIs('home') ? '-fill' : '' }}"></i>
+            </a>
+            <a href="{{ route('explore') }}" class="mobile-nav-icon">
+                <i class="bi bi-search"></i>
+            </a>
+            <a href="{{ route('posts.create') }}" class="mobile-nav-icon">
+                <i class="bi bi-plus-square"></i>
+            </a>
+            <a href="{{ route('notifications.index') }}" class="mobile-nav-icon">
+                <i class="bi bi-heart"></i>
+            </a>
+            <a href="{{ route('profile.show', auth()->user()->profile->username) }}" class="mobile-nav-icon">
+                @if(auth()->user()->profile->avatar)
+                <img src="{{ auth()->user()->profile->avatar_url }}" class="rounded-circle"
+                    style="width: 24px; height: 24px; object-fit: cover;">
+                @else
+                <i class="bi bi-person-circle"></i>
+                @endif
+            </a>
+        </div>
+    </nav>
 
-    <!-- CSRF Token for AJAX -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     @stack('scripts')
 </body>

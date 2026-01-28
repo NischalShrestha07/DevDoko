@@ -64,7 +64,6 @@ class ProfileController extends Controller
             'avatar' => 'nullable|image|max:2048',
             'github_link' => 'nullable|url|max:255',
             'portfolio_link' => 'nullable|url|max:255',
-            'location' => 'nullable|string|max:100',
             'tech_tags' => 'array|max:10',
             'tech_tags.*' => 'exists:tech_tags,id',
         ]);
@@ -87,7 +86,6 @@ class ProfileController extends Controller
             'avatar' => $avatarPath,
             'github_link' => $request->github_link,
             'portfolio_link' => $request->portfolio_link,
-            'location' => $request->location,
         ]);
 
         // Sync tech tags

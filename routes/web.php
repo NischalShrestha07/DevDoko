@@ -48,8 +48,6 @@ Route::get('/explore', [ExploreController::class, 'index'])->name('explore');
 // Public Profile View
 Route::get('/@{username}', [ProfileController::class, 'show'])->name('profile.show');
 
-// Public Post View
-Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
 // Public Tag View
 Route::get('/tags/{tag}', [TagController::class, 'show'])->name('tags.show');
@@ -67,6 +65,8 @@ Route::middleware(['auth'])->group(function () {
     // Posts
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+    Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
+
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
     // Post Interactions

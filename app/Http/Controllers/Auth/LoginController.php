@@ -10,16 +10,27 @@ class LoginController extends Controller
 {
     public function __construct()
     {
+        // Remove or comment out middleware if causing issues
         // $this->middleware('guest')->except('logout');
     }
 
     public function showLoginForm()
     {
+        // Redirect if already logged in
+        if (Auth::check()) {
+            return redirect()->route('home');
+        }
+
         return view('auth.login');
     }
 
     public function login(Request $request)
     {
+        // Redirect if already logged in
+        if (Auth::check()) {
+            return redirect()->route('home');
+        }
+
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',

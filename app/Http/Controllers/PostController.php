@@ -13,19 +13,12 @@ use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth')->except(['show']);
-    }
-
-    // Show create post form
     public function create(Request $request)
     {
         $type = $request->query('type', 'text');
         return view('posts.create', compact('type'));
     }
 
-    // Store new post
     public function store(Request $request)
     {
         // Validate based on post type
@@ -104,7 +97,6 @@ class PostController extends Controller
             ->with('success', 'Post created successfully!');
     }
 
-    // Show single post
     public function show(Post $post)
     {
         // Check if user can view the post
@@ -129,16 +121,78 @@ class PostController extends Controller
             'codeSnippet'
         ]);
 
-        // Increment view count (you can add a views column to posts table)
-        // $post->increment('views');
+        // Get related posts (same user)
+        $relatedPosts = Post::where('user_id', $post->user_id)
+            ->where('id', '!=', $post->id)
+            ->where('visibility', 'public')
+            ->with(['media', 'codeSnippet'])
+            ->latest()
+            ->take(6)
+            ->get();
 
-        return view('posts.show', compact('post'));
+        return view('posts.show', compact('post', 'relatedPosts'));
     }
 
-    // Delete post
-    public function destroy(Post $post)
+    public function edit(Post $post)
     {
         // Authorization check
+        if (Auth::id() !== $post->user_id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $post->load(['tags', 'media', 'codeSnippet']);
+
+        $tags = $post->tags->pluck('name')->implode(', ');
+
+        return view('posts.edit', compact('post', 'tags'));
+    }
+
+    public function update(Request $request, Post $post)
+    {
+        // Authorization check
+        if (Auth::id() !== $post->user_id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $validated = $request->validate([
+            'caption' => 'required|string|max:2000',
+            'visibility' => 'required|in:public,followers',
+            'tags' => 'nullable|string|max:255',
+            'location' => 'nullable|string|max:100',
+        ]);
+
+        // Update post
+        $post->update([
+            'caption' => $validated['caption'],
+            'visibility' => $validated['visibility'],
+            'location' => $validated['location'] ?? null,
+        ]);
+
+        // Handle tags
+        if (!empty($validated['tags'])) {
+            $tags = array_map('trim', explode(',', $validated['tags']));
+            $tagIds = [];
+
+            foreach ($tags as $tagName) {
+                if (!empty($tagName)) {
+                    $tag = Tag::firstOrCreate([
+                        'name' => Str::lower($tagName)
+                    ]);
+                    $tagIds[] = $tag->id;
+                }
+            }
+
+            $post->tags()->sync($tagIds);
+        } else {
+            $post->tags()->detach();
+        }
+
+        return redirect()->route('posts.show', $post)
+            ->with('success', 'Post updated successfully!');
+    }
+
+    public function destroy(Post $post)
+    {
         if (Auth::id() !== $post->user_id && Auth::user()->role !== 'admin') {
             abort(403, 'Unauthorized action.');
         }

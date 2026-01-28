@@ -14,7 +14,6 @@ class Profile extends Model
         'github_link',
         'portfolio_link',
         'reputation_score',
-        'location',
     ];
 
     protected $appends = ['avatar_url'];
@@ -35,5 +34,24 @@ class Profile extends Model
     public function techTags()
     {
         return $this->belongsToMany(TechTag::class, 'profile_tech_tag');
+    }
+
+    // Add reputation methods
+    public function incrementReputation($points, $action)
+    {
+        $this->reputation_score += $points;
+        $this->save();
+
+        // Create reputation log
+        \App\Models\ReputationLog::create([
+            'user_id' => $this->user_id,
+            'action' => $action,
+            'points' => $points,
+        ]);
+    }
+
+    public function decrementReputation($points, $action)
+    {
+        $this->incrementReputation(-$points, $action);
     }
 }
