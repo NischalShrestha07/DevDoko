@@ -49,14 +49,17 @@
 
                 <div class="d-flex mb-3">
                     <div class="me-4">
-                        <span class="fw-bold">{{ $posts->total() }}</span> posts
+                        {{-- <span class="fw-bold">{{ $posts->total() }}</span> posts --}}
+                        <span class="stat-value">{{ auth()->user()->posts->count() ?? 0 }}</span> posts
                     </div>
                     <a href="{{ route('users.followers', $profile->user) }}"
                         class="text-decoration-none text-dark me-4">
-                        <span class="fw-bold">{{ $profile->user->followers_count ?? 0 }}</span> followers
+                        {{-- <span class="fw-bold">{{ $profile->user->followers_count ?? 0 }}</span> followers --}}
+                        <span class="stat-value">{{ auth()->user()->followers->count() ?? 0 }}</span> followers
                     </a>
                     <a href="{{ route('users.following', $profile->user) }}" class="text-decoration-none text-dark">
-                        <span class="fw-bold">{{ $profile->user->following_count ?? 0 }}</span> following
+                        {{-- <span class="fw-bold">{{ $profile->user->following_count ?? 0 }}</span> following --}}
+                        <span class="stat-value">{{ auth()->user()->following->count() ?? 0 }}</span> following
                     </a>
                 </div>
 
@@ -97,6 +100,7 @@
                 </div>
                 @endif
             </div>
+
         </div>
     </div>
 </div>

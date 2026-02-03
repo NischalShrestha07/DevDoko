@@ -24,7 +24,7 @@ class PostController extends Controller
         // Validate based on post type
         $validationRules = [
             'type' => 'required|in:text,image,video,code',
-            'caption' => 'required|string|max:2000',
+            'caption' => 'required|string|max:20000',
             'visibility' => 'required|in:public,followers',
             'tags' => 'nullable|string|max:255',
             'location' => 'nullable|string|max:100',

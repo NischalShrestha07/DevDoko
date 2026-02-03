@@ -81,10 +81,6 @@
             <span style="background: #007acc; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px;">
                 {{ $post->codeSnippet->language }}
             </span>
-            <button onclick="copyCode('{{ $post->id }}')"
-                style="background: #2d2d30; color: #d4d4d4; border: 1px solid #3e3e42; padding: 4px 12px; border-radius: 4px; font-size: 12px; cursor: pointer;">
-                <i class="bi bi-clipboard"></i> Copy
-            </button>
         </div>
         <pre
             style="margin: 0; font-family: 'Consolas', 'Monaco', monospace; font-size: 14px; line-height: 1.5;"><code id="code-{{ $post->id }}">{{ $post->codeSnippet->code }}</code></pre>
