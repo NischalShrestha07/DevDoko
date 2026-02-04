@@ -18,7 +18,7 @@ class ProfileController extends Controller
     {
         $profile = Profile::with([
             'user.posts' => function ($query) {
-                $query->with(['likes', 'comments', 'tags', 'media', 'codeSnippet'])
+                $query->with(['likes', 'comments', 'tags', 'media'])
                     ->latest();
             },
             'user.followers',

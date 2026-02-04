@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class PostController extends Controller
 {
@@ -48,6 +49,15 @@ class PostController extends Controller
     public function store(Request $request)
     {
         try {
+            Log::info('Post creation request received', ['user_id' => Auth::id(), 'type' => $request->type]);
+
+            // DEBUG: Log what's in the request
+            Log::debug('Request data', [
+                'type' => $request->type,
+                'has_video' => $request->hasFile('video'),
+                'video_size' => $request->file('video') ? $request->file('video')->getSize() : null,
+                'all_data' => $request->except(['_token', 'video'])
+            ]);
             $validator = Validator::make($request->all(), [
                 'title' => 'nullable|string|max:200',
                 'content' => 'nullable|string|max:20000',
@@ -66,13 +76,21 @@ class PostController extends Controller
 
 
             if ($validator->fails()) {
-                return back()->withErrors($validator)->withInput();
+                Log::warning('Post validation failed', ['errors' => $validator->errors()->all()]);
+
+                // DEBUG: Check what we're returning
+                $response = back()->withErrors($validator)->withInput();
+                Log::debug('Returning response type: ' . get_class($response));
+
+                return $response;
             }
 
             $validated = $validator->validated();
+            Log::info('Post validation passed', ['type' => $validated['type']]);
 
             // Validate content based on type
             if (!$this->validatePostContent($request, $validated['type'])) {
+                Log::warning('Post content validation failed');
                 return back()->withErrors(['content' => 'Please provide content for your post type.'])->withInput();
             }
 
@@ -98,26 +116,41 @@ class PostController extends Controller
                 'reading_time' => $this->calculateReadingTime($validated['content'] ?? '')
             ];
 
+            Log::info('Creating post', $postData);
 
             $post = Post::create($postData);
-            // return $post;
+            Log::info('Post created successfully', ['post_id' => $post->id]);
 
             // Handle tags
             $this->handleTags($request, $post);
+            Log::info('Tags handled for post', ['post_id' => $post->id]);
 
             // Create notification for followers
-            $this->notifyFollowers($post);
+            try {
+                $this->notifyFollowers($post);
+                Log::info('Notifications sent for post', ['post_id' => $post->id]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send notifications', ['error' => $e->getMessage()]);
+                // Don't fail the post creation if notifications fail
+            }
 
-            // Create activity log
-            activity()
-                ->causedBy(Auth::user())
-                ->performedOn($post)
-                ->log('created_post');
+            // Create activity log if package exists
+            try {
+                if (function_exists('activity')) {
+                    activity()
+                        ->causedBy(Auth::user())
+                        ->performedOn($post)
+                        ->log('created_post');
+                    Log::info('Activity log created');
+                }
+            } catch (\Exception $e) {
+                Log::warning('Activity log failed', ['error' => $e->getMessage()]);
+            }
 
             return redirect()->route('posts.show', $post)
                 ->with('success', 'Post created successfully!');
         } catch (\Exception $e) {
-            \Log::error('Post creation failed: ' . $e->getMessage(), [
+            Log::error('Post creation failed: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'user_id' => Auth::id(),
                 'request' => $request->except(['image', 'video'])
@@ -137,7 +170,9 @@ class PostController extends Controller
         $post->load([
             'user.profile',
             'comments' => function ($query) {
-                $query->with(['user.profile', 'replies.user.profile'])
+                $query->with(['user.profile', 'replies' => function ($q) {
+                    $q->with('user.profile')->orderBy('created_at', 'desc');
+                }])
                     ->whereNull('parent_id')
                     ->orderBy('created_at', 'desc')
                     ->take(10);
@@ -261,10 +296,16 @@ class PostController extends Controller
         }
 
         // Create activity log
-        activity()
-            ->causedBy(Auth::user())
-            ->performedOn($post)
-            ->log('updated_post');
+        try {
+            if (function_exists('activity')) {
+                activity()
+                    ->causedBy(Auth::user())
+                    ->performedOn($post)
+                    ->log('updated_post');
+            }
+        } catch (\Exception $e) {
+            Log::warning('Activity log failed on update', ['error' => $e->getMessage()]);
+        }
 
         return redirect()->route('posts.show', $post)
             ->with('success', 'Post updated successfully!');
@@ -289,10 +330,16 @@ class PostController extends Controller
         }
 
         // Create activity log
-        activity()
-            ->causedBy(Auth::user())
-            ->performedOn($post)
-            ->log('deleted_post');
+        try {
+            if (function_exists('activity')) {
+                activity()
+                    ->causedBy(Auth::user())
+                    ->performedOn($post)
+                    ->log('deleted_post');
+            }
+        } catch (\Exception $e) {
+            Log::warning('Activity log failed on delete', ['error' => $e->getMessage()]);
+        }
 
         $post->delete();
 
@@ -336,7 +383,12 @@ class PostController extends Controller
 
         // Create notification for original post owner
         if ($post->user_id !== Auth::id()) {
-            $post->user->notify(new \App\Notifications\PostShared($sharedPost, Auth::user()));
+            try {
+                // You need to create this notification class
+                // $post->user->notify(new \App\Notifications\PostShared($sharedPost, Auth::user()));
+            } catch (\Exception $e) {
+                Log::error('Failed to send share notification', ['error' => $e->getMessage()]);
+            }
         }
 
         return redirect()->route('posts.show', $sharedPost)
@@ -359,7 +411,14 @@ class PostController extends Controller
     private function handleImageUpload(Request $request): ?string
     {
         if ($request->hasFile('image')) {
-            return $request->file('image')->store('posts/images', 'public');
+            try {
+                $path = $request->file('image')->store('posts/images', 'public');
+                Log::info('Image uploaded successfully', ['path' => $path]);
+                return $path;
+            } catch (\Exception $e) {
+                Log::error('Image upload failed', ['error' => $e->getMessage()]);
+                return null;
+            }
         }
         return null;
     }
@@ -367,26 +426,40 @@ class PostController extends Controller
     private function handleVideoUpload(Request $request): ?string
     {
         if ($request->hasFile('video')) {
-            return $request->file('video')->store('posts/videos', 'public');
+            try {
+                $path = $request->file('video')->store('posts/videos', 'public');
+                Log::info('Video uploaded successfully', ['path' => $path]);
+                return $path;
+            } catch (\Exception $e) {
+                Log::error('Video upload failed', ['error' => $e->getMessage()]);
+                return null;
+            }
         }
         return null;
     }
 
     private function handleTags(Request $request, Post $post): void
     {
-        if ($request->filled('tags')) {
-            $tagNames = array_filter(array_map('trim', explode(',', $request->tags)));
+        try {
+            if ($request->filled('tags')) {
+                $tagNames = array_filter(array_map('trim', explode(',', $request->tags)));
+                Log::info('Processing tags', ['tags' => $tagNames]);
 
-            foreach ($tagNames as $tagName) {
-                if (!empty($tagName) && strlen($tagName) <= 50) {
-                    $slug = Str::slug($tagName);
-                    $tag = Tag::firstOrCreate(
-                        ['slug' => $slug],
-                        ['name' => $tagName, 'slug' => $slug]
-                    );
-                    $post->tags()->attach($tag->id);
+                foreach ($tagNames as $tagName) {
+                    if (!empty($tagName) && strlen($tagName) <= 50) {
+                        $slug = Str::slug($tagName);
+                        $tag = Tag::firstOrCreate(
+                            ['slug' => $slug],
+                            ['name' => $tagName, 'slug' => $slug]
+                        );
+                        Log::info('Attaching tag', ['tag_id' => $tag->id, 'tag_name' => $tag->name]);
+                        $post->tags()->attach($tag->id);
+                    }
                 }
             }
+        } catch (\Exception $e) {
+            Log::error('Tag handling failed', ['error' => $e->getMessage(), 'post_id' => $post->id]);
+            // Don't throw exception - tags are optional
         }
     }
 
@@ -400,14 +473,39 @@ class PostController extends Controller
 
     private function notifyFollowers(Post $post): void
     {
-        if (!in_array($post->visibility, ['public', 'followers'])) {
-            return;
-        }
+        try {
+            if (!in_array($post->visibility, ['public', 'followers'])) {
+                return;
+            }
 
-        $followers = Auth::user()->followers()->where('users.notifications_enabled', true)->get();
+            $followers = Auth::user()->followers;
+            Log::info('Notifying followers', ['count' => $followers->count()]);
 
-        foreach ($followers as $follower) {
-            $follower->notify(new \App\Notifications\NewPostNotification($post, Auth::user()));
+            foreach ($followers as $follower) {
+                try {
+                    // Create notification record
+                    \App\Models\Notification::create([
+                        'user_id' => $follower->id,
+                        'type' => 'new_post',
+                        'data' => json_encode([
+                            'post_id' => $post->id,
+                            'post_title' => $post->title ?? 'New Post',
+                            'user_name' => Auth::user()->name,
+                            'user_id' => Auth::id(),
+                            'message' => Auth::user()->name . ' created a new post'
+                        ]),
+                        'read_at' => null
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Failed to create notification for follower', [
+                        'follower_id' => $follower->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Notify followers failed', ['error' => $e->getMessage()]);
+            // Don't throw - notifications shouldn't break post creation
         }
     }
 }

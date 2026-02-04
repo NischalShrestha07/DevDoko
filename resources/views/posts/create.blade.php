@@ -507,211 +507,243 @@
 </style>
 @endpush
 
-@push('scripts')
+
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize Highlight.js
+    // Initialize Highlight.js
+    if (typeof hljs !== 'undefined') {
         hljs.highlightAll();
+    }
 
-        // Elements
-        const postTypeBtns = document.querySelectorAll('.post-type-btn');
-        const postTypeInput = document.getElementById('postType');
-        const sections = {
-            content: document.getElementById('contentSection'),
-            code: document.getElementById('codeSection'),
-            image: document.getElementById('imageSection'),
-            video: document.getElementById('videoSection'),
-            link: document.getElementById('linkSection'),
-            title: document.getElementById('titleSection')
-        };
-        const submitText = document.getElementById('submitText');
-        const form = document.getElementById('createPostForm');
+    // Elements
+    const postTypeBtns = document.querySelectorAll('.post-type-btn');
+    const postTypeInput = document.getElementById('postType');
+    const sections = {
+        content: document.getElementById('contentSection'),
+        code: document.getElementById('codeSection'),
+        image: document.getElementById('imageSection'),
+        video: document.getElementById('videoSection'),
+        link: document.getElementById('linkSection'),
+        title: document.getElementById('titleSection')
+    };
+    const submitText = document.getElementById('submitText');
+    const form = document.getElementById('createPostForm');
 
-        // Character counters
-        const contentTextarea = document.getElementById('content');
-        const charCount = document.getElementById('charCount');
-        const codeTextarea = document.getElementById('code_snippet');
-        const codeCharCount = document.getElementById('codeCharCount');
-        const readingTime = document.getElementById('readingTime');
+    // Character counters
+    const contentTextarea = document.getElementById('content');
+    const charCount = document.getElementById('charCount');
+    const codeTextarea = document.getElementById('code_snippet');
+    const codeCharCount = document.getElementById('codeCharCount');
+    const readingTime = document.getElementById('readingTime');
 
-        // File upload elements
-        const imageInput = document.getElementById('image');
-        const videoInput = document.getElementById('video');
-        const imagePreview = document.getElementById('imagePreview');
-        const videoPreview = document.getElementById('videoPreview');
-        const imageUploadArea = document.getElementById('imageUploadArea');
-        const videoUploadArea = document.getElementById('videoUploadArea');
-        const browseImageBtn = document.getElementById('browseImage');
-        const browseVideoBtn = document.getElementById('browseVideo');
-        const removeImageBtn = document.getElementById('removeImage');
-        const removeVideoBtn = document.getElementById('removeVideo');
+    // File upload elements
+    const imageInput = document.getElementById('image');
+    const videoInput = document.getElementById('video');
+    const imagePreview = document.getElementById('imagePreview');
+    const videoPreview = document.getElementById('videoPreview');
+    const imageUploadArea = document.getElementById('imageUploadArea');
+    const videoUploadArea = document.getElementById('videoUploadArea');
+    const browseImageBtn = document.getElementById('browseImage');
+    const browseVideoBtn = document.getElementById('browseVideo');
+    const removeImageBtn = document.getElementById('removeImage');
+    const removeVideoBtn = document.getElementById('removeVideo');
 
-        // Tags management
-        const tagInput = document.getElementById('tagInput');
-        const addTagBtn = document.getElementById('addTagBtn');
-        const selectedTagsDiv = document.getElementById('selectedTags');
-        const tagsInput = document.getElementById('tagsInput');
-        const popularTags = document.querySelectorAll('.tag-suggestion');
+    // Tags management
+    const tagInput = document.getElementById('tagInput');
+    const addTagBtn = document.getElementById('addTagBtn');
+    const selectedTagsDiv = document.getElementById('selectedTags');
+    const tagsInput = document.getElementById('tagsInput');
+    const popularTags = document.querySelectorAll('.tag-suggestion');
 
-        // Form submission
-        const submitBtn = document.getElementById('submitBtn');
-        const submitSpinner = document.getElementById('submitSpinner');
+    // Form submission
+    const submitBtn = document.getElementById('submitBtn');
+    const submitSpinner = document.getElementById('submitSpinner');
 
-        // State
-        let selectedTags = new Set(JSON.parse(tagsInput.value || '[]'));
-        let currentActiveType = 'text';
+    // State
+    let selectedTags = new Set();
+    let currentActiveType = 'text';
 
-        // Initialize from old input
-        function initializeFromOldInput() {
-            // Set active type from old input or URL parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const typeFromUrl = urlParams.get('type');
-            const typeFromOld = '{{ old("type", "text") }}';
-            const initialType = typeFromOld !== 'text' ? typeFromOld : (typeFromUrl || 'text');
+    // Initialize tags from hidden input
+    function initializeTags() {
+        if (tagsInput.value) {
+            const tags = tagsInput.value.split(',').filter(tag => tag.trim());
+            tags.forEach(tag => {
+                if (tag.trim()) {
+                    selectedTags.add(tag.trim());
+                }
+            });
+        }
+    }
 
-            // Activate the correct type button
-            document.querySelector(`.post-type-btn[data-type="${initialType}"]`)?.click();
+    // Initialize from old input
+    function initializeFromOldInput() {
+        // Set active type from old input or URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const typeFromUrl = urlParams.get('type');
+        const typeFromOld = '{{ old("type", "text") }}';
 
-            // Set title visibility
-            updateTitleVisibility(initialType);
-
-            // Update submit button text
-            updateSubmitButtonText(initialType);
+        let initialType = 'text';
+        if (typeFromOld && typeFromOld !== 'text') {
+            initialType = typeFromOld;
+        } else if (typeFromUrl) {
+            initialType = typeFromUrl;
         }
 
-        // Post type switching
-        postTypeBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const type = this.dataset.type;
+        // Activate the correct type button
+        const initialBtn = document.querySelector(`.post-type-btn[data-type="${initialType}"]`);
+        if (initialBtn) {
+            activatePostType(initialType, initialBtn);
+        } else {
+            // Fallback to text
+            const textBtn = document.querySelector('.post-type-btn[data-type="text"]');
+            if (textBtn) {
+                activatePostType('text', textBtn);
+            }
+        }
+    }
 
-                // Don't do anything if already active
-                if (currentActiveType === type) return;
+    function activatePostType(type, button) {
+        // Update UI
+        postTypeBtns.forEach(b => b.classList.remove('active'));
+        button.classList.add('active');
+        postTypeInput.value = type;
+        currentActiveType = type;
 
-                // Update UI
-                postTypeBtns.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                postTypeInput.value = type;
-                currentActiveType = type;
-
-                // Hide all sections
-                Object.values(sections).forEach(section => {
-                    if (section) section.classList.add('d-none');
-                });
-
-                // Show appropriate sections
-                updateTitleVisibility(type);
-
-                switch(type) {
-                    case 'code':
-                        sections.code.classList.remove('d-none');
-                        break;
-                    case 'image':
-                        sections.image.classList.remove('d-none');
-                        break;
-                    case 'video':
-                        sections.video.classList.remove('d-none');
-                        break;
-                    case 'link':
-                        sections.link.classList.remove('d-none');
-                        break;
-                    default:
-                        sections.content.classList.remove('d-none');
-                        break;
-                }
-
-                // Update placeholder and submit text
-                updatePlaceholder(type);
-                updateSubmitButtonText(type);
-
-                // Validate form for current type
-                validateForm();
-            });
+        // Hide all sections
+        Object.values(sections).forEach(section => {
+            if (section) section.classList.add('d-none');
         });
 
-        function updateTitleVisibility(type) {
-            if (['text', 'article', 'question', 'project'].includes(type)) {
-                sections.title.classList.remove('d-none');
-            } else {
-                sections.title.classList.add('d-none');
-            }
+        // Show appropriate sections
+        updateTitleVisibility(type);
+
+        switch(type) {
+            case 'code':
+                if (sections.code) sections.code.classList.remove('d-none');
+                break;
+            case 'image':
+                if (sections.image) sections.image.classList.remove('d-none');
+                break;
+            case 'video':
+                if (sections.video) sections.video.classList.remove('d-none');
+                break;
+            case 'link':
+                if (sections.link) sections.link.classList.remove('d-none');
+                break;
+            default:
+                if (sections.content) sections.content.classList.remove('d-none');
+                break;
         }
 
-        function updatePlaceholder(type) {
-            const placeholders = {
-                text: "What's on your mind?",
-                article: "Write your article here...",
-                question: "Ask your question...",
-                project: "Describe your project...",
-                status: "Share an update...",
-                code: "Paste your code here...",
-                image: "Describe your image (optional)...",
-                video: "Describe your video (optional)...",
-                link: ""
-            };
+        // Update placeholder and submit text
+        updatePlaceholder(type);
+        updateSubmitButtonText(type);
 
-            if (contentTextarea && placeholders[type]) {
-                contentTextarea.placeholder = placeholders[type];
-            }
+        // Validate form for current type
+        validateForm();
+    }
+
+    // Post type switching
+    postTypeBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const type = this.dataset.type;
+
+            // Don't do anything if already active
+            if (currentActiveType === type) return;
+
+            activatePostType(type, this);
+        });
+    });
+
+    function updateTitleVisibility(type) {
+        if (!sections.title) return;
+
+        if (['text', 'article', 'question', 'project'].includes(type)) {
+            sections.title.classList.remove('d-none');
+        } else {
+            sections.title.classList.add('d-none');
         }
+    }
 
-        function updateSubmitButtonText(type) {
-            const buttonTexts = {
-                text: "Publish Post",
-                code: "Share Code",
-                image: "Share Image",
-                video: "Share Video",
-                link: "Share Link",
-                question: "Ask Question",
-                project: "Share Project",
-                article: "Publish Article",
-                status: "Share Update"
-            };
+    function updatePlaceholder(type) {
+        const placeholders = {
+            text: "What's on your mind?",
+            article: "Write your article here...",
+            question: "Ask your question...",
+            project: "Describe your project...",
+            status: "Share an update...",
+            code: "Paste your code here...",
+            image: "Describe your image (optional)...",
+            video: "Describe your video (optional)...",
+            link: ""
+        };
 
-            if (submitText) {
-                const text = buttonTexts[type] || "Publish Post";
-                submitText.innerHTML = `<i class="bi bi-send"></i> ${text}`;
-            }
+        if (contentTextarea && placeholders[type]) {
+            contentTextarea.placeholder = placeholders[type];
         }
+    }
 
-        // Character counter for content
-        if (contentTextarea && charCount && readingTime) {
-            contentTextarea.addEventListener('input', function() {
-                const length = this.value.length;
-                charCount.textContent = length;
+    function updateSubmitButtonText(type) {
+        const buttonTexts = {
+            text: "Publish Post",
+            code: "Share Code",
+            image: "Share Image",
+            video: "Share Video",
+            link: "Share Link",
+            question: "Ask Question",
+            project: "Share Project",
+            article: "Publish Article",
+            status: "Share Update"
+        };
 
-                // Calculate reading time (200 words per minute)
-                const words = this.value.trim().split(/\s+/).length;
-                const minutes = Math.max(1, Math.ceil(words / 200));
-                readingTime.textContent = `${minutes} min read`;
-
-                // Validate form
-                validateForm();
-            });
-
-            // Trigger initial calculation
-            contentTextarea.dispatchEvent(new Event('input'));
+        if (submitText) {
+            const text = buttonTexts[type] || "Publish Post";
+            submitText.innerHTML = `<i class="bi bi-send"></i> ${text}`;
         }
+    }
 
-        // Character counter for code
-        if (codeTextarea && codeCharCount) {
-            codeTextarea.addEventListener('input', function() {
-                codeCharCount.textContent = this.value.length;
-                validateForm();
-            });
-            codeTextarea.dispatchEvent(new Event('input'));
-        }
+    // Character counter for content
+    if (contentTextarea && charCount && readingTime) {
+        contentTextarea.addEventListener('input', function() {
+            const length = this.value.length;
+            if (charCount) charCount.textContent = length;
 
-        // Image upload handling
-        if (browseImageBtn && imageInput) {
-            browseImageBtn.addEventListener('click', () => imageInput.click());
+            // Calculate reading time (200 words per minute)
+            const words = this.value.trim().split(/\s+/).length;
+            const minutes = Math.max(1, Math.ceil(words / 200));
+            if (readingTime) readingTime.textContent = `${minutes} min read`;
+
+            // Validate form
+            validateForm();
+        });
+
+        // Trigger initial calculation
+        contentTextarea.dispatchEvent(new Event('input'));
+    }
+
+    // Character counter for code
+    if (codeTextarea && codeCharCount) {
+        codeTextarea.addEventListener('input', function() {
+            if (codeCharCount) codeCharCount.textContent = this.value.length;
+            validateForm();
+        });
+        codeTextarea.dispatchEvent(new Event('input'));
+    }
+
+    // Image upload handling
+    if (browseImageBtn && imageInput) {
+        browseImageBtn.addEventListener('click', () => imageInput.click());
+
+        if (imageUploadArea) {
             imageUploadArea.addEventListener('click', () => imageInput.click());
 
             imageUploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
-                imageUploadArea.style.borderColor = 'var(--primary-color)';
+                imageUploadArea.style.borderColor = '#0d6efd';
                 imageUploadArea.style.backgroundColor = 'rgba(13, 110, 253, 0.1)';
             });
 
@@ -730,325 +762,270 @@
                     handleImageUpload(e.dataTransfer.files[0]);
                 }
             });
-
-            imageInput.addEventListener('change', function(e) {
-                if (this.files.length) {
-                    handleImageUpload(this.files[0]);
-                }
-            });
         }
 
-        if (removeImageBtn) {
-            removeImageBtn.addEventListener('click', function() {
-                imagePreview.classList.add('d-none');
-                imageUploadArea.classList.remove('d-none');
-                imageInput.value = '';
-                validateForm();
-            });
+        imageInput.addEventListener('change', function(e) {
+            if (this.files.length) {
+                handleImageUpload(this.files[0]);
+            }
+        });
+    }
+
+    if (removeImageBtn) {
+        removeImageBtn.addEventListener('click', function() {
+            if (imagePreview) imagePreview.classList.add('d-none');
+            if (imageUploadArea) imageUploadArea.classList.remove('d-none');
+            if (imageInput) imageInput.value = '';
+            validateForm();
+        });
+    }
+
+    function handleImageUpload(file) {
+        // Validate file
+        if (!file.type.match('image.*')) {
+            alert('Please select an image file (JPEG, PNG, GIF, WebP, SVG).');
+            return;
         }
 
-        function handleImageUpload(file) {
-            // Validate file
-            if (!file.type.match('image.*')) {
-                alert('Please select an image file (JPEG, PNG, GIF, WebP, SVG).');
-                return;
-            }
+        if (file.size > 20 * 1024 * 1024) {
+            alert('File size must be less than 20MB.');
+            return;
+        }
 
-            if (file.size > 20 * 1024 * 1024) {
-                alert('File size must be less than 20MB.');
-                return;
-            }
-
-            // Show preview
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                imagePreview.querySelector('img').src = e.target.result;
+        // Show preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            if (imagePreview) {
+                const img = imagePreview.querySelector('img');
+                if (img) img.src = e.target.result;
                 imagePreview.classList.remove('d-none');
-                imageUploadArea.classList.add('d-none');
-                validateForm();
-            };
-            reader.readAsDataURL(file);
-        }
+            }
+            if (imageUploadArea) imageUploadArea.classList.add('d-none');
+            validateForm();
+        };
+        reader.readAsDataURL(file);
+    }
 
-        // Video upload handling
-        if (browseVideoBtn && videoInput) {
-            browseVideoBtn.addEventListener('click', () => videoInput.click());
+    // Video upload handling
+    if (browseVideoBtn && videoInput) {
+        browseVideoBtn.addEventListener('click', () => videoInput.click());
+
+        if (videoUploadArea) {
             videoUploadArea.addEventListener('click', () => videoInput.click());
-
-            videoInput.addEventListener('change', function(e) {
-                if (this.files.length) {
-                    handleVideoUpload(this.files[0]);
-                }
-            });
         }
 
-        if (removeVideoBtn) {
-            removeVideoBtn.addEventListener('click', function() {
-                videoPreview.classList.add('d-none');
-                videoUploadArea.classList.remove('d-none');
-                videoInput.value = '';
-                validateForm();
-            });
+        videoInput.addEventListener('change', function(e) {
+            if (this.files.length) {
+                handleVideoUpload(this.files[0]);
+            }
+        });
+    }
+
+    if (removeVideoBtn) {
+        removeVideoBtn.addEventListener('click', function() {
+            if (videoPreview) videoPreview.classList.add('d-none');
+            if (videoUploadArea) videoUploadArea.classList.remove('d-none');
+            if (videoInput) videoInput.value = '';
+            validateForm();
+        });
+    }
+
+    function handleVideoUpload(file) {
+        // Validate file
+        const videoTypes = ['video/mp4', 'video/avi', 'video/quicktime', 'video/x-ms-wmv'];
+        if (!videoTypes.some(type => file.type.includes(type))) {
+            alert('Please select a video file (MP4, AVI, MOV, WMV).');
+            return;
         }
 
-        function handleVideoUpload(file) {
-            // Validate file
-            const videoTypes = ['video/mp4', 'video/avi', 'video/quicktime', 'video/x-ms-wmv'];
-            if (!videoTypes.some(type => file.type.includes(type))) {
-                alert('Please select a video file (MP4, AVI, MOV, WMV).');
-                return;
-            }
+        if (file.size > 50 * 1024 * 1024) {
+            alert('File size must be less than 50MB.');
+            return;
+        }
 
-            if (file.size > 50 * 1024 * 1024) {
-                alert('File size must be less than 50MB.');
-                return;
-            }
-
-            // Show preview
-            const url = URL.createObjectURL(file);
+        // Show preview
+        const url = URL.createObjectURL(file);
+        if (videoPreview) {
             const videoPlayer = videoPreview.querySelector('#videoPlayer');
-            videoPlayer.src = url;
-            videoPreview.classList.remove('d-none');
-            videoUploadArea.classList.add('d-none');
-            validateForm();
-        }
-
-        // Tags management
-        function addTag(tagName) {
-            tagName = tagName.trim().toLowerCase();
-
-            if (!tagName || selectedTags.size >= 10) return;
-
-            // Check if tag already exists
-            if (Array.from(selectedTags).some(tag => tag.toLowerCase() === tagName)) {
-                return;
+            if (videoPlayer) {
+                videoPlayer.src = url;
+                videoPreview.classList.remove('d-none');
             }
+        }
+        if (videoUploadArea) videoUploadArea.classList.add('d-none');
+        validateForm();
+    }
 
-            selectedTags.add(tagName);
+    // Tags management
+    function addTag(tagName) {
+        tagName = tagName.trim().toLowerCase();
 
-            const tagElement = document.createElement('div');
-            tagElement.className = 'selected-tag rounded-pill px-3 py-1 d-flex align-items-center';
-            tagElement.innerHTML = `
-                <i class="bi bi-hash me-1"></i>${tagName}
-                <button type="button" class="btn-close btn-close-sm ms-2" data-tag-name="${tagName}"></button>
-            `;
+        if (!tagName || selectedTags.size >= 10) return;
 
-            selectedTagsDiv.appendChild(tagElement);
-            updateTagsInput();
-            validateForm();
+        // Check if tag already exists
+        if (Array.from(selectedTags).some(tag => tag.toLowerCase() === tagName)) {
+            return;
         }
 
-        function removeTag(tagName) {
-            selectedTags.delete(tagName);
-            updateTagsInput();
-            validateForm();
+        selectedTags.add(tagName);
 
-            // Remove from UI
+        const tagElement = document.createElement('div');
+        tagElement.className = 'selected-tag rounded-pill px-3 py-1 d-flex align-items-center';
+        tagElement.innerHTML = `
+            <i class="bi bi-hash me-1"></i>${tagName}
+            <button type="button" class="btn-close btn-close-sm ms-2" data-tag-name="${tagName}"></button>
+        `;
+
+        if (selectedTagsDiv) selectedTagsDiv.appendChild(tagElement);
+        updateTagsInput();
+        validateForm();
+    }
+
+    function removeTag(tagName) {
+        selectedTags.delete(tagName);
+        updateTagsInput();
+        validateForm();
+
+        // Remove from UI
+        if (selectedTagsDiv) {
             const tagElement = selectedTagsDiv.querySelector(`[data-tag-name="${tagName}"]`);
             if (tagElement) {
                 tagElement.parentElement.remove();
             }
         }
+    }
 
-        function updateTagsInput() {
+    function updateTagsInput() {
+        if (tagsInput) {
             tagsInput.value = Array.from(selectedTags).join(',');
         }
+    }
 
-        // Initialize tags from old input
-        if (tagsInput.value) {
-            const tags = tagsInput.value.split(',').filter(tag => tag.trim());
-            tags.forEach(tag => addTag(tag));
-        }
+    // Initialize tags from old input
+    initializeTags();
 
-        // Add tag from input
-        if (addTagBtn && tagInput) {
-            addTagBtn.addEventListener('click', function() {
-                const tagName = tagInput.value.trim();
+    // Add tag from input
+    if (addTagBtn && tagInput) {
+        addTagBtn.addEventListener('click', function() {
+            const tagName = tagInput.value.trim();
+            if (tagName) {
+                addTag(tagName);
+                tagInput.value = '';
+            }
+        });
+
+        tagInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ',' || e.key === ' ') {
+                e.preventDefault();
+                const tagName = this.value.trim();
                 if (tagName) {
                     addTag(tagName);
-                    tagInput.value = '';
+                    this.value = '';
                 }
-            });
+            }
+        });
+    }
 
-            tagInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' || e.key === ',' || e.key === ' ') {
-                    e.preventDefault();
-                    const tagName = this.value.trim();
-                    if (tagName) {
-                        addTag(tagName);
-                        this.value = '';
-                    }
-                }
+    // Add tag from popular tags
+    if (popularTags) {
+        popularTags.forEach(tag => {
+            tag.addEventListener('click', function() {
+                const tagName = this.dataset.tagName;
+                addTag(tagName);
             });
-        }
+        });
+    }
 
-        // Add tag from popular tags
-        if (popularTags) {
-            popularTags.forEach(tag => {
-                tag.addEventListener('click', function() {
-                    const tagName = this.dataset.tagName;
-                    addTag(tagName);
-                });
-            });
-        }
-
-        // Remove tag
+    // Remove tag
+    if (selectedTagsDiv) {
         selectedTagsDiv.addEventListener('click', function(e) {
             if (e.target.classList.contains('btn-close')) {
                 const tagName = e.target.dataset.tagName;
                 removeTag(tagName);
             }
         });
+    }
 
-        // Form validation
-        function validateForm() {
-            const type = currentActiveType;
-            let isValid = true;
-            let errorMessage = '';
+    // Form validation
+    function validateForm() {
+        const type = currentActiveType;
+        let isValid = true;
+        let errorMessage = '';
 
-            switch(type) {
-                case 'text':
-                case 'article':
-                case 'question':
-                case 'project':
-                case 'status':
-                    if (!contentTextarea.value.trim()) {
-                        isValid = false;
-                        errorMessage = 'Please add some content.';
-                    }
-                    break;
-
-                case 'code':
-                    if (!codeTextarea.value.trim()) {
-                        isValid = false;
-                        errorMessage = 'Please add some code.';
-                    }
-                    break;
-
-                case 'image':
-                    if (!imageInput.files.length && !contentTextarea.value.trim()) {
-                        isValid = false;
-                        errorMessage = 'Please add an image or description.';
-                    }
-                    break;
-
-                case 'video':
-                    if (!videoInput.files.length && !contentTextarea.value.trim()) {
-                        isValid = false;
-                        errorMessage = 'Please add a video or description.';
-                    }
-                    break;
-
-                case 'link':
-                    const linkUrl = document.getElementById('link_url');
-                    if (!linkUrl.value.trim()) {
-                        isValid = false;
-                        errorMessage = 'Please enter a URL.';
-                    }
-                    break;
-            }
-
-            // Update submit button state
-            if (submitBtn) {
-                submitBtn.disabled = !isValid;
-                submitBtn.title = isValid ? '' : errorMessage;
-            }
-
-            return isValid;
-        }
-
-        // Form submission
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                if (!validateForm()) {
-                    e.preventDefault();
-                    alert('Please fill in all required fields.');
-                    return;
+        switch(type) {
+            case 'text':
+            case 'article':
+            case 'question':
+            case 'project':
+            case 'status':
+                if (contentTextarea && !contentTextarea.value.trim()) {
+                    isValid = false;
+                    errorMessage = 'Please add some content.';
                 }
+                break;
 
-                // Show loading state
-                submitBtn.disabled = true;
-                submitText.classList.add('d-none');
-                submitSpinner.classList.remove('d-none');
+            case 'code':
+                if (codeTextarea && !codeTextarea.value.trim()) {
+                    isValid = false;
+                    errorMessage = 'Please add some code.';
+                }
+                break;
 
-                // Optional: Show preview before submission
-                // e.preventDefault();
-                // showPreview();
-            });
+            case 'image':
+                if (imageInput && !imageInput.files.length &&
+                    contentTextarea && !contentTextarea.value.trim()) {
+                    isValid = false;
+                    errorMessage = 'Please add an image or description.';
+                }
+                break;
+
+            case 'video':
+                if (videoInput && !videoInput.files.length &&
+                    contentTextarea && !contentTextarea.value.trim()) {
+                    isValid = false;
+                    errorMessage = 'Please add a video or description.';
+                }
+                break;
+
+            case 'link':
+                const linkUrl = document.getElementById('link_url');
+                if (linkUrl && !linkUrl.value.trim()) {
+                    isValid = false;
+                    errorMessage = 'Please enter a URL.';
+                }
+                break;
         }
 
-        // Preview functionality
-        function showPreview() {
-            const type = currentActiveType;
-            let previewHTML = '';
+        // Update submit button state
+        if (submitBtn) {
+            submitBtn.disabled = !isValid;
+            if (!isValid) {
+                submitBtn.setAttribute('title', errorMessage);
+            } else {
+                submitBtn.removeAttribute('title');
+            }
+        }
 
-            switch(type) {
-                case 'text':
-                case 'article':
-                case 'question':
-                case 'project':
-                case 'status':
-                    previewHTML = marked.parse(contentTextarea.value);
-                    break;
+        return isValid;
+    }
 
-                case 'code':
-                    const language = document.getElementById('code_language').value || 'plaintext';
-                    const code = codeTextarea.value;
-                    previewHTML = `<pre><code class="language-${language}">${hljs.highlight(code, { language }).value}</code></pre>`;
-                    break;
-
-                case 'image':
-                    if (imagePreview.querySelector('img').src) {
-                        previewHTML = `<img src="${imagePreview.querySelector('img').src}" class="img-fluid rounded" alt="Preview">`;
-                        if (contentTextarea.value.trim()) {
-                            previewHTML += `<div class="mt-3">${marked.parse(contentTextarea.value)}</div>`;
-                        }
-                    }
-                    break;
-
-                case 'link':
-                    const linkUrl = document.getElementById('link_url').value;
-                    const linkTitle = document.getElementById('link_title').value || 'Link';
-                    const linkDesc = document.getElementById('link_description').value || '';
-                    previewHTML = `
-                        <div class="card">
-                            <div class="card-body">
-                                <h5><a href="${linkUrl}" target="_blank">${linkTitle}</a></h5>
-                                ${linkDesc ? `<p>${linkDesc}</p>` : ''}
-                                <small class="text-muted">${new URL(linkUrl).hostname}</small>
-                            </div>
-                        </div>
-                    `;
-                    break;
+    // Form submission
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (!validateForm()) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+                return;
             }
 
-            // Add tags preview
-            if (selectedTags.size > 0) {
-                previewHTML += `<div class="mt-3"><strong>Tags:</strong> ${Array.from(selectedTags).map(tag => `<span class="badge bg-primary me-1">#${tag}</span>`).join('')}</div>`;
-            }
-
-            document.getElementById('previewContent').innerHTML = previewHTML;
-            new bootstrap.Modal(document.getElementById('previewModal')).show();
-        }
-
-        // Initialize the form
-        initializeFromOldInput();
-
-        // Auto-save draft (optional)
-        let autoSaveTimer;
-        function autoSaveDraft() {
-            clearTimeout(autoSaveTimer);
-            autoSaveTimer = setTimeout(() => {
-                const formData = new FormData(form);
-                // Send AJAX request to save draft
-                console.log('Auto-saving draft...');
-            }, 3000);
-        }
-
-        // Add auto-save listeners
-        [contentTextarea, codeTextarea, tagInput].forEach(el => {
-            if (el) el.addEventListener('input', autoSaveDraft);
+            // Show loading state
+            if (submitBtn) submitBtn.disabled = true;
+            if (submitText) submitText.classList.add('d-none');
+            if (submitSpinner) submitSpinner.classList.remove('d-none');
         });
-    });
+    }
+
+    // Initialize the form
+    initializeFromOldInput();
+});
 </script>
-@endpush

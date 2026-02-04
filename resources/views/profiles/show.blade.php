@@ -142,14 +142,9 @@
                         <div class="text-center">
                             <i class="bi bi-code-slash fs-1"></i>
                             <div class="mt-2">Code Snippet</div>
-                            <small class="text-muted">{{ $post->code_snippet->language ?? '' }}</small>
-                        </div>
-                    </div>
-                    @else
-                    <div class="bg-light p-4 rounded h-100 d-flex align-items-center justify-content-center">
-                        <div class="text-center">
-                            <i class="bi bi-file-text fs-1 text-muted"></i>
-                            <div class="mt-2 text-muted">Text Post</div>
+                            <small class="text-muted">
+                                {{ $post->code_language ?? '' }}
+                            </small>
                         </div>
                     </div>
                     @endif
@@ -189,32 +184,7 @@
     </div>
 </div>
 
-<!-- Developer Stats -->
-<div class="card border-0 shadow-sm mb-4">
-    <div class="card-header bg-white">
-        <h6 class="mb-0 fw-bold">Developer Stats</h6>
-    </div>
-    <div class="card-body">
-        <div class="row text-center">
-            <div class="col-3">
-                <div class="display-6 fw-bold text-primary">{{ $profile->user->developer_score }}</div>
-                <small class="text-muted">Dev Score</small>
-            </div>
-            <div class="col-3">
-                <div class="display-6 fw-bold text-success">{{ $profile->user->code_posts_count ?? 0 }}</div>
-                <small class="text-muted">Code Posts</small>
-            </div>
-            <div class="col-3">
-                <div class="display-6 fw-bold text-info">{{ $profile->user->projects_count ?? 0 }}</div>
-                <small class="text-muted">Projects</small>
-            </div>
-            <div class="col-3">
-                <div class="display-6 fw-bold text-warning">{{ $profile->user->contributions_count ?? 0 }}</div>
-                <small class="text-muted">Contributions</small>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <!-- GitHub Integration -->
 @if($profile->github_link)
@@ -237,27 +207,5 @@
 </div>
 @endif
 
-<!-- Tech Stack Badges -->
-<div class="card border-0 shadow-sm mb-4">
-    <div class="card-header bg-white">
-        <h6 class="mb-0 fw-bold">Tech Stack</h6>
-    </div>
-    <div class="card-body">
-        <div class="d-flex flex-wrap gap-2">
-            @foreach($profile->techTags as $tech)
-            <a href="{{ route('tech.show', $tech->name) }}" class="tech-badge">
-                <span class="badge bg-primary px-3 py-2">
-                    <i class="bi bi-tag-fill me-1"></i> {{ $tech->name }}
-                </span>
-            </a>
-            @endforeach
-        </div>
-        @if(auth()->id() === $profile->user_id)
-        <button class="btn btn-sm btn-outline-primary mt-3" data-bs-toggle="modal" data-bs-target="#editTechStack">
-            <i class="bi bi-plus-circle"></i> Add Tech Stack
-        </button>
-        @endif
-    </div>
-</div>
 
 @endsection

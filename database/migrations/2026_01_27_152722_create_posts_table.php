@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->enum('type', ['text', 'code', 'image', 'question', 'project', 'status']);
+            $table->enum('type', ['text', 'code', 'image', 'question', 'project', 'status', 'video', 'share', 'link']);
             $table->string('title')->nullable();
             $table->text('content')->nullable();
             $table->text('code_snippet')->nullable();

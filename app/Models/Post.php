@@ -281,6 +281,7 @@ class Post extends Model
     {
         return match ($this->type) {
             'code' => 'Code',
+            'share' => 'Share',
             'image' => 'Image',
             'video' => 'Video',
             'link' => 'Link',
