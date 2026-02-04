@@ -9,43 +9,30 @@ use Illuminate\Support\Facades\Auth;
 
 class LikeController extends Controller
 {
-    public function __construct()
-    {
-        // $this->middleware('auth');
-    }
-
-    // Toggle like on a post
     public function toggle(Post $post)
     {
         $user = Auth::user();
 
-        // Check if user can like this post
-        if (
-            $post->visibility === 'followers' &&
-            !$user->isFollowing($post->user) &&
-            $user->id !== $post->user_id
-        ) {
-            return response()->json(['error' => 'Not authorized'], 403);
-        }
+        $like = $post->likes()->where('user_id', $user->id)->first();
 
-        $existingLike = $post->likes()->where('user_id', $user->id)->first();
-
-        if ($existingLike) {
-            $existingLike->delete();
+        if ($like) {
+            $like->delete();
             $liked = false;
         } else {
-            Like::create([
-                'user_id' => $user->id,
-                'post_id' => $post->id,
-            ]);
+            $post->likes()->create(['user_id' => $user->id]);
             $liked = true;
         }
 
-        $likesCount = $post->likes()->count();
+        // Update like count
+        $post->updateLikeCount();
 
-        return response()->json([
-            'liked' => $liked,
-            'likes_count' => $likesCount,
-        ]);
+        if (request()->ajax()) {
+            return response()->json([
+                'liked' => $liked,
+                'likes_count' => $post->fresh()->likes_count
+            ]);
+        }
+
+        return back();
     }
 }

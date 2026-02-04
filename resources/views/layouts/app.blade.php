@@ -14,6 +14,24 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 
+
+
+    <!-- Markdown Editor -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+
+    <!-- Highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+    <!-- Emoji Picker -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emoji-mart@latest/css/emoji-mart.css">
+    <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
+
+    <!-- File Upload Enhancement -->
+    <script src="https://cdn.jsdelivr.net/npm/filepond@latest/dist/filepond.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/filepond@latest/dist/filepond.min.css">
+
     <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
 
     <style>
@@ -679,6 +697,7 @@
                     </div>
                 </div>
             </div>
+
 
             <!-- Suggestions -->
             @if(isset($suggestedUsers) && $suggestedUsers->count() > 0)

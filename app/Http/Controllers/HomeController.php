@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\User;
-use App\Models\TechTag;
+use App\Models\Tag;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
@@ -16,135 +16,61 @@ class HomeController extends Controller
             return redirect()->route('home');
         }
 
-        // Get trending posts (developer-focused)
-        $posts = Post::with(['user.profile', 'likes', 'comments', 'codeSnippet'])
-            ->where('visibility', 'public')
-            ->where(function ($query) {
-                $query->where('type', 'code')
-                    ->orWhereHas('tags', function ($q) {
-                        $q->whereIn('name', ['laravel', 'react', 'python', 'javascript', 'php', 'webdev']);
-                    });
-            })
-            ->latest()
-            ->take(9)
-            ->get();
-
-        // Get popular tech tags
-        $techTags = TechTag::withCount('profiles')
-            ->orderBy('profiles_count', 'desc')
-            ->take(10)
-            ->get();
-
-        return view('welcome', compact('posts', 'techTags'));
+        return view('welcome');
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
 
-        // Get IDs of users that the current user follows
-        $followingIds = $user->following()->pluck('users.id')->toArray();
-        $followingIds[] = $user->id; // Include user's own posts
-
-        // Get posts from followed users and public posts
-        $posts = Post::with([
-            'user.profile',
-            'likes' => function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            },
-            'comments' => function ($query) {
-                $query->with('user.profile')->latest()->take(3);
-            },
-            'media',
-            'codeSnippet',
-            'tags'
-        ])
-            ->withCount(['likes', 'comments'])
-            ->where(function ($query) use ($followingIds, $user) {
-                // Posts from followed users
-                $query->whereIn('user_id', $followingIds)
-                    ->where(function ($q) use ($user) {
-                        $q->where('visibility', 'public')
-                            ->orWhere('visibility', 'followers');
-                    });
-
-                // Public posts from non-followed users (for discovery)
-                $query->orWhere(function ($q) use ($followingIds) {
-                    $q->where('visibility', 'public')
-                        ->whereNotIn('user_id', $followingIds);
-                });
-            })
-            ->latest()
+        // Get posts for feed
+        $posts = Post::with(['user.profile', 'likes', 'comments.user.profile', 'tags'])
+            ->visibleTo($user)
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        // Get suggested users based on tech stack
-        $userTechTags = $user->profile->techTags()->pluck('tech_tags.id');
-
-        $suggestedUsers = User::whereNotIn('id', $followingIds)
-            ->where('id', '!=', $user->id)
-            ->whereHas('profile.techTags', function ($query) use ($userTechTags) {
-                $query->whereIn('tech_tags.id', $userTechTags);
+        // Get suggested users (excluding already followed)
+        $suggestedUsers = User::where('id', '!=', $user->id)
+            ->whereDoesntHave('followers', function ($query) use ($user) {
+                $query->where('follower_id', $user->id);
             })
-            ->with(['profile', 'posts' => function ($query) {
-                $query->latest()->take(3);
-            }])
-            ->whereHas('posts')
+            ->with('profile')
             ->inRandomOrder()
             ->limit(5)
             ->get();
 
-        // If not enough suggestions, get random active developers
-        if ($suggestedUsers->count() < 3) {
-            $additionalUsers = User::whereNotIn('id', $followingIds)
-                ->where('id', '!=', $user->id)
-                ->with(['profile', 'posts' => function ($query) {
-                    $query->latest()->take(3);
-                }])
-                ->whereHas('posts')
-                ->inRandomOrder()
-                ->limit(5 - $suggestedUsers->count())
-                ->get();
+        // Get trending tags
+        $trendingTags = Tag::withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->limit(10)
+            ->get();
 
-            $suggestedUsers = $suggestedUsers->merge($additionalUsers);
-        }
-
-        return view('home', compact('posts', 'suggestedUsers'));
+        return view('home', compact('posts', 'suggestedUsers', 'trendingTags'));
     }
 
-    // Developer Explore Page
-    public function explore()
+    public function feed(Request $request)
     {
-        // Trending code snippets
-        $trendingCode = Post::with(['user.profile', 'codeSnippet'])
-            ->where('type', 'code')
-            ->where('visibility', 'public')
-            ->withCount(['likes', 'comments'])
-            ->orderByRaw('likes_count + comments_count DESC')
-            ->take(6)
-            ->get();
-
-        // Popular developers by tech stack
         $user = Auth::user();
-        $userTechTags = $user->profile->techTags()->pluck('tech_tags.id');
+        $type = $request->get('type', 'all');
 
-        $popularDevelopers = User::with(['profile', 'profile.techTags'])
-            ->whereHas('posts')
-            ->withCount(['posts', 'followers'])
-            ->whereHas('profile.techTags', function ($query) use ($userTechTags) {
-                $query->whereIn('tech_tags.id', $userTechTags);
-            })
-            ->orderBy('followers_count', 'desc')
-            ->take(12)
-            ->get();
+        $posts = Post::with(['user.profile', 'likes', 'comments.user.profile', 'tags'])
+            ->visibleTo($user);
 
-        // Popular projects (posts with many interactions)
-        $popularProjects = Post::with(['user.profile', 'tags', 'codeSnippet'])
-            ->where('visibility', 'public')
-            ->withCount(['likes', 'comments'])
-            ->orderByRaw('likes_count + comments_count DESC')
-            ->take(6)
-            ->get();
+        // Filter by type if specified
+        if ($type && $type !== 'all') {
+            $posts->where('type', $type);
+        }
 
-        return view('explore', compact('trendingCode', 'popularDevelopers', 'popularProjects'));
+        $posts = $posts->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'posts' => $posts->items(),
+                'next_page_url' => $posts->nextPageUrl()
+            ]);
+        }
+
+        return view('posts.feed', compact('posts'));
     }
 }

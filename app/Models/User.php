@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class User extends Authenticatable
 {
@@ -14,7 +15,14 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'username',
         'role',
+        'email_verified_at',
+        'is_active',
+        'last_login_at',
+        'github_id',
+        'github_token',
+        'github_refresh_token'
     ];
 
     protected $hidden = [
@@ -24,20 +32,11 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'last_login_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
-    // Auto-create profile when user is created
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::created(function ($user) {
-            $user->profile()->create([
-                'username' => strtolower(str_replace(' ', '', $user->name)) . rand(100, 999),
-                'reputation_score' => 0,
-            ]);
-        });
-    }
+    protected $appends = ['avatar_url'];
 
     // Relationships
     public function profile()
@@ -50,10 +49,39 @@ class User extends Authenticatable
         return $this->hasMany(Post::class);
     }
 
-    public function following()
+    public function projects()
     {
-        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'following_id')
-            ->withTimestamps();
+        return $this->hasMany(Project::class);
+    }
+
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'receiver_id');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function saves()
+    {
+        return $this->hasMany(Save::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 
     public function followers()
@@ -62,24 +90,94 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
-    public function likes()
+    public function following()
     {
-        return $this->hasMany(Like::class);
+        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'following_id')
+            ->withTimestamps();
     }
 
-    public function comments()
+    // Scopes
+    public function scopeDevelopers($query)
     {
-        return $this->hasMany(Comment::class);
+        return $query->whereHas('profile')
+            ->where('is_active', true)
+            ->orderBy('created_at', 'desc');
     }
 
-    public function saves()
+    public function scopePopular($query)
     {
-        return $this->hasMany(Save::class);
+        return $query->withCount('followers')
+            ->orderBy('followers_count', 'desc');
     }
 
-    // Check if user is following another user
+    // Accessors
+    public function getAvatarUrlAttribute()
+    {
+        return $this->profile->avatar_url ?? asset('images/default-avatar.png');
+    }
+
+    public function getPostsCountAttribute()
+    {
+        return $this->posts()->count();
+    }
+
+    public function getFollowersCountAttribute()
+    {
+        return $this->followers()->count();
+    }
+
+    public function getFollowingCountAttribute()
+    {
+        return $this->following()->count();
+    }
+
+    public function getProjectsCountAttribute()
+    {
+        return $this->projects()->count();
+    }
+
+    // Methods
     public function isFollowing(User $user)
     {
         return $this->following()->where('following_id', $user->id)->exists();
+    }
+
+    public function unreadNotificationsCount()
+    {
+        return $this->notifications()->where('read_at', null)->count();
+    }
+
+    public function hasRole($role)
+    {
+        return $this->role === $role;
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function updateLastLogin()
+    {
+        $this->update(['last_login_at' => now()]);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            // Create profile for new user
+            $user->profile()->create([
+                'username' => strtolower(str_replace(' ', '', $user->name)) . rand(100, 999),
+                'bio' => 'Hello! I\'m new to DevDoko.',
+                'location' => null,
+                'website' => null,
+                'github_link' => null,
+                'linkedin_link' => null,
+                'twitter_link' => null,
+                'tech_stack' => []
+            ]);
+        });
     }
 }

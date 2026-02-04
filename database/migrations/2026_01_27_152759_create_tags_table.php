@@ -14,6 +14,10 @@ return new class extends Migration
         Schema::create('tags', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
+            $table->string('slug')->unique();
+            $table->string('type')->default('general'); // general, technology, etc.
+            $table->text('description')->nullable();
+            $table->integer('usage_count')->default(0);
             $table->timestamps();
         });
     }

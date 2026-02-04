@@ -10,6 +10,6 @@ class TechTag extends Model
 
     public function profiles()
     {
-        return $this->belongsToMany(Profile::class);
+        return $this->belongsToMany(Profile::class, 'profile_tech_tag');
     }
 }

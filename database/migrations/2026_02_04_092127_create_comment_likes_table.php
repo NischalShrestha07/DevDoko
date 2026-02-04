@@ -8,18 +8,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('post_tag', function (Blueprint $table) {
+        Schema::create('comment_likes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('post_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('tag_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('comment_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
 
-            $table->unique(['post_id', 'tag_id']);
+            $table->unique(['user_id', 'comment_id']);
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('post_tag');
+        Schema::dropIfExists('comment_likes');
     }
 };

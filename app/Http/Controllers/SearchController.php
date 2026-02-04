@@ -33,16 +33,12 @@ class SearchController extends Controller
             ->orWhere('email', 'LIKE', "%{$query}%")
             ->paginate(10);
 
-        // Search posts (only public or user's own)
-        $posts = Post::with(['user.profile', 'tags', 'likes'])
-            ->where(function ($q) use ($query) {
-                $q->where('caption', 'LIKE', "%{$query}%");
-            })
+
+        $posts = Post::where('content', 'LIKE', "%{$query}%")
             ->where(function ($q) {
                 $q->where('visibility', 'public')
                     ->orWhere('user_id', Auth::id());
             })
-            ->latest()
             ->paginate(10);
 
         // Search tags

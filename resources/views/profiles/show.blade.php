@@ -142,7 +142,7 @@
                         <div class="text-center">
                             <i class="bi bi-code-slash fs-1"></i>
                             <div class="mt-2">Code Snippet</div>
-                            <small class="text-muted">{{ $post->codeSnippet->language ?? '' }}</small>
+                            <small class="text-muted">{{ $post->code_snippet->language ?? '' }}</small>
                         </div>
                     </div>
                     @else
@@ -188,4 +188,76 @@
         </div>
     </div>
 </div>
+
+<!-- Developer Stats -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white">
+        <h6 class="mb-0 fw-bold">Developer Stats</h6>
+    </div>
+    <div class="card-body">
+        <div class="row text-center">
+            <div class="col-3">
+                <div class="display-6 fw-bold text-primary">{{ $profile->user->developer_score }}</div>
+                <small class="text-muted">Dev Score</small>
+            </div>
+            <div class="col-3">
+                <div class="display-6 fw-bold text-success">{{ $profile->user->code_posts_count ?? 0 }}</div>
+                <small class="text-muted">Code Posts</small>
+            </div>
+            <div class="col-3">
+                <div class="display-6 fw-bold text-info">{{ $profile->user->projects_count ?? 0 }}</div>
+                <small class="text-muted">Projects</small>
+            </div>
+            <div class="col-3">
+                <div class="display-6 fw-bold text-warning">{{ $profile->user->contributions_count ?? 0 }}</div>
+                <small class="text-muted">Contributions</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- GitHub Integration -->
+@if($profile->github_link)
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-bold">
+            <i class="bi bi-github"></i> GitHub Activity
+        </h6>
+        <a href="{{ $profile->github_link }}" target="_blank" class="btn btn-sm btn-outline-dark">
+            View Profile
+        </a>
+    </div>
+    <div class="card-body">
+        <!-- GitHub stats would go here via API -->
+        <div class="text-center py-3">
+            <i class="bi bi-github fs-1 text-muted"></i>
+            <p class="text-muted mt-2">GitHub integration coming soon</p>
+        </div>
+    </div>
+</div>
+@endif
+
+<!-- Tech Stack Badges -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white">
+        <h6 class="mb-0 fw-bold">Tech Stack</h6>
+    </div>
+    <div class="card-body">
+        <div class="d-flex flex-wrap gap-2">
+            @foreach($profile->techTags as $tech)
+            <a href="{{ route('tech.show', $tech->name) }}" class="tech-badge">
+                <span class="badge bg-primary px-3 py-2">
+                    <i class="bi bi-tag-fill me-1"></i> {{ $tech->name }}
+                </span>
+            </a>
+            @endforeach
+        </div>
+        @if(auth()->id() === $profile->user_id)
+        <button class="btn btn-sm btn-outline-primary mt-3" data-bs-toggle="modal" data-bs-target="#editTechStack">
+            <i class="bi bi-plus-circle"></i> Add Tech Stack
+        </button>
+        @endif
+    </div>
+</div>
+
 @endsection

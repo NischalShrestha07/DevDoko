@@ -2,14 +2,23 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Tag extends Model
 {
-    protected $fillable = ['name'];
+    use HasFactory;
 
-    public function posts()
+    protected $fillable = ['name', 'slug', 'description', 'icon', 'color'];
+
+    public function posts(): BelongsToMany
     {
-        return $this->belongsToMany(Post::class);
+        return $this->belongsToMany(Post::class, 'post_tag');
+    }
+
+    public function getUrlAttribute(): string
+    {
+        return route('tags.show', $this->slug);
     }
 }
