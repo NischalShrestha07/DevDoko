@@ -35,7 +35,9 @@ class Post extends Model
         'likes_count',
         'comments_count',
         'shares_count',
-        'reading_time'
+        'reading_time',
+        'shared_post_id',
+        'share_details',
     ];
 
     protected $casts = [
@@ -303,5 +305,45 @@ class Post extends Model
                 $post->reading_time = $post->calculateReadingTime();
             }
         });
+    }
+
+    public function getVideoUrlAttribute(): ?string
+    {
+        if ($this->video_path) {
+            return Storage::url($this->video_path);
+        }
+        return null;
+    }
+
+    public function sharedPost()
+    {
+        return $this->belongsTo(Post::class, 'shared_post_id');
+    }
+
+    public function shares()
+    {
+        return $this->hasMany(Post::class, 'shared_post_id');
+    }
+
+    // Add accessor for share details
+    public function getShareDetailsAttribute($value)
+    {
+        return $value ? json_decode($value, true) : null;
+    }
+
+    // Check if post is a share
+    public function getIsShareAttribute(): bool
+    {
+        return $this->type === 'share' || $this->shared_post_id !== null;
+    }
+
+    // Get original post (for shares)
+    public function getOriginalPostAttribute()
+    {
+        if ($this->is_share && $this->share_details) {
+            // Create a virtual post object from share details
+            return (object) $this->share_details;
+        }
+        return null;
     }
 }

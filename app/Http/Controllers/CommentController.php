@@ -10,54 +10,45 @@ use Illuminate\Support\Facades\Validator;
 
 class CommentController extends Controller
 {
-    public function index(Post $post)
-    {
-        $comments = $post->comments()
-            ->with(['user.profile', 'replies.user.profile', 'likes'])
-            ->paginate(10);
-
-        return response()->json($comments);
-    }
-
     public function store(Request $request, Post $post)
     {
         $validator = Validator::make($request->all(), [
-            'content' => 'required|string|max:1000',
-            'parent_id' => 'nullable|exists:comments,id'
+            'content' => 'required|string|max:1000'
         ]);
 
         if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $comment = Comment::create([
+        $comment = $post->comments()->create([
             'user_id' => Auth::id(),
-            'post_id' => $post->id,
-            'parent_id' => $request->parent_id,
-            'content' => $request->content
+            'content' => $request->content,
+            'parent_id' => $request->parent_id
         ]);
 
-        // Increment comment count on post
-        $post->increment('comments_count');
+        // Update post comment count
+        $post->updateCommentCount();
 
-        // If this is a reply, increment parent comment's replies count
-        if ($request->parent_id) {
-            $parentComment = Comment::find($request->parent_id);
-            $parentComment->incrementReplies();
-        }
-
-        // Load relationships for response
+        // Load user relationship for response
         $comment->load('user.profile');
 
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'comment' => $comment,
-                'html' => view('posts.partials.comment', ['comment' => $comment])->render()
-            ]);
-        }
+        return response()->json([
+            'comment' => $comment,
+            'message' => 'Comment added successfully'
+        ]);
+    }
 
-        return back()->with('success', 'Comment added successfully!');
+    public function index(Post $post)
+    {
+        $comments = $post->comments()
+            ->with('user.profile', 'replies.user.profile')
+            ->whereNull('parent_id')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return response()->json([
+            'html' => view('posts.partials.comments', compact('comments'))->render()
+        ]);
     }
 
     public function update(Request $request, Comment $comment)
@@ -69,44 +60,27 @@ class CommentController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
+            return back()->withErrors($validator);
         }
 
         $comment->update(['content' => $request->content]);
 
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'comment' => $comment
-            ]);
-        }
-
-        return back()->with('success', 'Comment updated successfully!');
+        return back()->with('success', 'Comment updated successfully');
     }
 
     public function destroy(Comment $comment)
     {
         $this->authorize('delete', $comment);
 
-        // Decrement comment count on post
-        $comment->post->decrement('comments_count');
-
-        // If this is a reply, decrement parent comment's replies count
-        if ($comment->parent_id) {
-            $parentComment = Comment::find($comment->parent_id);
-            $parentComment->decrementReplies();
-        }
-
-        // Delete all replies first
-        $comment->replies()->delete();
-
+        $post = $comment->post;
         $comment->delete();
 
-        if (request()->wantsJson()) {
-            return response()->json(['success' => true]);
-        }
+        // Update post comment count
+        $post->updateCommentCount();
 
-        return back()->with('success', 'Comment deleted successfully!');
+        return response()->json([
+            'message' => 'Comment deleted successfully'
+        ]);
     }
 
     public function like(Comment $comment)
@@ -116,23 +90,43 @@ class CommentController extends Controller
 
         if ($like) {
             $like->delete();
-            $comment->decrementLikes();
             $liked = false;
         } else {
             $comment->likes()->create(['user_id' => $user->id]);
-            $comment->incrementLikes();
             $liked = true;
         }
 
         return response()->json([
-            'success' => true,
             'liked' => $liked,
-            'likes_count' => $comment->likes_count
+            'likes_count' => $comment->likes()->count()
         ]);
     }
 
     public function reply(Request $request, Comment $comment)
     {
-        return $this->store($request, $comment->post);
+        $validator = Validator::make($request->all(), [
+            'content' => 'required|string|max:1000'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $reply = Comment::create([
+            'user_id' => Auth::id(),
+            'post_id' => $comment->post_id,
+            'content' => $request->content,
+            'parent_id' => $comment->id
+        ]);
+
+        // Update post comment count
+        $comment->post->updateCommentCount();
+
+        $reply->load('user.profile');
+
+        return response()->json([
+            'reply' => $reply,
+            'message' => 'Reply added successfully'
+        ]);
     }
 }

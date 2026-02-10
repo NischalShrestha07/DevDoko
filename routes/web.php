@@ -44,16 +44,7 @@ Route::middleware('auth')->group(function () {
     // Logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-    // Home feed
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
-
-    // Profile Management
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
-    Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
-    Route::post('/profile/cover', [ProfileController::class, 'updateCover'])->name('profile.cover.update');
-
-    // Posts - COMPLETE RESOURCE ROUTES
+    // Posts - Resource Routes
     Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
@@ -66,6 +57,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/posts/{post}/like/toggle', [LikeController::class, 'toggle'])->name('posts.like.toggle');
     Route::post('/posts/{post}/save', [SaveController::class, 'store'])->name('posts.save');
     Route::delete('/posts/{post}/save', [SaveController::class, 'destroy'])->name('posts.unsave');
+    Route::post('/posts/{post}/pin', [PostController::class, 'pin'])->name('posts.pin');
+    Route::post('/posts/{post}/share', [PostController::class, 'share'])->name('posts.share');
+    Route::post('/posts/{post}/report', [PostController::class, 'report'])->name('posts.report');
 
     // Comments
     Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
@@ -75,16 +69,46 @@ Route::middleware('auth')->group(function () {
     Route::post('/comments/{comment}/like', [CommentController::class, 'like'])->name('comments.like');
     Route::post('/comments/{comment}/reply', [CommentController::class, 'reply'])->name('comments.reply');
 
+    // Follow System
+    Route::post('/users/{user}/follow', [FollowController::class, 'follow'])->name('users.follow');
+    Route::delete('/users/{user}/follow', [FollowController::class, 'unfollow'])->name('users.unfollow');
+    Route::get('/users/{user}/followers', [FollowController::class, 'followers'])->name('users.followers');
+    Route::get('/users/{user}/following', [FollowController::class, 'following'])->name('users.following');
+
+    // Home feed
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+    // Profile Management
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
+    Route::post('/profile/cover', [ProfileController::class, 'updateCover'])->name('profile.cover.update');
+
+    // Post Interactions
+    Route::post('/posts/{post}/like/toggle', [LikeController::class, 'toggle'])->name('posts.like.toggle');
+    Route::post('/posts/{post}/save', [SaveController::class, 'store'])->name('posts.save');
+    Route::delete('/posts/{post}/save', [SaveController::class, 'destroy'])->name('posts.unsave');
+
+    // Share and Report routes
+    Route::post('/posts/{post}/share', [PostController::class, 'share'])->name('posts.share');
+    Route::post('/posts/{post}/report', [PostController::class, 'report'])->name('posts.report');
+
+    // Comments routes
+    Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::post('/comments/{comment}/like', [CommentController::class, 'like'])->name('comments.like');
+    Route::post('/comments/{comment}/reply', [CommentController::class, 'reply'])->name('comments.reply');
+
     // Posts - Additional routes
     Route::post('/posts/{post}/pin', [PostController::class, 'pin'])->name('posts.pin');
     Route::post('/posts/{post}/share', [PostController::class, 'share'])->name('posts.share');
     Route::post('/posts/{post}/report', [PostController::class, 'report'])->name('posts.report');
 
-    // Post feeds
+
+    // Feed routes
     Route::get('/feed', [HomeController::class, 'feed'])->name('feed');
-    Route::get('/feed/latest', [HomeController::class, 'latest'])->name('feed.latest');
-    Route::get('/feed/popular', [HomeController::class, 'popular'])->name('feed.popular');
     Route::get('/feed/following', [HomeController::class, 'following'])->name('feed.following');
+    Route::get('/feed/popular', [HomeController::class, 'popular'])->name('feed.popular');
+    Route::get('/feed/latest', [HomeController::class, 'latest'])->name('feed.latest');
 
     // Post collections
     Route::get('/collections', [SaveController::class, 'collections'])->name('collections.index');
@@ -94,18 +118,6 @@ Route::middleware('auth')->group(function () {
     // Post drafts
     Route::get('/drafts', [PostController::class, 'drafts'])->name('posts.drafts');
     Route::post('/posts/{post}/publish', [PostController::class, 'publish'])->name('posts.publish');
-
-    // Comments
-    Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
-    Route::get('/posts/{post}/comments', [CommentController::class, 'index'])->name('comments.index');
-    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
-    Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
-
-    // Follow System
-    Route::post('/users/{user}/follow', [FollowController::class, 'follow'])->name('users.follow');
-    Route::delete('/users/{user}/follow', [FollowController::class, 'unfollow'])->name('users.unfollow');
-    Route::get('/users/{user}/followers', [FollowController::class, 'followers'])->name('users.followers');
-    Route::get('/users/{user}/following', [FollowController::class, 'following'])->name('users.following');
 
     // Messages
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');

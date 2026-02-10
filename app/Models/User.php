@@ -20,7 +20,7 @@ class User extends Authenticatable
         'role',
         'email_verified_at',
         'is_active',
-        'last_login_at',
+        // 'last_login_at',
         'github_id',
         'github_token',
         'github_refresh_token'
@@ -111,7 +111,6 @@ class User extends Authenticatable
             ->orderBy('followers_count', 'desc');
     }
 
-    // Accessors
     public function getAvatarUrlAttribute()
     {
         if ($this->profile) {
@@ -143,7 +142,6 @@ class User extends Authenticatable
         return $this->projects()->count();
     }
 
-    // Methods
     public function isFollowing(User $user)
     {
         return $this->following()->where('following_id', $user->id)->exists();

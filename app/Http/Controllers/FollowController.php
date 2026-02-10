@@ -8,70 +8,65 @@ use Illuminate\Support\Facades\Auth;
 
 class FollowController extends Controller
 {
-    public function __construct()
-    {
-        // $this->middleware('auth');
-    }
-
-    /**
-     * Follow a user
-     */
     public function follow(User $user)
     {
-        if (Auth::id() === $user->id) {
-            return redirect()->back()->with('error', 'You cannot follow yourself');
+        $currentUser = Auth::user();
+
+        // Check if already following
+        if ($currentUser->isFollowing($user)) {
+            return response()->json([
+                'following' => true,
+                'message' => 'Already following this user'
+            ]);
         }
 
-        if (!Auth::user()->isFollowing($user)) {
-            Auth::user()->following()->attach($user->id);
+        // Follow the user
+        $currentUser->following()->attach($user->id);
 
-            // Add reputation to the user being followed
-            $user->profile->incrementReputation(5, 'follow_received');
-
-            return redirect()->back()->with('success', "You are now following {$user->name}");
-        }
-
-        return redirect()->back()->with('info', 'You are already following this user');
+        return response()->json([
+            'following' => true,
+            'message' => 'Successfully followed user',
+            'followers_count' => $user->followers()->count()
+        ]);
     }
 
-    /**
-     * Unfollow a user
-     */
     public function unfollow(User $user)
     {
-        if (Auth::user()->isFollowing($user)) {
-            Auth::user()->following()->detach($user->id);
+        $currentUser = Auth::user();
 
-            // Remove reputation from the user being unfollowed
-            $user->profile->decrementReputation(5, 'follow_lost');
-
-            return redirect()->back()->with('success', "You have unfollowed {$user->name}");
+        // Check if following
+        if (!$currentUser->isFollowing($user)) {
+            return response()->json([
+                'following' => false,
+                'message' => 'Not following this user'
+            ]);
         }
 
-        return redirect()->back()->with('info', 'You are not following this user');
+        // Unfollow the user
+        $currentUser->following()->detach($user->id);
+
+        return response()->json([
+            'following' => false,
+            'message' => 'Successfully unfollowed user',
+            'followers_count' => $user->followers()->count()
+        ]);
     }
 
-    /**
-     * Show user's followers
-     */
     public function followers(User $user)
     {
         $followers = $user->followers()
             ->with('profile')
             ->paginate(20);
 
-        return view('follow.followers', compact('user', 'followers'));
+        return view('users.followers', compact('user', 'followers'));
     }
 
-    /**
-     * Show who user is following
-     */
     public function following(User $user)
     {
         $following = $user->following()
             ->with('profile')
             ->paginate(20);
 
-        return view('follow.following', compact('user', 'following'));
+        return view('users.following', compact('user', 'following'));
     }
 }

@@ -6,8 +6,8 @@
 <div class="row justify-content-center">
     <div class="col-md-12">
         <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white border-0 py-3">
-                <h5 class="mb-0">Edit Profile</h5>
+            <div class="card-header shadow-sm bg-white border-0 py-3">
+                <h3 class="mb-0">Edit Profile</h3>
             </div>
             <div class="card-body">
                 <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">

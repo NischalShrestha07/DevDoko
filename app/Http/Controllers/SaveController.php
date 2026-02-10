@@ -2,57 +2,50 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Save;
 use App\Models\Post;
+use App\Models\Save;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SaveController extends Controller
 {
-    public function __construct()
+    public function store(Request $request, Post $post)
     {
-        // $this->middleware('auth');
+        $user = Auth::user();
+
+        $save = Save::firstOrCreate([
+            'user_id' => $user->id,
+            'post_id' => $post->id
+        ]);
+
+        return response()->json([
+            'saved' => true,
+            'message' => 'Post saved successfully'
+        ]);
     }
 
-    /**
-     * Display user's saved posts
-     */
+    public function destroy(Request $request, Post $post)
+    {
+        $user = Auth::user();
+
+        Save::where('user_id', $user->id)
+            ->where('post_id', $post->id)
+            ->delete();
+
+        return response()->json([
+            'saved' => false,
+            'message' => 'Post unsaved successfully'
+        ]);
+    }
+
     public function index()
     {
-        $savedPosts = Auth::user()->saves()
-            ->with(['post.user.profile', 'post.tags', 'post.likes', 'post.comments'])
+        $user = Auth::user();
+        $savedPosts = $user->saves()
+            ->with('post.user.profile')
             ->orderBy('created_at', 'desc')
-            ->paginate(12);
+            ->paginate(20);
 
-        return view('saved.index', compact('savedPosts'));
-    }
-
-    /**
-     * Save a post
-     */
-    public function store(Post $post)
-    {
-        if (!$post->isSavedBy(Auth::user())) {
-            Save::create([
-                'user_id' => Auth::id(),
-                'post_id' => $post->id,
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Post saved!');
-    }
-
-    /**
-     * Unsave a post
-     */
-    public function destroy(Post $post)
-    {
-        $save = $post->saves()->where('user_id', Auth::id())->first();
-
-        if ($save) {
-            $save->delete();
-        }
-
-        return redirect()->back()->with('success', 'Post removed from saves!');
+        return view('posts.saved', compact('savedPosts'));
     }
 }

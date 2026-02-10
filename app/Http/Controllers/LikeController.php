@@ -9,10 +9,9 @@ use Illuminate\Support\Facades\Auth;
 
 class LikeController extends Controller
 {
-    public function toggle(Post $post)
+    public function toggle(Request $request, Post $post)
     {
         $user = Auth::user();
-
         $like = $post->likes()->where('user_id', $user->id)->first();
 
         if ($like) {
@@ -26,13 +25,9 @@ class LikeController extends Controller
         // Update like count
         $post->updateLikeCount();
 
-        if (request()->ajax()) {
-            return response()->json([
-                'liked' => $liked,
-                'likes_count' => $post->fresh()->likes_count
-            ]);
-        }
-
-        return back();
+        return response()->json([
+            'liked' => $liked,
+            'likes_count' => $post->likes()->count()
+        ]);
     }
 }

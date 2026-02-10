@@ -455,7 +455,6 @@
     </div>
 </div>
 
-@push('scripts')
 <script>
     // Handle like form submission with AJAX
     document.querySelectorAll('.like-form').forEach(form => {
@@ -776,4 +775,3 @@
         filter: invert(1) grayscale(100%) brightness(200%);
     }
 </style>
-@endpush
