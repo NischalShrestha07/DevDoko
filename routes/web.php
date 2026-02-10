@@ -136,4 +136,6 @@ Route::middleware('auth')->group(function () {
 
     // Saved Posts
     Route::get('/saved', [SaveController::class, 'index'])->name('saved.index');
+
+    Route::get('/users/{user}/saved', [ProfileController::class, 'saved'])->name('users.saved');
 });

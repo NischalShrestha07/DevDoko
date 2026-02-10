@@ -104,4 +104,50 @@ class ProfileController extends Controller
         return redirect()->route('profile.show', $profile->username)
             ->with('success', 'Profile updated successfully!');
     }
+
+    public function followers(User $user)
+    {
+        $followers = $user->followers()
+            ->with(['profile', 'posts' => function ($query) {
+                $query->latest()->take(3);
+            }])
+            ->paginate(20);
+
+        if (request()->expectsJson()) {
+            return response()->json(['followers' => $followers]);
+        }
+
+        return view('follow.followers', compact('user', 'followers'));
+    }
+
+    /**
+     * Get following list
+     */
+    public function following(User $user)
+    {
+        $following = $user->following()
+            ->with(['profile', 'posts' => function ($query) {
+                $query->latest()->take(3);
+            }])
+            ->paginate(20);
+
+        if (request()->expectsJson()) {
+            return response()->json(['following' => $following]);
+        }
+
+        return view('profiles.following', compact('user', 'following'));
+    }
+
+    /**
+     * Get user's saved posts
+     */
+    public function saved(User $user)
+    {
+        $savedPosts = $user->saves()
+            ->with('post.user.profile')
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        return view('profiles.saved', compact('user', 'savedPosts'));
+    }
 }
