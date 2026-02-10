@@ -10,6 +10,7 @@ class Profile extends Model
         'user_id',
         'username',
         'bio',
+        'name',
         'avatar',
         'github_link',
         'portfolio_link',
@@ -23,7 +24,10 @@ class Profile extends Model
         if ($this->avatar) {
             return asset('storage/' . $this->avatar);
         }
-        return 'https://ui-avatars.com/api/?name=' . urlencode($this->username) . '&background=random&color=fff';
+
+        return 'https://ui-avatars.com/api/?name='
+            . urlencode($this->username)
+            . '&background=random&color=fff';
     }
 
     public function user()

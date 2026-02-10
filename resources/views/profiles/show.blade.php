@@ -9,8 +9,8 @@
         <div class="row">
             <div class="col-md-3 text-center">
                 @if($profile->avatar)
-                <img src="{{ asset('storage/' . $profile->avatar) }}" class="rounded-circle mb-3"
-                    style="width: 150px; height: 150px; object-fit: cover;">
+                <img src="{{ $profile->avatar_url }}" class="rounded-circle mb-3"
+                    style="width:150px;height:150px;object-fit:cover;">
                 @else
                 <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center mb-3"
                     style="width: 150px; height: 150px;">

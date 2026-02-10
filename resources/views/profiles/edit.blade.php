@@ -18,8 +18,8 @@
                     <div class="text-center mb-4">
                         <div class="position-relative d-inline-block">
                             @if($profile->avatar)
-                            <img src="{{ asset('storage/' . $profile->avatar) }}" class="rounded-circle mb-3"
-                                id="avatar-preview" width="150" height="150" style="object-fit: cover;">
+                            <img src="{{ $profile->avatar_url }}" id="avatar-preview" class="rounded-circle mb-3"
+                                width="150" height="150" style="object-fit:cover;">
                             @else
                             <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mb-3"
                                 id="avatar-preview" style="width: 150px; height: 150px;">
@@ -50,8 +50,7 @@
                     <!-- Name -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">Full Name</label>
-                        <input type="text" class="form-control" value="{{ auth()->user()->name }}" disabled>
-                        <small class="text-muted">Name cannot be changed</small>
+                        <input type="text" name="name" class="form-control" value="{{ auth()->user()->name }}">
                     </div>
 
                     <!-- Bio -->

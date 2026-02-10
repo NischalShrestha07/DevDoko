@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -113,7 +114,13 @@ class User extends Authenticatable
     // Accessors
     public function getAvatarUrlAttribute()
     {
-        return $this->profile->avatar_url ?? asset('images/default-avatar.png');
+        if ($this->profile) {
+            return $this->profile->avatar_url;
+        }
+
+        // Return default avatar if no profile
+        $name = $this->name ?? $this->username ?? 'User';
+        return 'https://ui-avatars.com/api/?name=' . urlencode($name) . '&background=random&color=fff';
     }
 
     public function getPostsCountAttribute()
@@ -167,16 +174,13 @@ class User extends Authenticatable
         parent::boot();
 
         static::created(function ($user) {
-            // Create profile for new user
             $user->profile()->create([
                 'username' => strtolower(str_replace(' ', '', $user->name)) . rand(100, 999),
                 'bio' => 'Hello! I\'m new to DevDoko.',
-                'location' => null,
-                'website' => null,
+                'avatar' => null,
                 'github_link' => null,
-                'linkedin_link' => null,
-                'twitter_link' => null,
-                'tech_stack' => []
+                'portfolio_link' => null,
+                'reputation_score' => 0,
             ]);
         });
     }

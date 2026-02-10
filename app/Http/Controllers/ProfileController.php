@@ -66,6 +66,7 @@ class ProfileController extends Controller
             'portfolio_link' => 'nullable|url|max:255',
             'tech_tags' => 'array|max:10',
             'tech_tags.*' => 'exists:tech_tags,id',
+            'name' => 'nullable|string|max:255',
         ]);
 
         // Handle avatar upload
@@ -86,7 +87,12 @@ class ProfileController extends Controller
             'avatar' => $avatarPath,
             'github_link' => $request->github_link,
             'portfolio_link' => $request->portfolio_link,
+
         ]);
+        $user->update([
+            'name' => $request->name,
+        ]);
+
 
         // Sync tech tags
         if ($request->has('tech_tags')) {
