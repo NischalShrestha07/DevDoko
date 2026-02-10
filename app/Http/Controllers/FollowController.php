@@ -22,12 +22,7 @@ class FollowController extends Controller
 
         // Follow the user
         $currentUser->following()->attach($user->id);
-
-        return response()->json([
-            'following' => true,
-            'message' => 'Successfully followed user',
-            'followers_count' => $user->followers()->count()
-        ]);
+        return redirect()->back();
     }
 
     public function unfollow(User $user)
@@ -44,12 +39,7 @@ class FollowController extends Controller
 
         // Unfollow the user
         $currentUser->following()->detach($user->id);
-
-        return response()->json([
-            'following' => false,
-            'message' => 'Successfully unfollowed user',
-            'followers_count' => $user->followers()->count()
-        ]);
+        return redirect()->back();
     }
 
     public function followers(User $user)
@@ -58,7 +48,7 @@ class FollowController extends Controller
             ->with('profile')
             ->paginate(20);
 
-        return view('users.followers', compact('user', 'followers'));
+        return view('follow.followers', compact('user', 'followers'));
     }
 
     public function following(User $user)
@@ -67,6 +57,6 @@ class FollowController extends Controller
             ->with('profile')
             ->paginate(20);
 
-        return view('users.following', compact('user', 'following'));
+        return view('follow.following', compact('user', 'following'));
     }
 }
