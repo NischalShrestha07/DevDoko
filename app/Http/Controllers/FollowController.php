@@ -59,4 +59,24 @@ class FollowController extends Controller
 
         return view('follow.following', compact('user', 'following'));
     }
+
+    public function toggle(User $user)
+    {
+        // Prevent user from following themselves
+        if (Auth::id() === $user->id) {
+            return back()->with('error', 'You cannot follow yourself.');
+        }
+
+        $authUser = Auth::user();
+
+        if ($authUser->isFollowing($user)) {
+            $authUser->unfollow($user);
+            $message = 'Unfollowed successfully.';
+        } else {
+            $authUser->follow($user);
+            $message = 'Followed successfully.';
+        }
+
+        return back()->with('success', $message);
+    }
 }

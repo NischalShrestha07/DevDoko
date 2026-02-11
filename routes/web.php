@@ -44,6 +44,9 @@ Route::middleware('auth')->group(function () {
     // Logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+    // Home feed
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+
     // Posts - Resource Routes
     Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
@@ -74,9 +77,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/users/{user}/follow', [FollowController::class, 'unfollow'])->name('users.unfollow');
     Route::get('/users/{user}/followers', [FollowController::class, 'followers'])->name('users.followers');
     Route::get('/users/{user}/following', [FollowController::class, 'following'])->name('users.following');
+    // Route::post('/users/{user}/follow', [FollowController::class, 'toggle'])->name('follow.toggle');
 
-    // Home feed
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
+
 
     // Profile Management
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');

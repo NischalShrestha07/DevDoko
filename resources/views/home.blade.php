@@ -1252,24 +1252,6 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Quick share to platform</label>
-                        <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-outline-primary flex-fill"
-                                onclick="shareToWhatsApp('${shareUrl}')">
-                                <i class="bi bi-whatsapp"></i> WhatsApp
-                            </button>
-                            <button type="button" class="btn btn-outline-info flex-fill"
-                                onclick="shareToTwitter('${shareUrl}')">
-                                <i class="bi bi-twitter"></i> Twitter
-                            </button>
-                            <button type="button" class="btn btn-outline-primary flex-fill"
-                                onclick="shareToFacebook('${shareUrl}')">
-                                <i class="bi bi-facebook"></i> Facebook
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
                         <label class="form-label fw-bold">Share as a new post</label>
                         <form action="/posts/${postId}/share" method="POST" class="share-post-form">
                             @csrf
