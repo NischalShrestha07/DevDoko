@@ -182,4 +182,24 @@ class User extends Authenticatable
             ]);
         });
     }
+
+    public function isOnline(): bool
+    {
+        return $this->last_login_at && $this->last_login_at->diffInMinutes(now()) < 5;
+    }
+
+    // Also add this scope for active users
+    public function scopeActive($query)
+    {
+        return $query->where('last_login_at', '>=', now()->subMinutes(5));
+    }
+
+    public function scopeSuggested($query, $userId)
+    {
+        return $query->where('id', '!=', $userId)
+            ->whereDoesntHave('followers', function ($q) use ($userId) {
+                $q->where('follower_id', $userId);
+            })
+            ->inRandomOrder();
+    }
 }

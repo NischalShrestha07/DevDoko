@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\DeveloperController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\SaveController;
 use App\Http\Controllers\ExploreController;
@@ -126,13 +127,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::get('/messages/{user}', [MessageController::class, 'show'])->name('messages.show');
     Route::post('/messages/{user}', [MessageController::class, 'store'])->name('messages.store');
+    Route::get('/messages/search/all', [MessageController::class, 'search'])->name('messages.search');
+    Route::post('/messages/{message}/star', [MessageController::class, 'toggleStar'])->name('messages.star');
     Route::delete('/messages/{message}', [MessageController::class, 'destroy'])->name('messages.destroy');
+    Route::post('/messages/{user}/read', [MessageController::class, 'markAsRead'])->name('messages.read');
+    Route::post('/messages/{message}/reactions', [MessageController::class, 'addReaction'])->name('messages.reactions.store');
+    Route::delete('/messages/{message}/reactions', [MessageController::class, 'removeReaction'])->name('messages.reactions.destroy');
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllRead');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
     Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
-    Route::post('/notifications/{notification}/mark-read', [NotificationController::class, 'markAsRead'])->name('notifications.markRead');
+    Route::get('/notifications/count', [NotificationController::class, 'count'])->name('notifications.count');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+
 
     // Search
     Route::get('/search', [SearchController::class, 'index'])->name('search');
@@ -141,4 +149,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/saved', [SaveController::class, 'index'])->name('saved.index');
 
     Route::get('/users/{user}/saved', [ProfileController::class, 'saved'])->name('users.saved');
+    Route::get('/developers', [DeveloperController::class, 'index'])->name('developers.index');
 });

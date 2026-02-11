@@ -47,6 +47,7 @@
                     @endif
                 </div>
 
+
                 <div class="d-flex mb-3">
                     <div class="me-4">
                         {{-- <span class="fw-bold">{{ $posts->total() }}</span> posts --}}

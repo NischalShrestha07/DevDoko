@@ -15,14 +15,15 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('from_user_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->string('type'); // like, comment, follow, mention
-            $table->text('message');
+            $table->string('type'); // like, comment, follow, message, etc.
+            $table->text('message')->nullable(); // MAKE THIS NULLABLE
             $table->json('data')->nullable();
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
 
             $table->index(['user_id', 'read_at']);
             $table->index(['from_user_id']);
+            $table->index(['type']);
         });
     }
 
