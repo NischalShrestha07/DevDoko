@@ -369,6 +369,49 @@
                     <span class="nav-text">Profile</span>
                 </a>
             </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-people-fill"></i> Groups
+                </a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" href="{{ route('groups.index') }}">
+                            <i class="bi bi-compass"></i> Discover Groups
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{{ route('groups.my-groups') }}">
+                            <i class="bi bi-bookmark-check"></i> My Groups
+                        </a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{{ route('groups.create') }}">
+                            <i class="bi bi-plus-circle"></i> Create Group
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            @auth
+            @php
+            $pendingRequests = \App\Models\Group::whereHas('members', function($q) {
+            $q->where('user_id', auth()->id())
+            ->where('status', 'pending');
+            })->count();
+            @endphp
+            @if($pendingRequests > 0)
+            <li class="nav-item">
+                <a class="nav-link position-relative" href="{{ route('groups.my-groups') }}">
+                    <i class="bi bi-bell"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ $pendingRequests }}
+                    </span>
+                </a>
+            </li>
+            @endif
+            @endauth
         </ul>
 
         <div style="position: absolute; bottom: 30px; width: calc(100% - 24px);">

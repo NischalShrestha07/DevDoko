@@ -17,6 +17,10 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\GroupController;
+use App\Http\Controllers\GroupPostController;
+use App\Http\Controllers\GroupResourceController;
+use App\Http\Controllers\GroupEventController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +35,12 @@ Route::get('/@{username}', [ProfileController::class, 'show'])->name('profile.sh
 Route::get('/tags/{tag}', [TagController::class, 'show'])->name('tags.show');
 Route::get('/tech/{technology}', [TagController::class, 'techShow'])->name('tech.show');
 Route::get('/tech-trending', [TagController::class, 'trending'])->name('tech.trending');
+
+Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
+Route::get('/groups/discover', [GroupController::class, 'discover'])->name('groups.discover');
+Route::get('/groups/trending', [GroupController::class, 'trending'])->name('groups.trending');
+Route::get('/groups/categories/{category}', [GroupController::class, 'category'])->name('groups.category');
+Route::get('/groups/invitation/{token}', [GroupController::class, 'acceptInvitation'])->name('groups.accept-invitation');
 
 // Auth routes
 Route::middleware('guest')->group(function () {
@@ -130,5 +140,80 @@ Route::middleware('auth')->group(function () {
     Route::get('/saved', [SaveController::class, 'index'])->name('saved.index');
 
     Route::get('/users/{user}/saved', [ProfileController::class, 'saved'])->name('users.saved');
+
+    // Developers
     Route::get('/developers', [DeveloperController::class, 'index'])->name('developers.index');
+
+    // ============= GROUP ROUTES =============
+    Route::get('/my-groups', [GroupController::class, 'myGroups'])->name('groups.my-groups');
+    Route::get('/groups/recommended', [GroupController::class, 'recommended'])->name('groups.recommended');
+
+    // Create Group
+    Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
+    Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
+
+    // Single Group Routes (using slug)
+    Route::prefix('groups/{group:slug}')->group(function () {
+        // View group
+        Route::get('/', [GroupController::class, 'show'])->name('groups.show');
+
+        // Manage group
+        Route::get('/edit', [GroupController::class, 'edit'])->name('groups.edit');
+        Route::put('/', [GroupController::class, 'update'])->name('groups.update');
+        Route::delete('/', [GroupController::class, 'destroy'])->name('groups.destroy');
+
+        // Membership
+        Route::post('/join', [GroupController::class, 'join'])->name('groups.join');
+        Route::delete('/leave', [GroupController::class, 'leave'])->name('groups.leave');
+        Route::get('/members', [GroupController::class, 'members'])->name('groups.members');
+        Route::post('/members/{user}/approve', [GroupController::class, 'approveMember'])->name('groups.members.approve');
+        Route::delete('/members/{user}/reject', [GroupController::class, 'rejectMember'])->name('groups.members.reject');
+        Route::delete('/members/{user}/remove', [GroupController::class, 'removeMember'])->name('groups.members.remove');
+        Route::put('/members/{user}/role', [GroupController::class, 'updateMemberRole'])->name('groups.members.role');
+
+        // Invitations
+        Route::post('/invite', [GroupController::class, 'invite'])->name('groups.invite');
+
+        // Posts
+        Route::post('/posts', [GroupController::class, 'storePost'])->name('groups.posts.store');
+        Route::get('/posts/{post}', [GroupController::class, 'showPost'])->name('groups.post');
+        Route::post('/posts/{post}/like', [GroupController::class, 'likePost'])->name('groups.posts.like');
+        Route::post('/posts/{post}/pin', [GroupController::class, 'pinPost'])->name('groups.posts.pin');
+        Route::post('/posts/{post}/unpin', [GroupController::class, 'unpinPost'])->name('groups.posts.unpin');
+
+        // Post Comments
+        Route::post('/posts/{post}/comments', [GroupController::class, 'storeComment'])->name('groups.posts.comments.store');
+        Route::delete('/comments/{comment}', [GroupController::class, 'deleteComment'])->name('groups.comments.destroy');
+        Route::post('/comments/{comment}/like', [GroupController::class, 'likeComment'])->name('groups.comments.like');
+
+        // Resources
+        Route::get('/resources', [GroupController::class, 'resources'])->name('groups.resources');
+        Route::post('/resources', [GroupController::class, 'storeResource'])->name('groups.resources.store');
+        Route::get('/resources/{resource}/download', [GroupController::class, 'downloadResource'])->name('groups.resources.download');
+        Route::delete('/resources/{resource}', [GroupController::class, 'deleteResource'])->name('groups.resources.destroy');
+        Route::post('/resources/{resource}/like', [GroupController::class, 'likeResource'])->name('groups.resources.like');
+
+        // Events
+        Route::get('/events', [GroupController::class, 'events'])->name('groups.events');
+        Route::post('/events', [GroupController::class, 'storeEvent'])->name('groups.events.store');
+        Route::delete('/events/{event}', [GroupController::class, 'deleteEvent'])->name('groups.events.destroy');
+        Route::post('/events/{event}/attend', [GroupController::class, 'attendEvent'])->name('groups.events.attend');
+
+        // Activity
+        Route::get('/activity', [GroupController::class, 'activity'])->name('groups.activity');
+    });
+
+
+    // Group categories and discovery
+    Route::get('/groups/discover', [GroupController::class, 'discover'])->name('groups.discover');
+    Route::get('/groups/recommended', [GroupController::class, 'recommended'])->name('groups.recommended');
+    Route::get('/groups/trending', [GroupController::class, 'trending'])->name('groups.trending');
+});
+
+// Admin routes (if you have admin middleware)
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/groups', [AdminController::class, 'groups'])->name('groups');
+    Route::get('/groups/{group}', [AdminController::class, 'showGroup'])->name('groups.show');
+    Route::delete('/groups/{group}', [AdminController::class, 'deleteGroup'])->name('groups.delete');
+    Route::post('/groups/{group}/feature', [AdminController::class, 'featureGroup'])->name('groups.feature');
 });
