@@ -11,13 +11,13 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
                     <h5 class="fw-semibold mb-0">
-                        <i class="bi bi-chat-dots me-2 text-primary"></i>
+                        <i class="bi bi-chat-dots text-primary"></i>
                         Messages
                     </h5>
                     <div class="d-flex gap-2">
-                        <span class="badge bg-primary rounded-pill px-3 py-2">
+                        {{-- <span class="badge bg-primary rounded-pill px-3 py-2">
                             {{ $conversations->count() }} chats
-                        </span>
+                        </span> --}}
                         <a href="{{ route('developers.index') }}"
                             class="btn btn-sm btn-outline-primary rounded-pill px-3">
                             <i class="bi bi-plus-lg me-1"></i>

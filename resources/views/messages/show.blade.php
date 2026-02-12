@@ -14,9 +14,9 @@
                         Messages
                     </h5>
                     <div class="d-flex gap-2">
-                        <span class="badge bg-primary rounded-pill px-3 py-2">
+                        {{-- <span class="badge bg-primary rounded-pill px-3 py-2">
                             {{ $conversations->count() ?? 0 }} chats
-                        </span>
+                        </span> --}}
                         <a href="{{ route('developers.index') }}"
                             class="btn btn-sm btn-outline-primary rounded-pill px-3">
                             <i class="bi bi-plus-lg me-1"></i>

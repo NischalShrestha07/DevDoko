@@ -1,3 +1,4 @@
+{{-- resources/views/posts/partials/card.blade.php --}}
 {{-- Post Card Component --}}
 <div class="post-card mb-4" id="post-{{ $post->id }}" data-post-id="{{ $post->id }}">
     <!-- Post Header -->

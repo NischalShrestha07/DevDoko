@@ -48,7 +48,7 @@ Route::middleware('auth')->group(function () {
     // Home feed
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-    // Posts - Resource Routes
+    // Posts Routes
     Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
@@ -87,25 +87,6 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
     Route::post('/profile/cover', [ProfileController::class, 'updateCover'])->name('profile.cover.update');
-
-    // Post Interactions
-    Route::post('/posts/{post}/like/toggle', [LikeController::class, 'toggle'])->name('posts.like.toggle');
-    Route::post('/posts/{post}/save', [SaveController::class, 'store'])->name('posts.save');
-    Route::delete('/posts/{post}/save', [SaveController::class, 'destroy'])->name('posts.unsave');
-
-    // Share and Report routes
-    Route::post('/posts/{post}/share', [PostController::class, 'share'])->name('posts.share');
-    Route::post('/posts/{post}/report', [PostController::class, 'report'])->name('posts.report');
-
-    // Comments routes
-    Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
-    Route::post('/comments/{comment}/like', [CommentController::class, 'like'])->name('comments.like');
-    Route::post('/comments/{comment}/reply', [CommentController::class, 'reply'])->name('comments.reply');
-
-    // Posts - Additional routes
-    Route::post('/posts/{post}/pin', [PostController::class, 'pin'])->name('posts.pin');
-    Route::post('/posts/{post}/share', [PostController::class, 'share'])->name('posts.share');
-    Route::post('/posts/{post}/report', [PostController::class, 'report'])->name('posts.report');
 
 
     // Feed routes
