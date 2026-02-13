@@ -17,25 +17,56 @@ class ProfileController extends Controller
     public function show($username)
     {
         $profile = Profile::with([
-            'user.posts' => function ($query) {
-                $query->with(['likes', 'comments', 'tags', 'media'])
-                    ->latest();
-            },
-            'user.followers',
-            'user.following',
+            'user',
             'techTags'
         ])
             ->where('username', $username)
             ->firstOrFail();
 
-        $posts = $profile->user->posts()->paginate(12);
+        // Get user's posts with proper eager loading
+        $posts = $profile->user->posts()
+            ->with(['likes', 'comments', 'tags', 'media', 'user.profile'])
+            ->withCount(['likes', 'comments', 'saves'])
+            ->latest()
+            ->paginate(12);
+
+        // Get saved posts if authenticated and viewing own profile
+        $savedPosts = collect();
+        if (Auth::check() && Auth::id() === $profile->user_id) {
+            $savedPosts = Auth::user()->savedPosts()
+                ->with(['likes', 'comments', 'tags', 'media', 'user.profile'])
+                ->withCount(['likes', 'comments', 'saves'])
+                ->latest()
+                ->paginate(12, ['*'], 'saved_page');
+        }
+
+        // Get tagged posts (if you have a tagging system)
+        $taggedPosts = collect();
+        if (Auth::check() && Auth::id() === $profile->user_id) {
+            // Implement your tagged posts logic here
+            // $taggedPosts = $profile->user->taggedPosts()->paginate(12, ['*'], 'tagged_page');
+        }
 
         $isFollowing = false;
         if (Auth::check()) {
             $isFollowing = Auth::user()->isFollowing($profile->user);
         }
 
-        return view('profiles.show', compact('profile', 'posts', 'isFollowing'));
+        // Get followers/following counts
+        $followersCount = $profile->user->followers()->count();
+        $followingCount = $profile->user->following()->count();
+        $postsCount = $profile->user->posts()->count();
+
+        return view('profiles.show', compact(
+            'profile',
+            'posts',
+            'savedPosts',
+            'taggedPosts',
+            'isFollowing',
+            'followersCount',
+            'followingCount',
+            'postsCount'
+        ));
     }
 
     /**

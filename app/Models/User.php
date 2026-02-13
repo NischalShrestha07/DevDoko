@@ -202,4 +202,11 @@ class User extends Authenticatable
             })
             ->inRandomOrder();
     }
+
+    public function savedPosts()
+    {
+        return $this->belongsToMany(Post::class, 'saves')
+            ->withTimestamps()
+            ->orderBy('saves.created_at', 'desc');
+    }
 }

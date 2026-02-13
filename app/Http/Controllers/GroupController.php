@@ -1180,15 +1180,30 @@ class GroupController extends Controller
     /**
      * Edit post (if needed)
      */
+    /**
+     * Edit post
+     */
     public function editPost(Group $group, GroupPost $post)
     {
         if ($post->user_id !== Auth::id() && !$group->canManage(Auth::user())) {
-            abort(403);
+            abort(403, 'You do not have permission to edit this post.');
         }
 
-        return view('groups.edit-post', compact('group', 'post'));
-    }
+        if ($post->group_id !== $group->id) {
+            abort(404);
+        }
 
+        $postTypes = [
+            'general' => '📝 General',
+            'announcement' => '📢 Announcement',
+            'question' => '❓ Question',
+            'resource' => '📚 Resource',
+            'event' => '📅 Event',
+            'job' => '💼 Job',
+        ];
+
+        return view('groups.edit-post', compact('group', 'post', 'postTypes'));
+    }
     /**
      * Update post
      */
@@ -1235,5 +1250,90 @@ class GroupController extends Controller
 
         return redirect()->route('groups.show', $group->slug)
             ->with('success', 'Post deleted successfully!');
+    }
+
+
+    /**
+     * Mark post as important
+     */
+    public function markImportant(Group $group, GroupPost $post)
+    {
+        if (!$group->canManage(Auth::user())) {
+            abort(403, 'You do not have permission to mark posts as important.');
+        }
+
+        if ($post->group_id !== $group->id) {
+            abort(404);
+        }
+
+        $post->update([
+            'is_important' => true,
+        ]);
+
+        $group->logActivity(
+            Auth::user(),
+            'post_marked_important',
+            Auth::user()->name . ' marked post as important: ' . $post->title
+        );
+
+        return redirect()->back()->with('success', 'Post marked as important!');
+    }
+
+    /**
+     * Unmark post as important
+     */
+    public function unmarkImportant(Group $group, GroupPost $post)
+    {
+        if (!$group->canManage(Auth::user())) {
+            abort(403, 'You do not have permission to unmark posts as important.');
+        }
+
+        if ($post->group_id !== $group->id) {
+            abort(404);
+        }
+
+        $post->update([
+            'is_important' => false,
+        ]);
+
+        $group->logActivity(
+            Auth::user(),
+            'post_unmarked_important',
+            Auth::user()->name . ' unmarked post as important: ' . $post->title
+        );
+
+        return redirect()->back()->with('success', 'Post unmarked as important!');
+    }
+
+    /**
+     * Update comment
+     */
+    public function updateComment(Request $request, Group $group, GroupPostComment $comment)
+    {
+        if ($comment->user_id !== Auth::id() && !$group->canManage(Auth::user())) {
+            abort(403, 'You do not have permission to edit this comment.');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'content' => 'required|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $comment->update($validator->validated());
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'content' => $comment->content,
+                'message' => 'Comment updated successfully!'
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Comment updated successfully!');
     }
 }

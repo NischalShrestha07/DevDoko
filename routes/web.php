@@ -181,6 +181,20 @@ Route::middleware('auth')->group(function () {
         Route::post('/posts/{post}/pin', [GroupController::class, 'pinPost'])->name('groups.posts.pin');
         Route::post('/posts/{post}/unpin', [GroupController::class, 'unpinPost'])->name('groups.posts.unpin');
 
+
+
+        // Posts - Edit/Update/Delete
+        Route::get('/posts/{post}/edit', [GroupController::class, 'editPost'])->name('groups.posts.edit');
+        Route::put('/posts/{post}', [GroupController::class, 'updatePost'])->name('groups.posts.update');
+        Route::delete('/posts/{post}', [GroupController::class, 'deletePost'])->name('groups.posts.destroy');
+
+        // Post importance
+        Route::post('/posts/{post}/important', [GroupController::class, 'markImportant'])->name('groups.posts.important');
+        Route::post('/posts/{post}/unimportant', [GroupController::class, 'unmarkImportant'])->name('groups.posts.unimportant');
+
+        // Comments update
+        Route::put('/comments/{comment}', [GroupController::class, 'updateComment'])->name('groups.comments.update');
+
         // Post Comments
         Route::post('/posts/{post}/comments', [GroupController::class, 'storeComment'])->name('groups.posts.comments.store');
         Route::delete('/comments/{comment}', [GroupController::class, 'deleteComment'])->name('groups.comments.destroy');

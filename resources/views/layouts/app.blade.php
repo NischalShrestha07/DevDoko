@@ -15,385 +15,152 @@
 
     <!-- Highlight.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
-
-    <style>
-        :root {
-            --primary: #0095f6;
-            --secondary: #8e8e8e;
-            --border: #dbdbdb;
-            --bg-light: #fafafa;
-            --text-dark: #262626;
-            --text-light: #8e8e8e;
-        }
-
-        body {
-            background-color: var(--bg-light);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            color: var(--text-dark);
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        /* Main Layout */
-        .main-container {
-            max-width: 100%;
-            margin: 0 auto;
-        }
-
-        /* Navigation Sidebar */
-        .sidebar-left {
-            position: fixed;
-            left: 0;
-            top: 0;
-            height: 100vh;
-            width: 244px;
-            border-right: 1px solid var(--border);
-            background: white;
-            z-index: 1000;
-            padding: 30px 12px;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            padding-left: 12px;
-        }
-
-        .logo a {
-            color: var(--text-dark);
-            text-decoration: none;
-        }
-
-        .nav-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .nav-item {
-            margin-bottom: 8px;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            color: var(--text-dark);
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-
-        .nav-link:hover {
-            background-color: #f2f2f2;
-        }
-
-        .nav-link.active {
-            background-color: #f2f2f2;
-            font-weight: 600;
-        }
-
-        .nav-icon {
-            font-size: 24px;
-            margin-right: 16px;
-            width: 24px;
-            text-align: center;
-        }
-
-        .nav-text {
-            font-size: 16px;
-        }
-
-        /* Content Area */
-        .content-area {
-            margin-left: 244px;
-            padding: 0;
-            min-height: 100vh;
-        }
-
-        /* Mobile Navigation */
-        .mobile-nav {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            border-top: 1px solid var(--border);
-            z-index: 1000;
-            padding: 12px 0;
-        }
-
-        .mobile-nav-items {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-        }
-
-        .mobile-nav-icon {
-            font-size: 24px;
-            color: var(--text-dark);
-            text-decoration: none;
-        }
-
-        /* Responsive */
-        @media (max-width: 1260px) {
-            .sidebar-left {
-                width: 72px;
-            }
-
-            .nav-text,
-            .logo span {
-                display: none;
-            }
-
-            .nav-icon {
-                margin-right: 0;
-            }
-
-            .content-area {
-                margin-left: 72px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .sidebar-left {
-                display: none;
-            }
-
-            .content-area {
-                margin-left: 0;
-                padding-bottom: 60px;
-            }
-
-            .mobile-nav {
-                display: block;
-            }
-        }
-
-        /* Post Styles */
-        .post-content img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-        }
-
-        .post-content pre {
-            background-color: #f8f9fa;
-            padding: 1rem;
-            border-radius: 8px;
-            overflow-x: auto;
-            margin-bottom: 1rem;
-        }
-
-        .post-content code {
-            background-color: #f8f9fa;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.9em;
-        }
-
-        /* Story Circles */
-        .story-circle {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            padding: 3px;
-            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-        }
-
-        .story-inner {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 2px solid white;
-            overflow: hidden;
-        }
-
-        /* Card Styles */
-        .card {
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        /* Badge Styles */
-        .badge {
-            border-radius: 10px;
-            padding: 4px 8px;
-            font-weight: 500;
-        }
-
-        /* Button Styles */
-        .btn {
-            border-radius: 8px;
-            font-weight: 500;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .btn-outline-primary {
-            color: var(--primary);
-            border-color: var(--primary);
-        }
-
-        /* Form Controls */
-        .form-control {
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-
-        .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 0.25rem rgba(0, 149, 246, 0.25);
-        }
-
-        /* Dropdown Styles */
-        .dropdown-menu {
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .dropdown-item {
-            border-radius: 4px;
-            margin: 2px;
-        }
-
-        /* Modal Styles */
-        .modal-content {
-            border-radius: 12px;
-            border: none;
-        }
-
-        /* Pagination */
-        .pagination .page-link {
-            border-radius: 6px;
-            margin: 0 2px;
-        }
-
-        /* Alert Styles */
-        .alert {
-            border-radius: 8px;
-            border: none;
-        }
-    </style>
 </head>
 
-<body>
+<body class="bg-light"
+    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #262626;">
+
     <!-- Desktop Navigation Sidebar -->
-    <div class="sidebar-left d-none d-md-block">
-        <div class="logo">
-            <a href="{{ route('home') }}">
-                <img src="{{ asset('/assets/devdoko.png') }}" alt="DevDoko"
-                    style="width: 70px; border:2px solid black; border-radius: 50%;">
-                <span class="ms-2">DevDoko</span>
-            </a>
+    <div class="d-none d-md-block position-fixed start-0 top-0 h-100 bg-white border-end"
+        style="width: 244px; z-index: 1000; padding: 30px 12px; border-color: #dbdbdb !important;">
+
+        <!-- Logo -->
+        <div class="d-flex align-items-center mb-4 px-2">
+            <img src="{{ asset('/assets/devdoko.png') }}" alt="DevDoko"
+                style="width: 70px; border: 2px solid #000; border-radius: 50%;">
+            <span class="ms-2 fw-bold" style="font-size: 24px; color: #262626;">DevDoko</span>
         </div>
 
-        <ul class="nav-menu">
-            <li class="nav-item">
-                <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">
-                    <i class="bi bi-house-door{{ request()->routeIs('home') ? '-fill' : '' }} nav-icon"></i>
-                    <span class="nav-text">Home</span>
+        <!-- Navigation Menu -->
+        <ul class="list-unstyled">
+            <!-- Home -->
+            <li class="mb-2">
+                <a href="{{ route('home') }}"
+                    class="d-flex align-items-center px-3 py-2 text-decoration-none rounded-3 {{ request()->routeIs('home') ? 'bg-light fw-semibold' : '' }}"
+                    style="color: #262626; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#f2f2f2'"
+                    onmouseout="this.style.backgroundColor='{{ request()->routeIs('home') ? '#f2f2f2' : 'transparent' }}'">
+                    <i class="bi bi-house-door{{ request()->routeIs('home') ? '-fill' : '' }}"
+                        style="font-size: 24px; width: 24px;"></i>
+                    <span class="ms-3" style="font-size: 16px;">Home</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="{{ route('search') }}" class="nav-link {{ request()->routeIs('search') ? 'active' : '' }}">
-                    <i class="bi bi-search nav-icon"></i>
-                    <span class="nav-text">Search</span>
+
+            <!-- Search -->
+            <li class="mb-2">
+                <a href="{{ route('search') }}"
+                    class="d-flex align-items-center px-3 py-2 text-decoration-none rounded-3 {{ request()->routeIs('search') ? 'bg-light fw-semibold' : '' }}"
+                    style="color: #262626; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#f2f2f2'"
+                    onmouseout="this.style.backgroundColor='{{ request()->routeIs('search') ? '#f2f2f2' : 'transparent' }}'">
+                    <i class="bi bi-search" style="font-size: 24px; width: 24px;"></i>
+                    <span class="ms-3" style="font-size: 16px;">Search</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="{{ route('explore') }}" class="nav-link {{ request()->routeIs('explore') ? 'active' : '' }}">
-                    <i class="bi bi-compass nav-icon"></i>
-                    <span class="nav-text">Explore</span>
+
+            <!-- Explore -->
+            <li class="mb-2">
+                <a href="{{ route('explore') }}"
+                    class="d-flex align-items-center px-3 py-2 text-decoration-none rounded-3 {{ request()->routeIs('explore') ? 'bg-light fw-semibold' : '' }}"
+                    style="color: #262626; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#f2f2f2'"
+                    onmouseout="this.style.backgroundColor='{{ request()->routeIs('explore') ? '#f2f2f2' : 'transparent' }}'">
+                    <i class="bi bi-compass" style="font-size: 24px; width: 24px;"></i>
+                    <span class="ms-3" style="font-size: 16px;">Explore</span>
                 </a>
             </li>
-            <li class="nav-item">
+
+            <!-- Messages -->
+            <li class="mb-2">
                 <a href="{{ route('messages.index') }}"
-                    class="nav-link {{ request()->routeIs('messages.*') ? 'active' : '' }}">
-                    <i class="bi bi-chat{{ request()->routeIs('messages.*') ? '-fill' : '' }} nav-icon"></i>
-                    <span class="nav-text">Messages</span>
+                    class="d-flex align-items-center px-3 py-2 text-decoration-none rounded-3 {{ request()->routeIs('messages.*') ? 'bg-light fw-semibold' : '' }}"
+                    style="color: #262626; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#f2f2f2'"
+                    onmouseout="this.style.backgroundColor='{{ request()->routeIs('messages.*') ? '#f2f2f2' : 'transparent' }}'">
+                    <i class="bi bi-chat{{ request()->routeIs('messages.*') ? '-fill' : '' }}"
+                        style="font-size: 24px; width: 24px;"></i>
+                    <span class="ms-3" style="font-size: 16px;">Messages</span>
                 </a>
             </li>
-            <li class="nav-item">
+
+            <!-- Notifications -->
+            <li class="mb-2">
                 <a href="{{ route('notifications.index') }}"
-                    class="nav-link {{ request()->routeIs('notifications.*') ? 'active' : '' }}">
-                    <i class="bi bi-heart{{ request()->routeIs('notifications.*') ? '-fill' : '' }} nav-icon"></i>
-                    <span class="nav-text">Notifications</span>
+                    class="d-flex align-items-center px-3 py-2 text-decoration-none rounded-3 {{ request()->routeIs('notifications.*') ? 'bg-light fw-semibold' : '' }}"
+                    style="color: #262626; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#f2f2f2'"
+                    onmouseout="this.style.backgroundColor='{{ request()->routeIs('notifications.*') ? '#f2f2f2' : 'transparent' }}'">
+                    <i class="bi bi-heart{{ request()->routeIs('notifications.*') ? '-fill' : '' }}"
+                        style="font-size: 24px; width: 24px;"></i>
+                    <span class="ms-3" style="font-size: 16px;">Notifications</span>
                     @php
                     $unreadCount = auth()->user()->notifications()->where('read_at', null)->count();
                     @endphp
                     @if($unreadCount > 0)
-                    <span class="badge bg-danger ms-auto" style="font-size: 10px;">{{ $unreadCount }}</span>
+                    <span class="badge bg-danger ms-auto rounded-pill" style="font-size: 10px;">{{ $unreadCount
+                        }}</span>
                     @endif
                 </a>
             </li>
-            <li class="nav-item">
+
+            <!-- Create -->
+            <li class="mb-2">
                 <a href="{{ route('posts.create') }}"
-                    class="nav-link {{ request()->routeIs('posts.create') ? 'active' : '' }}">
-                    <i class="bi bi-plus-square{{ request()->routeIs('posts.create') ? '-fill' : '' }} nav-icon"></i>
-                    <span class="nav-text">Create</span>
+                    class="d-flex align-items-center px-3 py-2 text-decoration-none rounded-3 {{ request()->routeIs('posts.create') ? 'bg-light fw-semibold' : '' }}"
+                    style="color: #262626; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#f2f2f2'"
+                    onmouseout="this.style.backgroundColor='{{ request()->routeIs('posts.create') ? '#f2f2f2' : 'transparent' }}'">
+                    <i class="bi bi-plus-square{{ request()->routeIs('posts.create') ? '-fill' : '' }}"
+                        style="font-size: 24px; width: 24px;"></i>
+                    <span class="ms-3" style="font-size: 16px;">Create</span>
                 </a>
             </li>
-            <li class="nav-item">
+
+            <!-- Profile -->
+            <li class="mb-2">
                 <a href="{{ route('profile.show', auth()->user()->profile->username) }}"
-                    class="nav-link {{ request()->routeIs('profile.show') ? 'active' : '' }}">
+                    class="d-flex align-items-center px-3 py-2 text-decoration-none rounded-3 {{ request()->routeIs('profile.show') ? 'bg-light fw-semibold' : '' }}"
+                    style="color: #262626; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#f2f2f2'"
+                    onmouseout="this.style.backgroundColor='{{ request()->routeIs('profile.show') ? '#f2f2f2' : 'transparent' }}'">
                     @if(auth()->user()->profile->avatar)
-                    <img src="{{ auth()->user()->profile->avatar_url }}" class="nav-icon rounded-circle"
+                    <img src="{{ auth()->user()->profile->avatar_url }}" class="rounded-circle"
                         style="width: 24px; height: 24px; object-fit: cover;">
                     @else
-                    <i class="bi bi-person-circle nav-icon"></i>
+                    <i class="bi bi-person-circle" style="font-size: 24px; width: 24px;"></i>
                     @endif
-                    <span class="nav-text">Profile</span>
+                    <span class="ms-3" style="font-size: 16px;">Profile</span>
                 </a>
             </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                    <i class="bi bi-people-fill"></i> Groups
-                </a>
-                <ul class="dropdown-menu">
-                    <li>
-                        <a class="dropdown-item" href="{{ route('groups.index') }}">
-                            <i class="bi bi-compass"></i> Discover Groups
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="{{ route('groups.my-groups') }}">
-                            <i class="bi bi-bookmark-check"></i> My Groups
-                        </a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="{{ route('groups.create') }}">
-                            <i class="bi bi-plus-circle"></i> Create Group
-                        </a>
-                    </li>
-                </ul>
+
+            <!-- Groups Dropdown -->
+            <li class="mb-2">
+                <div class="dropdown">
+                    <a href="#"
+                        class="d-flex align-items-center px-3 py-2 text-decoration-none rounded-3 dropdown-toggle"
+                        style="color: #262626; transition: all 0.2s;" data-bs-toggle="dropdown" aria-expanded="false"
+                        onmouseover="this.style.backgroundColor='#f2f2f2'"
+                        onmouseout="this.style.backgroundColor='transparent'">
+                        <i class="bi bi-people-fill" style="font-size: 24px; width: 24px;"></i>
+                        <span class="ms-3" style="font-size: 16px;">Groups</span>
+                    </a>
+                    <ul class="dropdown-menu w-100 mt-1 border-0 shadow-sm" style="border-radius: 8px;">
+                        <li>
+                            <a class="dropdown-item py-2" href="{{ route('groups.index') }}">
+                                <i class="bi bi-compass me-2"></i> Discover Groups
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2" href="{{ route('groups.my-groups') }}">
+                                <i class="bi bi-bookmark-check me-2"></i> My Groups
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2" href="{{ route('groups.create') }}">
+                                <i class="bi bi-plus-circle me-2"></i> Create Group
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
+
+            <!-- Pending Requests Badge -->
             @auth
             @php
             $pendingRequests = \App\Models\Group::whereHas('members', function($q) {
@@ -402,48 +169,60 @@
             })->count();
             @endphp
             @if($pendingRequests > 0)
-            <li class="nav-item">
-                <a class="nav-link position-relative" href="{{ route('groups.my-groups') }}">
-                    <i class="bi bi-bell"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        {{ $pendingRequests }}
-                    </span>
+            <li class="mb-2">
+                <a href="{{ route('groups.my-groups') }}"
+                    class="d-flex align-items-center px-3 py-2 text-decoration-none rounded-3 position-relative"
+                    style="color: #262626; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#f2f2f2'"
+                    onmouseout="this.style.backgroundColor='transparent'">
+                    <i class="bi bi-bell" style="font-size: 24px; width: 24px;"></i>
+                    <span class="ms-3" style="font-size: 16px;">Requests</span>
+                    <span class="badge bg-danger rounded-pill ms-auto">{{ $pendingRequests }}</span>
                 </a>
             </li>
             @endif
             @endauth
-        </ul>
 
-        <div style="position: absolute; bottom: 30px; width: calc(100% - 24px);">
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button type="submit" class="nav-link w-100 text-start bg-transparent border-0 p-0">
-                    <i class="bi bi-box-arrow-right nav-icon"></i>
-                    <span class="nav-text">Logout</span>
-                </button>
-            </form>
-        </div>
+            <!-- Logout -->
+            <li class="position-absolute bottom-0 mb-4" style="width: calc(100% - 24px);">
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit"
+                        class="d-flex align-items-center w-100 px-3 py-2 text-start bg-transparent border-0 rounded-3"
+                        style="color: #262626; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#f2f2f2'"
+                        onmouseout="this.style.backgroundColor='transparent'">
+                        <i class="bi bi-box-arrow-right" style="font-size: 24px; width: 24px;"></i>
+                        <span class="ms-3" style="font-size: 16px;">Logout</span>
+                    </button>
+                </form>
+            </li>
+        </ul>
     </div>
 
-    <!-- Main Content -->
-    <div class="content-area">
+    <!-- Main Content Area -->
+    <div class="content-area" style="margin-left: 244px; min-height: 100vh;">
         <!-- Flash Messages -->
         @if(session('success'))
         <div class="container pt-3">
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i>
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert"
+                style="border-radius: 12px; background-color: #d4edda; color: #155724;">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                    <span>{{ session('success') }}</span>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             </div>
         </div>
         @endif
 
         @if(session('error'))
         <div class="container pt-3">
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert"
+                style="border-radius: 12px; background-color: #f8d7da; color: #721c24;">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                    <span>{{ session('error') }}</span>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             </div>
         </div>
         @endif
@@ -452,53 +231,67 @@
     </div>
 
     <!-- Mobile Navigation -->
-    <nav class="mobile-nav d-md-none">
-        <div class="mobile-nav-items">
-            <a href="{{ route('home') }}" class="mobile-nav-icon">
-                <i class="bi bi-house-door{{ request()->routeIs('home') ? '-fill' : '' }}"></i>
+    <nav class="d-md-none position-fixed bottom-0 start-0 end-0 bg-white border-top py-3 px-4"
+        style="z-index: 1000; border-color: #dbdbdb !important;">
+        <div class="d-flex justify-content-around align-items-center">
+            <!-- Home -->
+            <a href="{{ route('home') }}" class="text-decoration-none" style="color: #262626;">
+                <i class="bi bi-house-door{{ request()->routeIs('home') ? '-fill' : '' }} fs-4"></i>
             </a>
-            <a href="{{ route('search') }}" class="mobile-nav-icon">
-                <i class="bi bi-search"></i>
+
+            <!-- Search -->
+            <a href="{{ route('search') }}" class="text-decoration-none" style="color: #262626;">
+                <i class="bi bi-search fs-4"></i>
             </a>
-            <a href="{{ route('posts.create') }}" class="mobile-nav-icon">
-                <i class="bi bi-plus-square{{ request()->routeIs('posts.create') ? '-fill' : '' }}"></i>
+
+            <!-- Create -->
+            <a href="{{ route('posts.create') }}" class="text-decoration-none" style="color: #262626;">
+                <i class="bi bi-plus-square{{ request()->routeIs('posts.create') ? '-fill' : '' }} fs-4"></i>
             </a>
-            <a href="{{ route('notifications.index') }}" class="mobile-nav-icon position-relative">
-                <i class="bi bi-heart{{ request()->routeIs('notifications.*') ? '-fill' : '' }}"></i>
+
+            <!-- Notifications -->
+            <a href="{{ route('notifications.index') }}" class="text-decoration-none position-relative"
+                style="color: #262626;">
+                <i class="bi bi-heart{{ request()->routeIs('notifications.*') ? '-fill' : '' }} fs-4"></i>
                 @php
                 $unreadCount = auth()->user()->notifications()->where('read_at', null)->count();
                 @endphp
                 @if($unreadCount > 0)
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                    style="font-size: 8px;">
-                    {{ $unreadCount }}
-                </span>
+                    style="font-size: 10px;">{{ $unreadCount }}</span>
                 @endif
             </a>
-            <a href="{{ route('profile.show', auth()->user()->profile->username) }}" class="mobile-nav-icon">
+
+            <!-- Profile -->
+            <a href="{{ route('profile.show', auth()->user()->profile->username) }}" class="text-decoration-none">
                 @if(auth()->user()->profile->avatar)
                 <img src="{{ auth()->user()->profile->avatar_url }}" class="rounded-circle"
-                    style="width: 24px; height: 24px; object-fit: cover;">
+                    style="width: 28px; height: 28px; object-fit: cover;">
                 @else
-                <i class="bi bi-person-circle"></i>
+                <i class="bi bi-person-circle fs-4" style="color: #262626;"></i>
                 @endif
             </a>
         </div>
     </nav>
 
-    <!-- Bootstrap JS -->
+    <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Highlight.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize highlight.js
             if (typeof hljs !== 'undefined') {
                 document.querySelectorAll('pre code').forEach((block) => {
                     hljs.highlightElement(block);
                 });
             }
+
+            // Initialize all dropdowns
+            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+            var dropdownList = dropdownElementList.map(function(dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl);
+            });
         });
     </script>
 </body>
