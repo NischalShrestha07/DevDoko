@@ -3,7 +3,7 @@
 @section('title', 'Create Post - DevDoko')
 
 @section('content')
-<div class="container-fluid py-3">
+<div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-12">
             <div class="card border-0 shadow-sm">
@@ -396,7 +396,6 @@
 </div>
 @endsection
 
-@push('styles')
 <style>
     .post-type-btn {
         transition: all 0.2s;
@@ -505,7 +504,6 @@
         animation: pulse 1.5s infinite;
     }
 </style>
-@endpush
 
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>

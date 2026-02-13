@@ -6,6 +6,7 @@ use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Notification;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -15,6 +16,13 @@ use Illuminate\Support\Facades\Log;
 
 class PostController extends Controller
 {
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     public function index(Request $request)
     {
         $query = Post::with(['user.profile', 'tags', 'likes', 'comments.user.profile'])
@@ -433,6 +441,11 @@ class PostController extends Controller
             } catch (\Exception $e) {
                 Log::error('Failed to send share notification', ['error' => $e->getMessage()]);
             }
+        }
+
+        // Create notification for original post owner
+        if ($post->user_id !== Auth::id()) {
+            $this->notificationService->shareNotification(Auth::user(), $post, $sharedPost);
         }
 
         if ($request->expectsJson()) {

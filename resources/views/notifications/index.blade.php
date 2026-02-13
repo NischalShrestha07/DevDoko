@@ -1,5 +1,5 @@
 @extends('layouts.app')
-
+{{-- resources/notifications/index --}}
 @section('title', 'Notifications - DevDoko')
 
 @section('content')

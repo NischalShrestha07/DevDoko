@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Message;
 use App\Models\MessageReaction;
 use App\Models\Notification;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -15,6 +16,13 @@ use Illuminate\Support\Str;
 
 class MessageController extends Controller
 {
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     /**
      * Display messages inbox with developer-specific features
      */
@@ -264,26 +272,13 @@ class MessageController extends Controller
 
         $message = Message::create($messageData);
 
-        // Create notification for receiver - FIXED
-        if ($user->id !== Auth::id()) {
-            $senderName = Auth::user()->profile->username ?? Auth::user()->name;
-
-            $user->notifications()->create([
-                'from_user_id' => Auth::id(),
-                'type' => 'message',
-                'message' => $senderName . ' sent you a message',
-                'data' => [
-                    'message_id' => $message->id,
-                    'sender_id' => Auth::id(),
-                    'sender_name' => $senderName,
-                    'sender_avatar' => Auth::user()->avatar_url,
-                    'content' => Str::limit($message->content, 100),
-                    'type' => $message->type,
-                    'url' => route('messages.show', Auth::user())
-                ]
-            ]);
-        }
-
+        // Send notification
+        $this->notificationService->messageNotification(
+            Auth::user(),
+            $user,
+            $request->content,
+            $request->type ?? 'text'
+        );
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,

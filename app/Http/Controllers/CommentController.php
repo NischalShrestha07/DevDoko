@@ -4,16 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\Comment;
+use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class CommentController extends Controller
 {
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     public function store(Request $request, Post $post)
     {
         $validator = Validator::make($request->all(), [
-            'content' => 'required|string|max:1000'
+            'content' => 'required|string|max:5000',
         ]);
 
         if ($validator->fails()) {
@@ -28,6 +37,10 @@ class CommentController extends Controller
 
         // Update post comment count
         $post->updateCommentCount();
+
+        // Send notification
+        $this->notificationService->commentNotification(Auth::user(), $comment, $post);
+
 
         // Load user relationship for response
         $comment->load('user.profile');
@@ -105,7 +118,7 @@ class CommentController extends Controller
     public function reply(Request $request, Comment $comment)
     {
         $validator = Validator::make($request->all(), [
-            'content' => 'required|string|max:1000'
+            'content' => 'required|string|max:5000',
         ]);
 
         if ($validator->fails()) {
@@ -121,6 +134,9 @@ class CommentController extends Controller
 
         // Update post comment count
         $comment->post->updateCommentCount();
+
+        // Send notification
+        $this->notificationService->replyNotification(Auth::user(), $reply, $comment);
 
         $reply->load('user.profile');
 
