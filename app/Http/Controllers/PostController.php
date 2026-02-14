@@ -232,8 +232,7 @@ class PostController extends Controller
             'link_title' => 'nullable|string|max:200',
             'link_description' => 'nullable|string|max:500',
             'link_image' => 'nullable|url|max:500',
-            'tags' => 'nullable|array',
-            'tags.*' => 'exists:tags,id',
+            'tags' => 'nullable|string', // Changed from array to string
             'remove_image' => 'boolean',
             'remove_video' => 'boolean',
             'visibility' => 'required|in:public,followers,private'
@@ -275,32 +274,46 @@ class PostController extends Controller
             $validated['video_path'] = $path;
         }
 
+        // Remove tags from validated data since we'll handle them separately
+        unset($validated['tags']);
+
         // Update reading time
         $validated['reading_time'] = $this->calculateReadingTime($validated['content'] ?? '');
 
-        // Update post
-        $post->update(array_filter($validated));
+        // Update post - remove null values
+        $updateData = array_filter($validated, function ($value) {
+            return !is_null($value);
+        });
 
-        // Sync tags
-        if ($request->has('tags')) {
-            $post->tags()->sync($request->tags);
-        } else {
-            $post->tags()->detach();
-        }
+        $post->update($updateData);
 
-        // Handle new tags from string input
-        if ($request->filled('new_tags')) {
-            $newTags = array_filter(array_map('trim', explode(',', $request->new_tags)));
-            foreach ($newTags as $tagName) {
-                if (!empty($tagName) && strlen($tagName) <= 50) {
-                    $slug = Str::slug($tagName);
-                    $tag = Tag::firstOrCreate(
-                        ['slug' => $slug],
-                        ['name' => $tagName, 'slug' => $slug]
-                    );
-                    $post->tags()->syncWithoutDetaching($tag->id);
+        // Handle tags from the comma-separated string
+        if ($request->filled('tags')) {
+            $tagIds = [];
+            $tagNames = array_filter(array_map('trim', explode(',', $request->tags)));
+
+            foreach ($tagNames as $tagName) {
+                if (!empty($tagName)) {
+                    // Check if it's an ID or name
+                    if (is_numeric($tagName)) {
+                        $tagIds[] = $tagName;
+                    } else {
+                        // It's a tag name, find or create
+                        $slug = Str::slug($tagName);
+                        $tag = Tag::firstOrCreate(
+                            ['slug' => $slug],
+                            ['name' => $tagName, 'slug' => $slug]
+                        );
+                        $tagIds[] = $tag->id;
+                    }
                 }
             }
+
+            // Sync the tags
+            $post->tags()->sync($tagIds);
+        } else {
+            // If no tags provided, detach all
+            $post->tags()->detach();
         }
 
         // Create activity log

@@ -9,7 +9,8 @@
             <div class="card-body p-5">
                 <div class="text-center mb-4">
                     <h2 class="fw-bold">
-                        <i class="bi bi-code-slash"></i> DevDoko
+                        <img src="{{ asset('assets/devdoko.png') }}" width="50" height="50"
+                            style="border: 1px solid black;" class="rounded-circle" alt="DevDoko"> DevDoko
                     </h2>
                     <p class="text-muted">Join the developer community</p>
                 </div>
