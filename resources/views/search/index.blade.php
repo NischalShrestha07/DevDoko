@@ -4,125 +4,71 @@
 @section('title', 'Search - DevDoko')
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-md-12">
-        <!-- Search Box -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body">
-                <form method="GET" action="{{ route('search') }}">
-                    <div class="input-group">
-                        <input type="text" class="form-control" name="q" value="{{ $query }}"
-                            placeholder="Search developers, posts, tags...">
-                        <button class="btn btn-primary" type="submit">
-                            <i class="bi bi-search"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
 
-        @if($query)
-        <!-- Users Results -->
-        @if($users->count() > 0)
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-white border-0">
-                <h6 class="mb-0 fw-bold">Developers</h6>
-            </div>
-            <div class="card-body">
-                @foreach($users as $user)
-                <div class="d-flex align-items-center mb-3">
-                    <a href="{{ route('profile.show', $user->profile->username) }}" class="text-decoration-none">
-                        <img src="{{ $user->profile->avatar_url }}" alt="{{ $user->name }}" class="rounded-circle me-3"
-                            width="50" height="50" style="object-fit: cover;">
-                    </a>
-                    <div class="flex-grow-1">
-                        <a href="{{ route('profile.show', $user->profile->username) }}"
-                            class="text-decoration-none text-dark fw-bold d-block">
-                            {{ $user->profile->username }}
-                        </a>
-                        <small class="text-muted">{{ $user->name }}</small>
-                    </div>
-                    @if(auth()->id() !== $user->id)
-                    @if(auth()->user()->isFollowing($user))
-                    <form action="{{ route('users.unfollow', $user) }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-outline-secondary btn-sm">
-                            Following
-                        </button>
+            {{-- Search Box --}}
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <form method="GET" action="{{ route('search') }}">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light border-0">
+                                <i class="bi bi-search"></i>
+                            </span>
+
+                            <input type="text" name="q" class="form-control bg-light border-0"
+                                placeholder="Search developers..." value="{{ $query ?? '' }}" autofocus>
+
+                            @if(!empty($query))
+                            <a href="{{ route('search') }}" class="btn btn-light border-0">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                            @endif
+
+                            <button class="btn btn-primary px-4" type="submit">
+                                Search
+                            </button>
+                        </div>
                     </form>
-                    @else
-                    <form action="{{ route('users.follow', $user) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-primary btn-sm">
-                            Follow
-                        </button>
-                    </form>
-                    @endif
-                    @endif
                 </div>
-                @endforeach
-                {{ $users->links() }}
             </div>
-        </div>
-        @endif
 
-        <!-- Posts Results -->
-        @if($posts->count() > 0)
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-white border-0">
-                <h6 class="mb-0 fw-bold">Posts</h6>
-            </div>
-            <div class="card-body">
-                @foreach($posts as $post)
-                @include('posts.partials.card', ['post' => $post])
-                @endforeach
-                {{ $posts->links() }}
-            </div>
-        </div>
-        @endif
+            {{-- Results --}}
+            @if(!empty($query))
 
-        <!-- Tags Results -->
-        @if($tags->count() > 0)
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-white border-0">
-                <h6 class="mb-0 fw-bold">Tags</h6>
+            {{-- Result Count --}}
+            <div class="mb-3 text-muted">
+                @if(isset($users) && method_exists($users, 'total'))
+                Found <strong>{{ $users->total() }}</strong> developers for
+                "<strong>{{ $query }}</strong>"
+                @endif
             </div>
-            <div class="card-body">
-                <div class="d-flex flex-wrap gap-2">
-                    @foreach($tags as $tag)
-                    <a href="{{ route('tags.show', $tag->name) }}" class="btn btn-outline-primary btn-sm">
-                        #{{ $tag->name }}
-                        <span class="badge bg-light text-dark ms-1">{{ $tag->posts_count }}</span>
-                    </a>
-                    @endforeach
-                </div>
-                {{ $tags->links() }}
-            </div>
-        </div>
-        @endif
 
-        <!-- No Results -->
-        @if($users->count() === 0 && $posts->count() === 0 && $tags->count() === 0)
-        <div class="text-center py-5">
-            <i class="bi bi-search display-1 text-muted mb-3"></i>
-            <h5 class="text-muted">No results found</h5>
-            <p class="text-muted">Try different keywords or explore trending content</p>
-            <a href="{{ route('explore') }}" class="btn btn-primary">
-                Explore Trending
-            </a>
+            {{-- Developers List --}}
+            @if(isset($users) && $users->count() > 0)
+
+            @foreach($users as $user)
+            @include('search.partials.user-card', ['user' => $user])
+            @endforeach
+
+            <div class="mt-4">
+                {{ $users->appends(request()->query())->links() }}
+            </div>
+
+            @else
+            <div class="text-center py-5">
+                <i class="bi bi-search display-5 text-muted mb-3"></i>
+                <h5 class="text-muted">No results found</h5>
+                <p class="text-muted small">
+                    Try searching with a different keyword.
+                </p>
+            </div>
+            @endif
+
+            @endif
+
         </div>
-        @endif
-        @else
-        <!-- Empty State -->
-        <div class="text-center py-5">
-            <i class="bi bi-search display-1 text-muted mb-3"></i>
-            <h5 class="text-muted">Search DevDoko</h5>
-            <p class="text-muted mb-4">
-                Find developers, posts, and tags
-            </p>
-        </div>
-        @endif
     </div>
 </div>
 @endsection

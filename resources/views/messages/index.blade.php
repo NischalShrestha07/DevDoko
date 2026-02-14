@@ -248,7 +248,6 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-0 py-3">
                     <h6 class="fw-semibold mb-0">
-                        <i class="bi bi-lightning-charge-fill text-warning me-2"></i>
                         Quick Actions
                     </h6>
                 </div>
@@ -259,16 +258,6 @@
                             <span><i class="bi bi-people me-2"></i>Find Developers</span>
                             <i class="bi bi-arrow-right"></i>
                         </a>
-                        <a href="{{ route('messages.search') }}"
-                            class="btn btn-outline-secondary d-flex align-items-center justify-content-between">
-                            <span><i class="bi bi-search me-2"></i>Search Messages</span>
-                            <i class="bi bi-arrow-right"></i>
-                        </a>
-                        <button class="btn btn-outline-dark d-flex align-items-center justify-content-between"
-                            onclick="showShortcuts()">
-                            <span><i class="bi bi-keyboard me-2"></i>Keyboard Shortcuts</span>
-                            <i class="bi bi-question-circle"></i>
-                        </button>
                     </div>
                 </div>
             </div>

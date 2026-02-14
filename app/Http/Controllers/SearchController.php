@@ -5,69 +5,64 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Post;
 use App\Models\Tag;
+use App\Models\Group;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class SearchController extends Controller
 {
+    /**
+     * Main search page with advanced filtering
+     */
     public function index(Request $request)
     {
         $query = $request->get('q');
+        $language = $request->get('language');
+        $type = $request->get('type', 'all');
+        $from = $request->get('from');
+
+        // Always define variables to avoid undefined errors
+        $users = collect();
+        $posts = collect();
 
         if (!$query) {
-            return view('search.index', [
-                'users' => collect(),
-                'posts' => collect(),
-                'tags' => collect(),
-                'query' => '',
-            ]);
+            return view('search.index', compact(
+                'users',
+                'posts',
+                'query',
+                'type',
+                'language',
+                'from'
+            ));
         }
 
-        // Search users
-        $users = User::with('profile')
-            ->whereHas('profile', function ($q) use ($query) {
-                $q->where('username', 'LIKE', "%{$query}%")
-                    ->orWhere('bio', 'LIKE', "%{$query}%");
-            })
-            ->orWhere('name', 'LIKE', "%{$query}%")
-            ->orWhere('email', 'LIKE', "%{$query}%")
-            ->paginate(10);
+        if ($type === 'all' || $type === 'developers') {
+            $users = User::with('profile')
+                ->whereHas('profile', function ($q) use ($query) {
+                    $q->where('username', 'LIKE', "%{$query}%");
+                })
+                ->paginate(10);
+        }
 
+        //  Posts Search
+        if ($type === 'all' || $type === 'posts') {
+            $posts = Post::where('title', 'LIKE', "%{$query}%")
+                ->where(function ($q) {
+                    $q->where('visibility', 'public')
+                        ->orWhere('user_id', Auth::id());
+                })
+                ->with('user.profile')
+                ->paginate(10);
+        }
 
-        $posts = Post::where('content', 'LIKE', "%{$query}%")
-            ->where(function ($q) {
-                $q->where('visibility', 'public')
-                    ->orWhere('user_id', Auth::id());
-            })
-            ->paginate(10);
-
-        // Search tags
-        $tags = Tag::where('name', 'LIKE', "%{$query}%")
-            ->withCount('posts')
-            ->paginate(10);
-
-        return view('search.index', compact('users', 'posts', 'tags', 'query'));
-    }
-
-    public function users(Request $request)
-    {
-        $query = $request->get('q');
-
-        $users = User::with('profile')
-            ->whereHas('profile', function ($q) use ($query) {
-                $q->where('username', 'LIKE', "%{$query}%");
-            })
-            ->limit(10)
-            ->get()
-            ->map(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'username' => $user->profile->username,
-                    'avatar' => $user->profile->avatar_url,
-                    'name' => $user->name,
-                ];
-            });
-
-        return response()->json($users);
+        return view('search.index', compact(
+            'users',
+            'posts',
+            'query',
+            'type',
+            'language',
+            'from'
+        ));
     }
 }

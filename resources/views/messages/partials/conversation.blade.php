@@ -139,7 +139,7 @@
         @endif
     </div>
 
-    <!-- Message Input Area with Developer Features -->
+    <!-- Message Input Area with Developer Fea  tures -->
     <div class="card-footer bg-white border-0 p-3">
         <!-- Quick Actions Toolbar -->
         <div class="d-flex align-items-center gap-2 mb-3">
@@ -216,12 +216,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="flex-grow-1"></div>
-            <small class="text-muted">
-                <i class="bi bi-keyboard me-1"></i>
-                <kbd class="bg-light text-dark px-1 rounded">⌘↵</kbd> send
-            </small>
         </div>
 
         <!-- Code Input (Hidden by default) -->
@@ -251,34 +245,34 @@
             </div>
         </div>
 
-        <!-- File Upload Input (Hidden by default) -->
-        <div id="fileInputContainer" style="display: none;" class="mb-3">
-            <div class="card border-0 bg-light">
-                <div class="card-body p-3">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="bi bi-file-earmark fs-4"></i>
-                            <span>Upload file</span>
-                        </div>
-                        <button type="button" class="btn-close btn-sm" onclick="cancelFile()"></button>
-                    </div>
-                    <div class="mt-2">
-                        <input type="file" id="fileUpload" class="form-control form-control-sm">
-                        <small class="text-muted">Max size: 10MB</small>
-                    </div>
-                    <div class="mt-2">
-                        <button class="btn btn-sm btn-primary" onclick="sendFile()">Upload</button>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="cancelFile()">Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Main Message Input -->
         <form action="{{ route('messages.store', $conversationUser) }}" method="POST" id="messageForm"
             enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="type" id="messageType" value="text">
+
+            <!-- File Upload Input (Hidden by default) -->
+            <div id="fileInputContainer" style="display: none;" class="mb-3">
+                <div class="card border-0 bg-light">
+                    <div class="card-body p-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-file-earmark fs-4"></i>
+                                <span>Upload file</span>
+                            </div>
+                            <button type="button" class="btn-close btn-sm" onclick="cancelFile()"></button>
+                        </div>
+                        <div class="mt-2">
+                            <input type="file" id="fileUpload" name="file" class="form-control form-control-sm">
+                        </div>
+                        <div class="mt-2">
+                            <button class="btn btn-sm btn-primary" onclick="sendFile()">Upload</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="cancelFile()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <input type="hidden" name="reply_to_id" id="replyToId" value="">
             <input type="hidden" name="code_snippet" id="hiddenCodeSnippet" value="">
             <input type="hidden" name="code_language" id="hiddenCodeLanguage" value="">

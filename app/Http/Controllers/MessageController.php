@@ -227,7 +227,7 @@ class MessageController extends Controller
             'type' => 'required|in:text,code,file',
             'code_snippet' => 'nullable|required_if:type,code|string',
             'code_language' => 'nullable|required_if:type,code|string|max:50',
-            'file' => 'nullable|required_if:type,file|file|max:10240', // 10MB max
+            'file' => 'nullable|required_if:type,file|file|max:200000', // 10MB max
             'reply_to_id' => 'nullable|exists:messages,id',
         ]);
 
