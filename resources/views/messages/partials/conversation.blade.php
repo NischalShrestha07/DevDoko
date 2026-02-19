@@ -163,7 +163,7 @@
                         Introduction
                     </button>
                     <button class="dropdown-item py-2"
-                        onclick="setIcebreaker('💻 I noticed you work with development. I\'m also experienced in that and would love to exchange knowledge.')">
+                        onclick="setIcebreaker('I noticed you work with development. I\'m also experienced in that and would love to exchange knowledge.')">
                         <i class="bi bi-code-square me-2 text-success"></i>
                         Tech Stack
                     </button>
@@ -173,7 +173,7 @@
                         Collaboration
                     </button>
                     <button class="dropdown-item py-2"
-                        onclick="setIcebreaker('❓ Could I ask you a few questions about development?')">
+                        onclick="setIcebreaker(' Could I ask you a few questions about development?')">
                         <i class="bi bi-question-circle me-2 text-info"></i>
                         Ask for Help
                     </button>

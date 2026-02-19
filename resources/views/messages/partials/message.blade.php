@@ -119,8 +119,7 @@ $isDocument = in_array($fileExtension, ['doc', 'docx', 'txt', 'md', 'rtf']);
                                 <i class="bi bi-file-pdf fs-1 text-danger"></i>
                             </div>
                             <div class="flex-grow-1">
-                                <h6 class="fw-semibold mb-1">{{ $message->file_name }}</h6>
-                                <small class="text-muted">{{ number_format($message->file_size / 1024, 1) }} KB</small>
+                                <h6 class="fw-semibold text-dark mb-1">{{ $message->file_name }}</h6>
                                 <div class="mt-2">
                                     <a href="{{ $message->file_url }}" target="_blank"
                                         class="btn btn-sm btn-outline-primary me-2">
@@ -159,9 +158,6 @@ $isDocument = in_array($fileExtension, ['doc', 'docx', 'txt', 'md', 'rtf']);
                         <div>
                             <h6 class="fw-semibold mb-1 {{ $isOwn ? 'text-white' : 'text-dark' }}">{{
                                 $message->file_name }}</h6>
-                            <small class="{{ $isOwn ? 'text-white-50' : 'text-muted' }}">
-                                {{ number_format($message->file_size / 1024, 1) }} KB
-                            </small>
                             <a href="{{ $message->file_url }}" target="_blank"
                                 class="btn btn-sm {{ $isOwn ? 'btn-light' : 'btn-primary' }} d-block mt-2">
                                 <i class="bi bi-eye me-1"></i> View

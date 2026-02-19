@@ -66,7 +66,7 @@ class CommentController extends Controller
 
     public function update(Request $request, Comment $comment)
     {
-        $this->authorize('update', $comment);
+        // $this->authorize('update', $comment);
 
         $validator = Validator::make($request->all(), [
             'content' => 'required|string|max:1000'
@@ -83,7 +83,7 @@ class CommentController extends Controller
 
     public function destroy(Comment $comment)
     {
-        $this->authorize('delete', $comment);
+        // $this->authorize('delete', $comment);
 
         $post = $comment->post;
         $comment->delete();
@@ -91,9 +91,7 @@ class CommentController extends Controller
         // Update post comment count
         $post->updateCommentCount();
 
-        return response()->json([
-            'message' => 'Comment deleted successfully'
-        ]);
+        return back()->with('success', 'Comment deleted successfully');
     }
 
     public function like(Comment $comment)
@@ -109,10 +107,11 @@ class CommentController extends Controller
             $liked = true;
         }
 
-        return response()->json([
-            'liked' => $liked,
-            'likes_count' => $comment->likes()->count()
-        ]);
+        return redirect()->back();
+        // return response()->json([
+        //     'liked' => $liked,
+        //     'likes_count' => $comment->likes()->count()
+        // ]);
     }
 
     public function reply(Request $request, Comment $comment)
