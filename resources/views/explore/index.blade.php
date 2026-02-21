@@ -298,7 +298,6 @@
     </div>
 </div>
 
-@push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize highlight.js for code snippets
@@ -367,7 +366,6 @@
         });
     });
 </script>
-@endpush
 
 <style>
     /* Explore specific styles */

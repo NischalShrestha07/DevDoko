@@ -21,6 +21,8 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GroupPostController;
 use App\Http\Controllers\GroupResourceController;
 use App\Http\Controllers\GroupEventController;
+use App\Http\Controllers\MarketplaceController;
+use App\Http\Controllers\MarketplaceInterestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -143,6 +145,58 @@ Route::middleware('auth')->group(function () {
 
     // Developers
     Route::get('/developers', [DeveloperController::class, 'index'])->name('developers.index');
+
+
+    // Marketplace Routes
+    Route::prefix('marketplace')->name('marketplace.')->group(function () {
+        Route::get('/', [MarketplaceController::class, 'index'])->name('index');
+        Route::get('/create', [MarketplaceController::class, 'create'])->name('create');
+        Route::post('/', [MarketplaceController::class, 'store'])->name('store');
+        Route::get('/my-listings', [MarketplaceController::class, 'myListings'])->name('my-listings');
+        Route::get('/my-interests', [MarketplaceController::class, 'myInterests'])->name('my-interests');
+        Route::get('/saved', [MarketplaceController::class, 'savedListings'])->name('saved');
+
+        // Category view
+        Route::get('/category/{category}', [MarketplaceController::class, 'category'])->name('category');
+
+        // Save by ID (for AJAX calls) - FIXED: removed duplicate 'marketplace'
+        Route::post('/save/{id}', [MarketplaceController::class, 'toggleSaveById'])->name('save.by-id');
+
+        // Interest by ID (for AJAX calls) - FIXED: removed duplicate 'marketplace'
+        Route::post('/interest/{id}', [MarketplaceController::class, 'expressInterestById'])->name('interest.by-id');
+
+        // Single listing routes (using slug)
+        Route::prefix('{listing:slug}')->group(function () {
+            Route::get('/', [MarketplaceController::class, 'show'])->name('show');
+            Route::get('/edit', [MarketplaceController::class, 'edit'])->name('edit');
+            Route::put('/', [MarketplaceController::class, 'update'])->name('update');
+            Route::delete('/', [MarketplaceController::class, 'destroy'])->name('destroy');
+
+            // Images
+            Route::post('/images', [MarketplaceController::class, 'addImages'])->name('images.add');
+            Route::delete('/images/{image}', [MarketplaceController::class, 'deleteImage'])->name('images.delete');
+            Route::post('/images/{image}/primary', [MarketplaceController::class, 'setPrimaryImage'])->name('images.primary');
+
+            // Interests
+            Route::post('/interest', [MarketplaceController::class, 'expressInterest'])->name('interest');
+            Route::post('/save', [MarketplaceController::class, 'toggleSave'])->name('save');
+        });
+
+        // Interest responses
+        Route::post('/interests/{interest}/respond', [MarketplaceController::class, 'respondToInterest'])->name('interests.respond');
+
+        // Saved searches
+        Route::post('/saved-searches', [MarketplaceController::class, 'saveSearch'])->name('saved-searches.store');
+    });
+
+    // Marketplace Interests Routes
+    Route::prefix('marketplace/interests')->name('marketplace.interests.')->group(function () {
+        Route::get('/received', [MarketplaceInterestController::class, 'received'])->name('received');
+        Route::get('/sent', [MarketplaceInterestController::class, 'sent'])->name('sent');
+        Route::get('/{interest}', [MarketplaceInterestController::class, 'show'])->name('show');
+        Route::put('/{interest}', [MarketplaceInterestController::class, 'update'])->name('update');
+        Route::get('/{interest}/messages', [MarketplaceInterestController::class, 'messages'])->name('messages');
+    });
 
     // ============= GROUP ROUTES =============
     Route::get('/my-groups', [GroupController::class, 'myGroups'])->name('groups.my-groups');

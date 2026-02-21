@@ -209,4 +209,32 @@ class User extends Authenticatable
             ->withTimestamps()
             ->orderBy('saves.created_at', 'desc');
     }
+
+    public function marketplaceReviews()
+    {
+        return $this->hasMany(MarketplaceReview::class, 'seller_id');
+    }
+
+    public function savedMarketplaceSearches()
+    {
+        return $this->hasMany(MarketplaceSavedSearch::class);
+    }
+
+
+
+    public function savedMarketplaceListings()
+    {
+        return $this->belongsToMany(MarketplaceListing::class, 'marketplace_saved_listings', 'user_id', 'listing_id')
+            ->withTimestamps();
+    }
+
+    public function marketplaceListings()
+    {
+        return $this->hasMany(MarketplaceListing::class);
+    }
+
+    public function marketplaceInterests()
+    {
+        return $this->hasMany(MarketplaceInterest::class);
+    }
 }

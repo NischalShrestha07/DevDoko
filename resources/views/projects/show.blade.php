@@ -393,7 +393,6 @@
     </div>
 </div>
 
-@push('scripts')
 <script>
     // Like functionality
     document.querySelector('.like-btn').addEventListener('click', async function() {
@@ -499,5 +498,4 @@
         transition: transform 0.6s ease-in-out;
     }
 </style>
-@endpush
 @endsection

@@ -381,24 +381,6 @@
                         </button>
                     </form>
                 </div>
-
-                <div class="text-center">
-                    <small class="text-muted">Or share directly to:</small>
-                    <div class="d-flex justify-content-center gap-2 mt-2">
-                        <button class="btn btn-outline-primary btn-sm">
-                            <i class="bi bi-twitter"></i>
-                        </button>
-                        <button class="btn btn-outline-primary btn-sm">
-                            <i class="bi bi-facebook"></i>
-                        </button>
-                        <button class="btn btn-outline-primary btn-sm">
-                            <i class="bi bi-linkedin"></i>
-                        </button>
-                        <button class="btn btn-outline-primary btn-sm">
-                            <i class="bi bi-whatsapp"></i>
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

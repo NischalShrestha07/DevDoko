@@ -422,7 +422,6 @@
     @endif
 </div>
 
-@push('styles')
 <style>
     .hover-lift {
         transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -474,9 +473,7 @@
         z-index: 1;
     }
 </style>
-@endpush
 
-@push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize tooltips
@@ -486,5 +483,4 @@
         });
     });
 </script>
-@endpush
 @endsection

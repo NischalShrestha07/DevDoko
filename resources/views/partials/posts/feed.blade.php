@@ -202,7 +202,6 @@
 </div>
 @endif
 
-@push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
     // Like form submission
@@ -280,4 +279,3 @@
     });
 });
 </script>
-@endpush

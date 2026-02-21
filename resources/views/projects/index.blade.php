@@ -309,7 +309,6 @@
     </div>
 </div>
 
-@push('styles')
 <style>
     .project-card {
         transition: transform 0.3s, box-shadow 0.3s;
@@ -350,5 +349,4 @@
         border-radius: 12px;
     }
 </style>
-@endpush
 @endsection

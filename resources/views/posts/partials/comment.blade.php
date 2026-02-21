@@ -140,7 +140,6 @@
     </div>
 </div>
 
-@push('scripts')
 <script>
     // Edit comment
     function editComment(commentId) {
@@ -326,4 +325,3 @@
         border-top-left-radius: 4px !important;
     }
 </style>
-@endpush

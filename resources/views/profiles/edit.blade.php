@@ -126,7 +126,6 @@
     </div>
 </div>
 
-@push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
     // Avatar preview
@@ -159,5 +158,4 @@
     }
 });
 </script>
-@endpush
 @endsection
