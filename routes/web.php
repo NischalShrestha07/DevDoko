@@ -277,11 +277,3 @@ Route::middleware('auth')->group(function () {
     Route::get('/groups/recommended', [GroupController::class, 'recommended'])->name('groups.recommended');
     Route::get('/groups/trending', [GroupController::class, 'trending'])->name('groups.trending');
 });
-
-// Admin routes (if you have admin middleware)
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/groups', [AdminController::class, 'groups'])->name('groups');
-    Route::get('/groups/{group}', [AdminController::class, 'showGroup'])->name('groups.show');
-    Route::delete('/groups/{group}', [AdminController::class, 'deleteGroup'])->name('groups.delete');
-    Route::post('/groups/{group}/feature', [AdminController::class, 'featureGroup'])->name('groups.feature');
-});
