@@ -19,7 +19,6 @@ class HomeController extends Controller
             return redirect()->route('home');
         }
 
-        // Get platform statistics
         $stats = [
             'total_users' => User::count(),
             'total_posts' => Post::count(),
@@ -27,7 +26,6 @@ class HomeController extends Controller
             'code_snippets' => Post::where('type', 'code')->count(),
         ];
 
-        // Get featured content for non-logged in users
         $featuredPosts = Post::with(['user.profile', 'tags'])
             ->where('visibility', 'public')
             ->orderBy('created_at', 'desc')
@@ -46,13 +44,11 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
-        // Get posts for feed with better organization
         $posts = Post::with(['user.profile', 'likes', 'comments.user.profile', 'tags'])
             ->visibleTo($user)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        // Get suggested users based on interests
         $suggestedUsers = User::where('id', '!=', $user->id)
             ->whereDoesntHave('followers', function ($query) use ($user) {
                 $query->where('follower_id', $user->id);
@@ -64,19 +60,13 @@ class HomeController extends Controller
             ->limit(8)
             ->get();
 
-        // Get trending tags with post counts
-        // $trendingTags = Tag::withCount(['posts' => function ($query) {
-        //     $query->where('created_at', '>=', Carbon::now()->subWeek());
-        // }])
         $trendingTags = Tag::withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->limit(12)
             ->get();
 
-        // Get user's unread notifications count
         $unreadNotifications = $user->notifications()->where('read_at', null)->count();
 
-        // Get user's stats
         $userStats = [
             'posts_count' => $user->posts()->count(),
             'followers_count' => $user->followers()->count(),
@@ -87,10 +77,8 @@ class HomeController extends Controller
                 ->count(),
         ];
 
-        // Get trending posts
         $trendingPosts = Post::where('created_at', '>=', Carbon::now()->subDays(3))
             ->with('user.profile')
-            // ->withCount(['likes', 'comments', 'views'])
             ->withCount(['likes', 'comments'])
             ->orderByRaw('(likes_count * 3 + comments_count * 2 + views_count) DESC')
             ->take(5)
@@ -114,7 +102,6 @@ class HomeController extends Controller
         $posts = Post::with(['user.profile', 'likes', 'comments.user.profile', 'tags'])
             ->visibleTo($user);
 
-        // Filter by type if specified
         if ($type && $type !== 'all') {
             $posts->where('type', $type);
         }
@@ -131,20 +118,17 @@ class HomeController extends Controller
 
         return view('posts.feed', compact('posts'));
     }
-    // Add these methods to your HomeController class
 
     public function following(Request $request)
     {
         $user = Auth::user();
 
-        // Get posts from users the current user follows
         $posts = Post::with(['user.profile', 'likes', 'comments.user.profile', 'tags'])
             ->whereIn('user_id', $user->following()->pluck('following_id'))
             ->visibleTo($user)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        // Get suggested users based on interests
         $suggestedUsers = User::where('id', '!=', $user->id)
             ->whereDoesntHave('followers', function ($query) use ($user) {
                 $query->where('follower_id', $user->id);
@@ -156,7 +140,6 @@ class HomeController extends Controller
             ->limit(8)
             ->get();
 
-        // Get trending tags
         $trendingTags = Tag::withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->limit(12)
@@ -170,7 +153,6 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
-        // Get popular posts (based on likes, comments, and recency)
         $posts = Post::with(['user.profile', 'likes', 'comments.user.profile', 'tags'])
             ->visibleTo($user)
             ->where('created_at', '>=', Carbon::now()->subDays(7))
@@ -178,7 +160,6 @@ class HomeController extends Controller
             ->orderByRaw('(likes_count * 2 + comments_count) DESC')
             ->paginate(10);
 
-        // Get suggested users based on interests
         $suggestedUsers = User::where('id', '!=', $user->id)
             ->whereDoesntHave('followers', function ($query) use ($user) {
                 $query->where('follower_id', $user->id);
@@ -190,7 +171,6 @@ class HomeController extends Controller
             ->limit(8)
             ->get();
 
-        // Get trending tags
         $trendingTags = Tag::withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->limit(12)
@@ -204,13 +184,11 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
-        // Get latest posts
         $posts = Post::with(['user.profile', 'likes', 'comments.user.profile', 'tags'])
             ->visibleTo($user)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        // Get suggested users based on interests
         $suggestedUsers = User::where('id', '!=', $user->id)
             ->whereDoesntHave('followers', function ($query) use ($user) {
                 $query->where('follower_id', $user->id);
@@ -222,7 +200,6 @@ class HomeController extends Controller
             ->limit(8)
             ->get();
 
-        // Get trending tags
         $trendingTags = Tag::withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->limit(12)
