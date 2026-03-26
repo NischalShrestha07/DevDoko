@@ -804,13 +804,14 @@
                     <div class="card-body">
                         <h6 class="fw-bold mb-3">About DevDoko</h6>
                         <div class="d-flex flex-wrap gap-2 mb-3">
-                            <a href="#" class="text-decoration-none small text-muted">About</a>
-                            <a href="#" class="text-decoration-none small text-muted">Help</a>
-                            <a href="#" class="text-decoration-none small text-muted">API</a>
-                            <a href="#" class="text-decoration-none small text-muted">Jobs</a>
-                            <a href="#" class="text-decoration-none small text-muted">Privacy</a>
+                            <a href="{{route('posts.index')}}" class="text-decoration-none small text-muted">Posts</a>
+
+                            <a href="{{route('messages.index')}}"
+                                class="text-decoration-none small text-muted">Messages</a>
+                            <a href="{{route('notifications.index')}}"
+                                class="text-decoration-none small text-muted">Notifications</a>
+                            <a href="{{route('search')}}" class="text-decoration-none small text-muted">Search</a>
                             <a href="#" class="text-decoration-none small text-muted">Terms</a>
-                            <a href="#" class="text-decoration-none small text-muted">Locations</a>
                         </div>
                         <div class="text-muted small">
                             © {{ date('Y') }} DevDoko

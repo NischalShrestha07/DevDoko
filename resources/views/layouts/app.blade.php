@@ -108,7 +108,7 @@
 
             {{-- Working and add in further new updates --}}
             <!-- Marketplace Section -->
-            <div class="px-2 mb-3">
+            {{-- <div class="px-2 mb-3">
                 <div class="small text-secondary text-uppercase fw-semibold px-3 mb-2">Marketplace</div>
 
                 <!-- Main Marketplace Links -->
@@ -181,7 +181,7 @@
                     <i class="bi bi-plus-circle fs-5 me-3"></i>
                     <span>Sell Something</span>
                 </a>
-            </div>
+            </div> --}}
         </div>
 
         <!-- Logout Button -->

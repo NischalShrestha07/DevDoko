@@ -72,7 +72,7 @@
                     <form action="{{ route('groups.leave', $group->slug) }}" method="POST">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-outline-danger btn-sm"
+                        <button type="submit" class="btn btn-danger btn-sm"
                             onclick="return confirm('Leave this group?')">
                             <i class="bi bi-box-arrow-right"></i> Leave Group
                         </button>
