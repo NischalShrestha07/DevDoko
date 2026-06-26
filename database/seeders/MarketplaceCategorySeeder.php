@@ -90,12 +90,14 @@ class MarketplaceCategorySeeder extends Seeder
         foreach ($categories as $categoryData) {
             $children = $categoryData['children'] ?? [];
             unset($categoryData['children']);
+            $categoryData['slug'] = \Illuminate\Support\Str::slug($categoryData['name']);
 
             $parent = MarketplaceCategory::create($categoryData);
 
             foreach ($children as $index => $childData) {
                 $childData['parent_id'] = $parent->id;
                 $childData['order'] = $index;
+                $childData['slug'] = \Illuminate\Support\Str::slug($childData['name']);
                 MarketplaceCategory::create($childData);
             }
         }

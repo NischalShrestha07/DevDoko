@@ -42,7 +42,17 @@ class User extends Authenticatable
     // Relationships
     public function profile()
     {
-        return $this->hasOne(Profile::class);
+        return $this->hasOne(Profile::class)->withDefault(function ($profile, $user) {
+            $profile->forceFill([
+                'user_id' => $user->id,
+                'username' => $user->username ?? 'user_' . $user->id,
+                'bio' => 'Hello! I\'m new to DevDoko.',
+                'avatar' => null,
+                'github_link' => null,
+                'portfolio_link' => null,
+                'reputation_score' => 0,
+            ]);
+        });
     }
 
     public function posts()
