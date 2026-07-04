@@ -18,6 +18,7 @@
                 </div>
             </div>
 
+            @auth
             @if(auth()->id() == $post->user_id || auth()->user()->is_admin)
             <div class="dropdown">
                 <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
@@ -44,6 +45,7 @@
                 </ul>
             </div>
             @endif
+            @endauth
         </div>
     </div>
 
@@ -77,7 +79,7 @@
                     </div>
                     <div>
                         <button class="btn btn-sm btn-outline-light copy-code-btn"
-                            data-code="{{ htmlspecialchars($post->code_snippet) }}">
+                            data-code="{{ $post->code_snippet }}">
                             <i class="bi bi-clipboard me-1"></i> Copy
                         </button>
                     </div>
@@ -104,7 +106,7 @@
         <div class="px-4 py-2">
             <div class="d-flex flex-wrap gap-1">
                 @foreach($post->tags as $tag)
-                <a href="{{ route('tags.show', $tag->name) }}"
+                <a href="{{ route('tags.show', $tag->slug) }}"
                     class="badge bg-light text-dark text-decoration-none border">
                     #{{ $tag->name }}
                 </a>

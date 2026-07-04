@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Project extends Model
 {
@@ -28,11 +30,13 @@ class Project extends Model
         'thumbnail_path',
         'views_count',
         'forks_count',
-        'likes_count'
+        'likes_count',
+        'screenshots'
     ];
 
     protected $casts = [
         'technologies' => 'array',
+        'screenshots' => 'array',
         'is_public' => 'boolean',
         'is_featured' => 'boolean',
         'views_count' => 'integer',
@@ -129,7 +133,7 @@ class Project extends Model
 
     public function getExcerptAttribute(): string
     {
-        return str_limit(strip_tags($this->description), 150);
+        return Str::limit(strip_tags($this->description), 150);
     }
 
     public function getTechBadgesAttribute(): array

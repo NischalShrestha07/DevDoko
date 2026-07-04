@@ -43,7 +43,21 @@ class PostController extends Controller
 
         $posts = $query->paginate(20);
 
-        return view('posts.index', compact('posts'));
+        $trendingTags = Tag::withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->limit(10)
+            ->get();
+
+        $suggestedUsers = User::where('id', '!=', auth()->id())
+            ->whereDoesntHave('followers', function ($q) {
+                $q->where('follower_id', auth()->id());
+            })
+            ->with('profile')
+            ->inRandomOrder()
+            ->limit(5)
+            ->get();
+
+        return view('posts.index', compact('posts', 'trendingTags', 'suggestedUsers'));
     }
 
     public function create(Request $request)
@@ -69,7 +83,7 @@ class PostController extends Controller
             $validator = Validator::make($request->all(), [
                 'title' => 'nullable|string|max:200',
                 'content' => 'nullable|string|max:2000000',
-                'type' => 'required|in:text,code,image,video,link,question,project,article,status',
+                'type' => 'required|in:text,code,image,video,link,question,project,article,status,share',
                 'code_snippet' => 'nullable|string|max:20000000',
                 'code_language' => 'nullable|string|max:50',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,svg|max:20480',
@@ -209,7 +223,7 @@ class PostController extends Controller
 
     public function edit(Post $post)
     {
-        // $this->authorize('update', $post);
+        $this->authorize('update', $post);
 
         $tags = Tag::orderBy('name')->get();
         $selectedTags = $post->tags->pluck('id')->toArray();
@@ -219,7 +233,7 @@ class PostController extends Controller
 
     public function update(Request $request, Post $post)
     {
-        // $this->authorize('update', $post);
+        $this->authorize('update', $post);
 
         $validator = Validator::make($request->all(), [
             'title' => 'nullable|string|max:200',
@@ -245,13 +259,13 @@ class PostController extends Controller
         $validated = $validator->validated();
 
         // Handle image removal
-        if ($request->has('remove_image') && $post->image_path) {
+        if ($request->boolean('remove_image') && $post->image_path) {
             Storage::disk('public')->delete($post->image_path);
             $validated['image_path'] = null;
         }
 
         // Handle video removal
-        if ($request->has('remove_video') && $post->video_path) {
+        if ($request->boolean('remove_video') && $post->video_path) {
             Storage::disk('public')->delete($post->video_path);
             $validated['video_path'] = null;
         }
@@ -280,12 +294,7 @@ class PostController extends Controller
         // Update reading time
         $validated['reading_time'] = $this->calculateReadingTime($validated['content'] ?? '');
 
-        // Update post - remove null values
-        $updateData = array_filter($validated, function ($value) {
-            return !is_null($value);
-        });
-
-        $post->update($updateData);
+        $post->update($validated);
 
         // Handle tags from the comma-separated string
         if ($request->filled('tags')) {
@@ -334,7 +343,7 @@ class PostController extends Controller
 
     public function destroy(Post $post)
     {
-        // $this->authorize('delete', $post);
+        $this->authorize('delete', $post);
 
         // Delete associated files
         if ($post->image_path) {
@@ -366,6 +375,32 @@ class PostController extends Controller
 
         return redirect()->route('home')
             ->with('success', 'Post deleted successfully!');
+    }
+
+    public function report(Request $request, Post $post)
+    {
+        return back()->with('success', 'Post reported successfully.');
+    }
+
+    public function drafts()
+    {
+        $posts = Post::where('user_id', Auth::id())
+            ->where('visibility', 'private')
+            ->with(['tags'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return view('posts.drafts', compact('posts'));
+    }
+
+    public function publish(Request $request, Post $post)
+    {
+        $this->authorize('update', $post);
+
+        $post->update(['visibility' => 'public']);
+
+        return redirect()->route('posts.show', $post)
+            ->with('success', 'Post published successfully!');
     }
 
     public function pin(Post $post)
@@ -435,26 +470,6 @@ class PostController extends Controller
 
         // Increment share count
         $post->increment('shares_count');
-
-        // Create notification for original post owner
-        if ($post->user_id !== Auth::id()) {
-            try {
-                Notification::create([
-                    'user_id' => $post->user_id,
-                    'type' => 'post_shared',
-                    'data' => json_encode([
-                        'shared_by_id' => Auth::id(),
-                        'shared_by_name' => Auth::user()->name,
-                        'post_id' => $post->id,
-                        'shared_post_id' => $sharedPost->id,
-                        'message' => Auth::user()->name . ' shared your post'
-                    ]),
-                    'read_at' => null
-                ]);
-            } catch (\Exception $e) {
-                Log::error('Failed to send share notification', ['error' => $e->getMessage()]);
-            }
-        }
 
         // Create notification for original post owner
         if ($post->user_id !== Auth::id()) {

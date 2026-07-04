@@ -1,28 +1,29 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\PostController;
-use App\Http\Controllers\FollowController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DeveloperController;
-use App\Http\Controllers\LikeController;
-use App\Http\Controllers\SaveController;
 use App\Http\Controllers\ExploreController;
-use App\Http\Controllers\MessageController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\SearchController;
-use App\Http\Controllers\TagController;
+use App\Http\Controllers\FollowController;
 use App\Http\Controllers\GroupController;
-use App\Http\Controllers\GroupPostController;
-use App\Http\Controllers\GroupResourceController;
-use App\Http\Controllers\GroupEventController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\JobController;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\MarketplaceInterestController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\SaveController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\TagController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +33,8 @@ use App\Http\Controllers\MarketplaceInterestController;
 
 // Public Routes
 Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
+Route::get('/jobs', [JobController::class, 'index'])->name('jobs.index');
+Route::get('/jobs/{job}', [JobController::class, 'show'])->name('jobs.show');
 Route::get('/explore', [ExploreController::class, 'index'])->name('explore');
 Route::get('/@{username}', [ProfileController::class, 'show'])->name('profile.show');
 Route::get('/tags/{tag}', [TagController::class, 'show'])->name('tags.show');
@@ -39,8 +42,6 @@ Route::get('/tech/{technology}', [TagController::class, 'techShow'])->name('tech
 Route::get('/tech-trending', [TagController::class, 'trending'])->name('tech.trending');
 
 Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
-Route::get('/groups/discover', [GroupController::class, 'discover'])->name('groups.discover');
-Route::get('/groups/trending', [GroupController::class, 'trending'])->name('groups.trending');
 Route::get('/groups/categories/{category}', [GroupController::class, 'category'])->name('groups.category');
 Route::get('/groups/invitation/{token}', [GroupController::class, 'acceptInvitation'])->name('groups.accept-invitation');
 
@@ -50,6 +51,11 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
+
+    Route::get('/password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('/password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('/password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
 });
 
 // Authenticated routes
@@ -68,6 +74,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+
+    // Job Routes (index/show are public — see public section)
+    Route::resource('jobs', JobController::class)->except(['index', 'show']);
 
     // Post Interactions
     Route::post('/posts/{post}/like/toggle', [LikeController::class, 'toggle'])->name('posts.like.toggle');
@@ -92,25 +101,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/users/{user}/following', [FollowController::class, 'following'])->name('users.following');
     // Route::post('/users/{user}/follow', [FollowController::class, 'toggle'])->name('follow.toggle');
 
-
-
     // Profile Management
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
     Route::post('/profile/cover', [ProfileController::class, 'updateCover'])->name('profile.cover.update');
 
-
     // Feed routes
     Route::get('/feed', [HomeController::class, 'feed'])->name('feed');
     Route::get('/feed/following', [HomeController::class, 'following'])->name('feed.following');
     Route::get('/feed/popular', [HomeController::class, 'popular'])->name('feed.popular');
     Route::get('/feed/latest', [HomeController::class, 'latest'])->name('feed.latest');
-
-    // Post collections
-    Route::get('/collections', [SaveController::class, 'collections'])->name('collections.index');
-    Route::post('/collections', [SaveController::class, 'createCollection'])->name('collections.create');
-    Route::delete('/collections/{collection}', [SaveController::class, 'deleteCollection'])->name('collections.destroy');
 
     // Post drafts
     Route::get('/drafts', [PostController::class, 'drafts'])->name('posts.drafts');
@@ -134,7 +135,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/notifications/count', [NotificationController::class, 'count'])->name('notifications.count');
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 
-
     // Search
     Route::get('/search', [SearchController::class, 'index'])->name('search');
 
@@ -143,9 +143,22 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/users/{user}/saved', [ProfileController::class, 'saved'])->name('users.saved');
 
+    // Admin
+    Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard');
+
     // Developers
     Route::get('/developers', [DeveloperController::class, 'index'])->name('developers.index');
 
+    // Projects
+    Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+    Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
+    Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+    Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+    Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
+    Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
+    Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+    Route::post('/projects/{project}/fork', [ProjectController::class, 'fork'])->name('projects.fork');
+    Route::post('/projects/{project}/collaboration', [ProjectController::class, 'requestCollaboration'])->name('projects.request.collaboration');
 
     // Marketplace Routes
     Route::prefix('marketplace')->name('marketplace.')->group(function () {
@@ -200,7 +213,11 @@ Route::middleware('auth')->group(function () {
 
     // ============= GROUP ROUTES =============
     Route::get('/my-groups', [GroupController::class, 'myGroups'])->name('groups.my-groups');
+
+    // Group categories and discovery (must be before {group:slug} wildcard)
+    Route::get('/groups/discover', [GroupController::class, 'discover'])->name('groups.discover');
     Route::get('/groups/recommended', [GroupController::class, 'recommended'])->name('groups.recommended');
+    Route::get('/groups/trending', [GroupController::class, 'trending'])->name('groups.trending');
 
     // Create Group
     Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
@@ -235,8 +252,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/posts/{post}/pin', [GroupController::class, 'pinPost'])->name('groups.posts.pin');
         Route::post('/posts/{post}/unpin', [GroupController::class, 'unpinPost'])->name('groups.posts.unpin');
 
-
-
         // Posts - Edit/Update/Delete
         Route::get('/posts/{post}/edit', [GroupController::class, 'editPost'])->name('groups.posts.edit');
         Route::put('/posts/{post}', [GroupController::class, 'updatePost'])->name('groups.posts.update');
@@ -270,10 +285,4 @@ Route::middleware('auth')->group(function () {
         // Activity
         Route::get('/activity', [GroupController::class, 'activity'])->name('groups.activity');
     });
-
-
-    // Group categories and discovery
-    Route::get('/groups/discover', [GroupController::class, 'discover'])->name('groups.discover');
-    Route::get('/groups/recommended', [GroupController::class, 'recommended'])->name('groups.recommended');
-    Route::get('/groups/trending', [GroupController::class, 'trending'])->name('groups.trending');
 });

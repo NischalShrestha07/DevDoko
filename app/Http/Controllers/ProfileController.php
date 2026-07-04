@@ -172,6 +172,44 @@ class ProfileController extends Controller
     /**
      * Get user's saved posts
      */
+    public function updateAvatar(Request $request)
+    {
+        $request->validate([
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ]);
+
+        $user = Auth::user();
+        $profile = $user->profile;
+
+        if ($profile->avatar && Storage::disk('public')->exists($profile->avatar)) {
+            Storage::disk('public')->delete($profile->avatar);
+        }
+
+        $path = $request->file('avatar')->store('avatars', 'public');
+        $profile->update(['avatar' => $path]);
+
+        return back()->with('success', 'Avatar updated successfully!');
+    }
+
+    public function updateCover(Request $request)
+    {
+        $request->validate([
+            'cover' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+        ]);
+
+        $user = Auth::user();
+        $profile = $user->profile;
+
+        if ($profile->cover_image && Storage::disk('public')->exists($profile->cover_image)) {
+            Storage::disk('public')->delete($profile->cover_image);
+        }
+
+        $path = $request->file('cover')->store('covers', 'public');
+        $profile->update(['cover_image' => $path]);
+
+        return back()->with('success', 'Cover image updated successfully!');
+    }
+
     public function saved(User $user)
     {
         $savedPosts = $user->saves()

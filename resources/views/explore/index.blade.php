@@ -113,7 +113,7 @@
                                 @endif
                                 @if($post->content)
                                 <div class="post-content text-muted" style="font-size: 14px;">
-                                    {!! Str::markdown(Str::limit($post->content, 120)) !!}
+                                    {!! Str::markdown(e(Str::limit($post->content, 120))) !!}
                                 </div>
                                 @endif
                             </div>
@@ -210,7 +210,8 @@
                                     </div>
                                 </div>
 
-                                @if(auth()->id() !== $user->id)
+                                @auth
+                            @if(auth()->id() !== $user->id)
                                 <form action="{{ route('users.follow', $user) }}" method="POST" class="follow-form">
                                     @csrf
                                     <button type="submit" class="btn btn-primary btn-sm w-100">
@@ -221,7 +222,8 @@
                                         @endif
                                     </button>
                                 </form>
-                                @endif
+                            @endif
+                            @endauth
                             </a>
                         </div>
                     </div>
@@ -276,7 +278,7 @@
 
                         <div class="d-flex flex-wrap gap-2">
                             @foreach($popularTags as $tag)
-                            <a href="{{ route('tags.show', $tag->name) }}"
+                            <a href="{{ route('tags.show', $tag->slug) }}"
                                 class="badge bg-light text-dark text-decoration-none border px-3 py-2">
                                 #{{ $tag->name }}
                                 <span class="badge bg-secondary rounded-pill ms-1">{{ $tag->posts_count }}</span>

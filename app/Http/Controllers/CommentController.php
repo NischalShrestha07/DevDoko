@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Post;
 use App\Models\Comment;
+use App\Models\Post;
 use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
@@ -23,6 +23,7 @@ class CommentController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'content' => 'required|string|max:5000',
+            'parent_id' => 'nullable|exists:comments,id',
         ]);
 
         if ($validator->fails()) {
@@ -32,7 +33,7 @@ class CommentController extends Controller
         $comment = $post->comments()->create([
             'user_id' => Auth::id(),
             'content' => $request->content,
-            'parent_id' => $request->parent_id
+            'parent_id' => $request->parent_id,
         ]);
 
         // Update post comment count
@@ -41,13 +42,12 @@ class CommentController extends Controller
         // Send notification
         $this->notificationService->commentNotification(Auth::user(), $comment, $post);
 
-
         // Load user relationship for response
         $comment->load('user.profile');
 
         return response()->json([
             'comment' => $comment,
-            'message' => 'Comment added successfully'
+            'message' => 'Comment added successfully',
         ]);
     }
 
@@ -59,17 +59,19 @@ class CommentController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
+        $html = $comments->map(fn ($comment) => view('posts.partials.comment', compact('comment'))->render())->implode('');
+
         return response()->json([
-            'html' => view('posts.partials.comments', compact('comments'))->render()
+            'html' => $html,
         ]);
     }
 
     public function update(Request $request, Comment $comment)
     {
-        // $this->authorize('update', $comment);
+        $this->authorize('update', $comment);
 
         $validator = Validator::make($request->all(), [
-            'content' => 'required|string|max:1000'
+            'content' => 'required|string|max:1000',
         ]);
 
         if ($validator->fails()) {
@@ -83,7 +85,7 @@ class CommentController extends Controller
 
     public function destroy(Comment $comment)
     {
-        // $this->authorize('delete', $comment);
+        $this->authorize('delete', $comment);
 
         $post = $comment->post;
         $comment->delete();
@@ -128,7 +130,7 @@ class CommentController extends Controller
             'user_id' => Auth::id(),
             'post_id' => $comment->post_id,
             'content' => $request->content,
-            'parent_id' => $comment->id
+            'parent_id' => $comment->id,
         ]);
 
         // Update post comment count
@@ -141,7 +143,7 @@ class CommentController extends Controller
 
         return response()->json([
             'reply' => $reply,
-            'message' => 'Reply added successfully'
+            'message' => 'Reply added successfully',
         ]);
     }
 }

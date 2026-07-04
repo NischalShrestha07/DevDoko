@@ -91,8 +91,7 @@
                         $otherUser = $message->sender_id === Auth::id() ? $message->receiver : $message->sender;
                         @endphp
                         <a href="{{ route('messages.show', $otherUser) }}#message-{{ $message->id }}"
-                            class="list-group-item list-group-item-action border-0 p-3 mb-2 rounded-3"
-                            style="background-color: #f8f9fa;">
+                            class="list-group-item list-group-item-action border-0 p-3 mb-2 rounded-3 bg-body-tertiary">
                             <div class="d-flex gap-3">
                                 <img src="{{ $otherUser->avatar_url }}" class="rounded-circle flex-shrink-0"
                                     style="width: 48px; height: 48px; object-fit: cover;">

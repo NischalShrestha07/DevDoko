@@ -235,7 +235,7 @@ class GroupController extends Controller
 
     public function edit(Group $group)
     {
-        // $this->authorize('update', $group);
+        $this->authorize('update', $group);
 
         $categories = [
             'tech-stack' => 'Tech Stack',
@@ -250,7 +250,7 @@ class GroupController extends Controller
 
     public function update(Request $request, Group $group)
     {
-        // $this->authorize('update', $group);
+        $this->authorize('update', $group);
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:100|unique:groups,name,' . $group->id,
@@ -320,7 +320,7 @@ class GroupController extends Controller
 
     public function destroy(Group $group)
     {
-        // $this->authorize('delete', $group);
+        $this->authorize('delete', $group);
 
         DB::beginTransaction();
         try {
@@ -429,14 +429,14 @@ class GroupController extends Controller
 
     public function approveMember(Group $group, User $user)
     {
-        // $this->authorize('manage', $group);
+        $this->authorize('manage', $group);
         $group->approveMember($user, Auth::user());
         return redirect()->back()->with('success', $user->name . ' has been approved to join.');
     }
 
     public function rejectMember(Group $group, User $user)
     {
-        // $this->authorize('manage', $group);
+        $this->authorize('manage', $group);
         $group->members()->detach($user->id);
         $group->decrement('pending_requests');
         return redirect()->back()->with('success', 'Membership request rejected.');
@@ -444,7 +444,7 @@ class GroupController extends Controller
 
     public function removeMember(Group $group, User $user)
     {
-        // $this->authorize('manage', $group);
+        $this->authorize('manage', $group);
         $group->members()->detach($user->id);
         $group->decrement('members_count');
         return redirect()->back()->with('success', $user->name . ' has been removed from the group.');
@@ -452,7 +452,7 @@ class GroupController extends Controller
 
     public function updateMemberRole(Request $request, Group $group, User $user)
     {
-        // $this->authorize('manage', $group);
+        $this->authorize('manage', $group);
 
         $validator = Validator::make($request->all(), [
             'role' => 'required|in:admin,moderator,member',
@@ -470,7 +470,7 @@ class GroupController extends Controller
 
     public function invite(Request $request, Group $group)
     {
-        // $this->authorize('manage', $group);
+        $this->authorize('manage', $group);
 
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -631,7 +631,7 @@ class GroupController extends Controller
 
     public function pinPost(Group $group, GroupPost $post)
     {
-        // $this->authorize('manage', $group);
+        $this->authorize('manage', $group);
 
         $post->update([
             'is_pinned' => true,
@@ -643,7 +643,7 @@ class GroupController extends Controller
 
     public function unpinPost(Group $group, GroupPost $post)
     {
-        // $this->authorize('manage', $group);
+        $this->authorize('manage', $group);
 
         $post->update([
             'is_pinned' => false,
@@ -875,7 +875,7 @@ class GroupController extends Controller
 
     public function activity(Group $group)
     {
-        // $this->authorize('view', $group);
+        $this->authorize('view', $group);
 
         $activities = $group->activityLogs()
             ->with('user.profile')
@@ -1049,7 +1049,7 @@ class GroupController extends Controller
      */
     public function resendInvitation(Group $group, GroupInvitation $invitation)
     {
-        // $this->authorize('manage', $group);
+        $this->authorize('manage', $group);
 
         $invitation->update([
             'expires_at' => now()->addDays(7),
@@ -1066,7 +1066,7 @@ class GroupController extends Controller
      */
     public function cancelInvitation(Group $group, GroupInvitation $invitation)
     {
-        // $this->authorize('manage', $group);
+        $this->authorize('manage', $group);
 
         $invitation->update(['status' => 'expired']);
 
@@ -1078,7 +1078,7 @@ class GroupController extends Controller
      */
     public function updateGeneralSettings(Request $request, Group $group)
     {
-        // $this->authorize('manage', $group);
+        $this->authorize('manage', $group);
 
         $validator = Validator::make($request->all(), [
             'post_permission' => 'required|in:all_members,admins_only',
@@ -1102,7 +1102,7 @@ class GroupController extends Controller
      */
     public function updatePermissions(Request $request, Group $group)
     {
-        // $this->authorize('manage', $group);
+        $this->authorize('manage', $group);
 
         $validator = Validator::make($request->all(), [
             'privacy' => 'required|in:public,private,hidden',

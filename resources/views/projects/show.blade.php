@@ -82,20 +82,22 @@
 
             <!-- Project Owner -->
             <div class="d-flex align-items-center mb-4 p-3 border rounded">
-                <img src="{{ $project->user->profile->avatar_url }}" alt="{{ $project->user->name }}"
+                <img src="{{ $project->user->profile?->avatar_url }}" alt="{{ $project->user->name }}"
                     class="rounded-circle me-3" style="width: 56px; height: 56px; object-fit: cover;">
                 <div style="flex: 1;">
-                    <a href="{{ route('profile.show', $project->user->profile->username) }}"
+                    <a href="{{ route('profile.show', $project->user->profile?->username ?? $project->user->id) }}"
                         class="fw-bold text-dark text-decoration-none d-block">
                         {{ $project->user->name }}
                     </a>
                     <small class="text-muted">Project Owner</small>
                 </div>
+                @auth
                 @if(auth()->id() != $project->user_id)
                 <button class="btn btn-outline-primary btn-sm follow-btn" data-user-id="{{ $project->user->id }}">
                     {{ auth()->user()->isFollowing($project->user) ? 'Following' : 'Follow' }}
                 </button>
                 @endif
+                @endauth
             </div>
         </div>
 
@@ -172,7 +174,7 @@
                         <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
                             <img src="{{ Storage::url($screenshot) }}" class="d-block w-100"
                                 alt="Screenshot {{ $index + 1 }}"
-                                style="height: 400px; object-fit: contain; background: #f8f9fa;">
+                                style="height: 400px; object-fit: contain;" class="bg-body-tertiary">
                         </div>
                         @endforeach
                     </div>
@@ -418,8 +420,8 @@
                 button.dataset.liked = data.liked;
 
                 // Update stats card
-                document.querySelector('.like-btn').closest('.row')
-                    .querySelector('.text-success').previousElementSibling.textContent = data.likes_count;
+                const likeCountEl = document.querySelector('.text-success');
+                if (likeCountEl) likeCountEl.textContent = data.likes_count;
             }
         } catch (error) {
             console.error('Error liking project:', error);
@@ -456,7 +458,7 @@
         if (navigator.share) {
             navigator.share({
                 title: '{{ $project->title }}',
-                text: 'Check out this project on DevDoko: {{ $project->short_description }}',
+                text: 'Check out this project on DevDoko: ' + @json($project->short_description),
                 url: window.location.href
             });
         } else {
@@ -468,7 +470,10 @@
     }
 
     // Initialize carousel
-    const carousel = new bootstrap.Carousel(document.getElementById('screenshotsCarousel'));
+    const carouselEl = document.getElementById('screenshotsCarousel');
+    if (carouselEl) {
+        new bootstrap.Carousel(carouselEl);
+    }
 </script>
 
 <style>

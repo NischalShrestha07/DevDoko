@@ -179,7 +179,7 @@
                         <i class="bi bi-star-fill text-warning me-2"></i>
                         Starred
                     </h6>
-                    <a href="{{ route('messages.starred') }}" class="small text-decoration-none">View all</a>
+                    <a href="{{ route('messages.index') }}" class="small text-decoration-none">View all</a>
                 </div>
                 <div class="list-group list-group-flush">
                     @foreach($starredMessages->take(3) as $message)

@@ -1,4 +1,5 @@
 <?php
+
 // app/Http/Controllers/NotificationController.php
 
 namespace App\Http\Controllers;
@@ -18,7 +19,7 @@ class NotificationController extends Controller
             ->with('fromUser.profile');
 
         // Filter by type
-        if ($request->has('type') && !empty($request->type)) {
+        if ($request->has('type') && ! empty($request->type)) {
             $query->where('type', $request->type);
         }
 
@@ -26,7 +27,7 @@ class NotificationController extends Controller
         $notifications = $query->latest()->paginate(20);
 
         // Mark as read when viewed
-        Auth::user()->unreadNotifications()->update(['read_at' => now()]);
+        Auth::user()->notifications()->unread()->update(['read_at' => now()]);
 
         return view('notifications.index', compact('notifications'));
     }
@@ -36,7 +37,7 @@ class NotificationController extends Controller
      */
     public function markAllAsRead()
     {
-        Auth::user()->unreadNotifications()->update(['read_at' => now()]);
+        Auth::user()->notifications()->unread()->update(['read_at' => now()]);
 
         return redirect()->back()->with('success', 'All notifications marked as read');
     }
@@ -60,7 +61,8 @@ class NotificationController extends Controller
      */
     public function count()
     {
-        $count = Auth::user()->unreadNotifications()->count();
+        $count = Auth::user()->notifications()->unread()->count();
+
         return response()->json(['count' => $count]);
     }
 

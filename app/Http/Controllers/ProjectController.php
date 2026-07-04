@@ -6,7 +6,6 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ProjectController extends Controller
 {
@@ -55,15 +54,22 @@ class ProjectController extends Controller
         }
 
         $projects = $query->paginate(12);
+        $featuredProjects = Project::with('user.profile')
+            ->where('is_public', true)
+            ->where('is_featured', true)
+            ->recent()
+            ->limit(3)
+            ->get();
         $categories = Project::select('category')->distinct()->pluck('category');
         $technologies = $this->getPopularTechnologies();
 
-        return view('projects.index', compact('projects', 'categories', 'technologies'));
+        return view('projects.index', compact('projects', 'featuredProjects', 'categories', 'technologies'));
     }
 
     public function create()
     {
         $technologies = $this->getAllTechnologies();
+
         return view('projects.create', compact('technologies'));
     }
 
@@ -82,7 +88,7 @@ class ProjectController extends Controller
             'is_public' => 'boolean',
             'thumbnail' => 'nullable|image|max:2048',
             'screenshots' => 'nullable|array|max:5',
-            'screenshots.*' => 'image|max:2048'
+            'screenshots.*' => 'image|max:2048',
         ]);
 
         // Handle thumbnail upload
@@ -104,7 +110,7 @@ class ProjectController extends Controller
             'user_id' => Auth::id(),
             'is_public' => $validated['is_public'] ?? true,
             'status' => 'active',
-            'screenshots' => $screenshots
+            'screenshots' => $screenshots,
         ]));
 
         return redirect()->route('projects.show', $project)
@@ -113,7 +119,7 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
-        if (!$project->is_public && $project->user_id !== Auth::id()) {
+        if (! $project->is_public && $project->user_id !== Auth::id()) {
             abort(403, 'This project is private.');
         }
 
@@ -135,7 +141,7 @@ class ProjectController extends Controller
 
     public function edit(Project $project)
     {
-        // $this->authorize('update', $project);
+        abort_if($project->user_id !== Auth::id(), 403);
         $technologies = $this->getAllTechnologies();
 
         return view('projects.edit', compact('project', 'technologies'));
@@ -143,7 +149,7 @@ class ProjectController extends Controller
 
     public function update(Request $request, Project $project)
     {
-        // $this->authorize('update', $project);
+        abort_if($project->user_id !== Auth::id(), 403);
 
         $validated = $request->validate([
             'title' => 'required|string|max:200',
@@ -160,7 +166,7 @@ class ProjectController extends Controller
             'remove_thumbnail' => 'boolean',
             'screenshots' => 'nullable|array|max:5',
             'screenshots.*' => 'image|max:2048',
-            'remove_screenshots' => 'nullable|array'
+            'remove_screenshots' => 'nullable|array',
         ]);
 
         // Handle thumbnail removal/update
@@ -207,7 +213,7 @@ class ProjectController extends Controller
 
     public function destroy(Project $project)
     {
-        // $this->authorize('delete', $project);
+        abort_if($project->user_id !== Auth::id(), 403);
 
         // Delete associated files
         if ($project->thumbnail_path) {
@@ -234,17 +240,19 @@ class ProjectController extends Controller
         if ($liked) {
             $liked->delete();
             $project->decrementLikes();
+
             return response()->json(['liked' => false, 'likes_count' => $project->likes_count]);
         } else {
             $project->likes()->create(['user_id' => $user->id]);
             $project->incrementLikes();
+
             return response()->json(['liked' => true, 'likes_count' => $project->likes_count]);
         }
     }
 
     public function fork(Project $project)
     {
-        if (!$project->is_public) {
+        if (! $project->is_public) {
             return back()->with('error', 'Cannot fork private projects.');
         }
 
@@ -258,19 +266,19 @@ class ProjectController extends Controller
     {
         $request->validate([
             'message' => 'required|string|max:500',
-            'role' => 'required|string|max:100'
+            'role' => 'required|string|max:100',
         ]);
 
         // Create collaboration request
         $project->collaborations()->create([
             'user_id' => Auth::id(),
-            'title' => 'Collaboration Request: ' . $project->title,
+            'title' => 'Collaboration Request: '.$project->title,
             'description' => $request->message,
             'required_skills' => $project->technologies,
             'team_size' => 2,
             'current_size' => 1,
             'timeline' => 'flexible',
-            'status' => 'pending'
+            'status' => 'pending',
         ]);
 
         // Notify project owner
@@ -281,8 +289,8 @@ class ProjectController extends Controller
                 'user_name' => Auth::user()->name,
                 'project_id' => $project->id,
                 'project_title' => $project->title,
-                'message' => Auth::user()->name . ' wants to collaborate on your project'
-            ]
+                'message' => Auth::user()->name.' wants to collaborate on your project',
+            ],
         ]);
 
         return back()->with('success', 'Collaboration request sent!');
@@ -354,7 +362,7 @@ class ProjectController extends Controller
             'PyTorch',
             'Scikit-learn',
             'Pandas',
-            'NumPy'
+            'NumPy',
         ];
     }
 }

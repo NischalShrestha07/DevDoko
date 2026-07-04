@@ -6,6 +6,7 @@ use App\Models\Tag;
 use App\Models\Post;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TagController extends Controller
 {
@@ -24,13 +25,28 @@ class TagController extends Controller
         return view('tags.show', compact('tag', 'posts'));
     }
 
-    public function trending()
-    {        // Trending Posts (most liked in last 7 days)
-        $trendingTags = Tag::with(['user.profile', 'tags'])
-            ->where('visibility', 'public')
-            ->where('created_at', '>=', Carbon::now()->subDays(7))->take(12)
-            ->get();
+    public function techShow($technology)
+    {
+        $tag = Tag::where('name', $technology)->orWhere('slug', $technology)->first();
 
-        return view('tags.show', compact('trendingTags'));
+        if ($tag) {
+            return redirect()->route('tags.show', $tag->name);
+        }
+
+        abort(404);
+    }
+
+    public function trending()
+    {
+        $tag = (object) ['name' => 'Trending'];
+
+        $posts = Post::with(['user.profile', 'likes', 'comments'])
+            ->where('visibility', 'public')
+            ->where('created_at', '>=', Carbon::now()->subDays(7))
+            ->withCount('likes')
+            ->orderBy('likes_count', 'desc')
+            ->paginate(12);
+
+        return view('tags.show', compact('tag', 'posts'));
     }
 }

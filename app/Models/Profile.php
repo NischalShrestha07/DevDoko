@@ -12,6 +12,7 @@ class Profile extends Model
         'bio',
         'name',
         'avatar',
+        'cover_image',
         'github_link',
         'portfolio_link',
         'reputation_score',
@@ -43,8 +44,7 @@ class Profile extends Model
     // Add reputation methods
     public function incrementReputation($points, $action)
     {
-        $this->reputation_score += $points;
-        $this->save();
+        $this->increment('reputation_score', $points);
 
         // Create reputation log
         \App\Models\ReputationLog::create([

@@ -1,4 +1,5 @@
 <?php
+
 // app/Models/Notification.php
 
 namespace App\Models;
@@ -24,7 +25,7 @@ class Notification extends Model
     ];
 
     protected $appends = [
-        'time_ago'
+        'time_ago',
     ];
 
     public function user()
@@ -44,7 +45,7 @@ class Notification extends Model
 
     public function getActionUrlAttribute(): ?string
     {
-        if (!$this->data) {
+        if (! $this->data) {
             return null;
         }
 
@@ -66,14 +67,16 @@ class Notification extends Model
         if (isset($this->data['post_id'])) {
             return route('posts.show', $this->data['post_id']);
         }
+
         return null;
     }
 
     private function getCommentUrl(): ?string
     {
         if (isset($this->data['comment_id']) && isset($this->data['post_id'])) {
-            return route('posts.show', $this->data['post_id']) . '#comment-' . $this->data['comment_id'];
+            return route('posts.show', $this->data['post_id']).'#comment-'.$this->data['comment_id'];
         }
+
         return $this->getPostUrl();
     }
 
@@ -82,6 +85,7 @@ class Notification extends Model
         if ($this->fromUser) {
             return route('profile.show', $this->fromUser->username ?? $this->fromUser->name);
         }
+
         return null;
     }
 
@@ -91,8 +95,9 @@ class Notification extends Model
             return route('posts.show', $this->data['post_id']);
         }
         if (isset($this->data['comment_id'])) {
-            return route('posts.show', $this->data['post_id']) . '#comment-' . $this->data['comment_id'];
+            return route('posts.show', $this->data['post_id']).'#comment-'.$this->data['comment_id'];
         }
+
         return null;
     }
 
@@ -101,6 +106,7 @@ class Notification extends Model
         if ($this->fromUser) {
             return route('messages.show', $this->fromUser);
         }
+
         return null;
     }
 
@@ -109,14 +115,16 @@ class Notification extends Model
         if (isset($this->data['group_slug'])) {
             return route('groups.show', $this->data['group_slug']);
         }
+
         return null;
     }
 
     private function getEventUrl(): ?string
     {
-        if (isset($this->data['group_slug']) && isset($this->data['event_id'])) {
-            return route('groups.events.show', [$this->data['group_slug'], $this->data['event_id']]);
+        if (isset($this->data['group_slug'])) {
+            return route('groups.events', $this->data['group_slug']);
         }
+
         return null;
     }
 
@@ -126,26 +134,26 @@ class Notification extends Model
             return $this->message;
         }
 
-        if (!$this->fromUser || !$this->data) {
+        if (! $this->fromUser || ! $this->data) {
             return 'New notification';
         }
 
         $username = $this->fromUser->profile->username ?? $this->fromUser->name;
 
         return match ($this->type) {
-            'like' => $username . ' liked your post',
-            'post_like' => $username . ' liked your post',
-            'comment_like' => $username . ' liked your comment',
-            'comment' => $username . ' commented on your post',
-            'reply' => $username . ' replied to your comment',
-            'follow' => $username . ' started following you',
-            'mention' => $username . ' mentioned you in a post',
-            'share' => $username . ' shared your post',
-            'post_shared' => $username . ' shared your post',
-            'message' => $username . ' sent you a message',
-            'group_invite' => $username . ' invited you to join a group',
-            'event_reminder' => 'Reminder: ' . ($this->data['event_title'] ?? 'Event') . ' starts soon',
-            default => 'New notification from ' . $username,
+            'like' => $username.' liked your post',
+            'post_like' => $username.' liked your post',
+            'comment_like' => $username.' liked your comment',
+            'comment' => $username.' commented on your post',
+            'reply' => $username.' replied to your comment',
+            'follow' => $username.' started following you',
+            'mention' => $username.' mentioned you in a post',
+            'share' => $username.' shared your post',
+            'post_shared' => $username.' shared your post',
+            'message' => $username.' sent you a message',
+            'group_invite' => $username.' invited you to join a group',
+            'event_reminder' => 'Reminder: '.($this->data['event_title'] ?? 'Event').' starts soon',
+            default => 'New notification from '.$username,
         };
     }
 
@@ -176,7 +184,7 @@ class Notification extends Model
 
     public function markAsRead()
     {
-        if (!$this->read_at) {
+        if (! $this->read_at) {
             $this->update(['read_at' => now()]);
         }
     }

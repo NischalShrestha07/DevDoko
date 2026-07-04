@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
 
         $admin = User::create([
             'name' => 'Anup Ghimire',
-            'email' => 'anup.ghimire@devdoko.com',
+            'email' => 'admin@gmail.com',
             'password' => Hash::make('admin123'),
             'role' => 'admin',
         ]);
@@ -36,10 +36,30 @@ class DatabaseSeeder extends Seeder
         $users = User::factory(10)->create();
 
         $techTags = [
-            'Laravel', 'PHP', 'JavaScript', 'React', 'Vue.js', 'Node.js',
-            'Python', 'Django', 'Java', 'Spring Boot', 'C#', '.NET',
-            'Ruby', 'Rails', 'Go', 'Rust', 'Swift', 'Kotlin',
-            'MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'Docker', 'AWS',
+            'Laravel',
+            'PHP',
+            'JavaScript',
+            'React',
+            'Vue.js',
+            'Node.js',
+            'Python',
+            'Django',
+            'Java',
+            'Spring Boot',
+            'C#',
+            '.NET',
+            'Ruby',
+            'Rails',
+            'Go',
+            'Rust',
+            'Swift',
+            'Kotlin',
+            'MySQL',
+            'PostgreSQL',
+            'MongoDB',
+            'Redis',
+            'Docker',
+            'AWS',
         ];
 
         foreach ($techTags as $tagName) {

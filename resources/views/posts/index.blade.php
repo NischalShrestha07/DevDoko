@@ -155,13 +155,7 @@
                 </div>
                 <div class="card-body">
                     <div class="d-flex flex-wrap gap-2">
-                        @php
-                        $trendingTags = App\Models\Tag::withCount('posts')
-                        ->orderBy('posts_count', 'desc')
-                        ->limit(10)
-                        ->get();
-                        @endphp
-                        @foreach($trendingTags as $tag)
+                        @foreach($trendingTags ?? [] as $tag)
                         <a href="{{ route('tags.show', $tag->slug) }}"
                             class="text-decoration-none px-3 py-2 bg-light rounded-pill text-dark small">
                             #{{ $tag->name }}
@@ -182,27 +176,17 @@
                     <a href="{{ route('developers.index') }}" class="small text-decoration-none">View all</a>
                 </div>
                 <div class="list-group list-group-flush">
-                    @php
-                    $suggestedUsers = App\Models\User::where('id', '!=', auth()->id())
-                    ->whereDoesntHave('followers', function($q) {
-                    $q->where('follower_id', auth()->id());
-                    })
-                    ->with('profile')
-                    ->inRandomOrder()
-                    ->limit(5)
-                    ->get();
-                    @endphp
-                    @foreach($suggestedUsers as $suggestedUser)
+                    @foreach($suggestedUsers ?? [] as $suggestedUser)
                     <div class="list-group-item border-0 p-3">
                         <div class="d-flex align-items-center gap-3">
-                            <img src="{{ $suggestedUser->avatar_url }}" class="rounded-circle border"
+                            <img src="{{ $suggestedUser->profile?->avatar_url }}" class="rounded-circle border"
                                 style="width: 48px; height: 48px; object-fit: cover;">
                             <div class="flex-grow-1">
-                                <a href="{{ route('profile.show', $suggestedUser->profile->username) }}"
+                                <a href="{{ route('profile.show', $suggestedUser->profile?->username ?? $suggestedUser->id) }}"
                                     class="text-decoration-none text-dark fw-semibold d-block">
-                                    {{ $suggestedUser->profile->username ?? $suggestedUser->name }}
+                                    {{ $suggestedUser->profile?->username ?? $suggestedUser->name }}
                                 </a>
-                                <small class="text-muted">{{ $suggestedUser->profile->title ?? 'Developer' }}</small>
+                                <small class="text-muted">{{ $suggestedUser->profile?->title ?? 'Developer' }}</small>
                             </div>
                             <form action="{{ route('users.follow', $suggestedUser) }}" method="POST">
                                 @csrf

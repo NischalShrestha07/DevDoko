@@ -6,17 +6,17 @@
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center">
                 <!-- User Avatar -->
-                <a href="{{ route('profile.show', $post->user->profile->username) }}" class="text-decoration-none">
-                    <img src="{{ $post->user->profile->avatar_url }}" alt="{{ $post->user->name }}"
+                <a href="{{ route('profile.show', $post->user->profile?->username) }}" class="text-decoration-none">
+                    <img src="{{ $post->user->profile?->avatar_url }}" alt="{{ $post->user->name }}"
                         class="rounded-circle border" style="width: 42px; height: 42px; object-fit: cover;">
                 </a>
 
                 <!-- User Info -->
                 <div class="ms-3">
                     <div class="d-flex align-items-center">
-                        <a href="{{ route('profile.show', $post->user->profile->username) }}"
+                        <a href="{{ route('profile.show', $post->user->profile?->username) }}"
                             class="text-decoration-none text-dark fw-bold">
-                            {{ $post->user->profile->username }}
+                            {{ $post->user->profile?->username }}
                         </a>
 
                         @if($post->user->is_verified)
@@ -92,6 +92,7 @@
                         </form>
                     </li>
                     @else
+                    @auth
                     @if(auth()->user()->isFollowing($post->user))
                     <li>
                         <form action="{{ route('users.unfollow', $post->user) }}" method="POST">
@@ -112,8 +113,9 @@
                         </form>
                     </li>
                     @endif
+                    @endauth
                     <li>
-                        <button class="dropdown-item" onclick="copyToClipboard('{{ $post->url }}')">
+                        <button class="dropdown-item" onclick="copyToClipboard({{ json_encode($post->url) }})">
                             <i class="bi bi-link-45deg me-2"></i> Copy Link
                         </button>
                     </li>
@@ -151,7 +153,7 @@
         @if($post->content)
         <div class="px-4 mb-3">
             <div class="post-content">
-                {!! Str::markdown($post->content) !!}
+                {!! Str::markdown(e($post->content)) !!}
             </div>
         </div>
         @endif
@@ -188,7 +190,7 @@
         <div class="mb-3">
             <img src="{{ $post->image_url }}" alt="Post image" class="img-fluid w-100"
                 style="max-height: 600px; object-fit: contain; cursor: pointer;"
-                onclick="openImageModal('{{ $post->image_url }}', '{{ $post->title }}')">
+                onclick="openImageModal({{ json_encode($post->image_url) }}, {{ json_encode($post->title) }})">
         </div>
         @endif
 

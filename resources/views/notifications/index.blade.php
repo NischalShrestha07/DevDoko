@@ -76,7 +76,7 @@
                         <div class="position-relative">
                             @if($notification->fromUser)
                             <a
-                                href="{{ route('profile.show', $notification->fromUser->profile->username ?? $notification->fromUser->name) }}">
+                                href="{{ route('profile.show', $notification->fromUser->profile?->username ?? $notification->fromUser->name) }}">
                                 <img src="{{ $notification->fromUser->avatar_url }}"
                                     alt="{{ $notification->fromUser->name }}" class="rounded-circle border"
                                     style="width: 56px; height: 56px; object-fit: cover;">
@@ -102,9 +102,9 @@
                             <div class="d-flex justify-content-between align-items-start mb-1">
                                 <div>
                                     @if($notification->fromUser)
-                                    <a href="{{ route('profile.show', $notification->fromUser->profile->username ?? $notification->fromUser->name) }}"
+                                    <a href="{{ route('profile.show', $notification->fromUser->profile?->username ?? $notification->fromUser->name) }}"
                                         class="text-decoration-none text-dark fw-semibold">
-                                        {{ $notification->fromUser->profile->username ?? $notification->fromUser->name
+                                        {{ $notification->fromUser->profile?->username ?? $notification->fromUser->name
                                         }}
                                     </a>
                                     @endif
@@ -189,7 +189,7 @@
                                 @endif
 
                                 @if($notification->type === 'follow' && $notification->fromUser)
-                                <a href="{{ route('profile.show', $notification->fromUser->profile->username ?? $notification->fromUser->name) }}"
+                                <a href="{{ route('profile.show', $notification->fromUser->profile?->username ?? $notification->fromUser->name) }}"
                                     class="btn btn-sm btn-outline-primary rounded-pill px-4">
                                     <i class="bi bi-person me-1"></i>
                                     View Profile
@@ -248,7 +248,7 @@
     }
 
     .list-group-item:hover {
-        background-color: #f8f9fa !important;
+        background-color: var(--bs-list-group-hover-bg, #f8f9fa);
     }
 </style>
 @endsection

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 
 <head>
     <meta charset="UTF-8">
@@ -7,133 +7,168 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'DevDoko')</title>
 
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <!-- Highlight.js -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
     <link rel="icon" href="{{ asset('assets/devdokoIcon.png') }}">
 </head>
 
-<body class="bg-light">
-    <!-- Desktop Sidebar - Using Bootstrap classes -->
-    <div class="d-none d-md-flex flex-column bg-white border-end vh-100 position-fixed"
-        style="width: 260px; top: 0; left: 0;">
-        <!-- Logo -->
-        <div class="p-3 border-bottom">
-            <div class="d-flex align-items-center">
-                <img src="{{ asset('/assets/devdoko.png') }}" alt="DevDoko" class="rounded-circle border border-dark"
-                    style="width: 50px; height: 50px; object-fit: cover;">
-                <span class="ms-2 fw-bold fs-4">DevDoko</span>
+<body>
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center py-4">
+                    <i class="bi bi-question-circle text-warning display-4 mb-3 d-block"></i>
+                    <p class="confirm-message mb-0 fw-semibold">Are you sure?</p>
+                </div>
+                <div class="modal-footer justify-content-center border-0 pt-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger btn-confirm-yes">Confirm</button>
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- Scrollable Menu -->
+    <!-- Top Header Bar -->
+    <header class="top-header d-flex align-items-center px-3 py-0 border-bottom">
+        <div class="d-flex align-items-center flex-grow-1">
+            <a href="{{ route('home') }}" class="d-flex align-items-center text-decoration-none text-dark fw-bold fs-6">
+                <img src="{{ asset('/assets/devdoko.png') }}" alt="DevDoko" class="rounded-circle me-2 d-md-none"
+                    style="width: 32px; height: 32px; object-fit: cover;">
+                <span class="d-md-none">DevDoko</span>
+            </a>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <button id="darkModeToggleHeader" onclick="DevDoko.toggleTheme()"
+                class="btn btn-sm rounded-pill d-flex align-items-center gap-1 text-secondary border-0"
+                aria-label="Toggle dark mode"
+                style="background: transparent;">
+                <i class="bi bi-moon-fill fs-6"></i>
+                <span class="small d-none d-md-inline">Theme</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Desktop Sidebar -->
+    <div class="d-none d-md-flex flex-column bg-white border-end vh-100 position-fixed"
+        style="width: 260px; top: 0; left: 0; z-index: 1020;">
+        <!-- Logo -->
+        <div class="p-3 border-bottom">
+            <a href="{{ route('home') }}" class="d-flex align-items-center text-decoration-none text-dark">
+                <img src="{{ asset('/assets/devdoko.png') }}" alt="DevDoko" class="rounded-circle border"
+                    style="width: 45px; height: 45px; object-fit: cover;">
+                <span class="ms-2 fw-bold fs-4">DevDoko</span>
+            </a>
+        </div>
+
+        <!-- Navigation -->
         <div class="flex-grow-1 overflow-auto py-2">
-            <!-- Main Navigation -->
             <div class="px-2 mb-3">
                 <div class="small text-secondary text-uppercase fw-semibold px-3 mb-2">Main</div>
                 <a href="{{ route('home') }}"
-                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 {{ request()->routeIs('home') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('home') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                    @if(request()->routeIs('home'))<span class="nav-active-indicator"></span>@endif
                     <i class="bi bi-house-door{{ request()->routeIs('home') ? '-fill' : '' }} fs-5 me-3"></i>
                     <span>Home</span>
                 </a>
                 <a href="{{ route('search') }}"
-                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 {{ request()->routeIs('search') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('search') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                    @if(request()->routeIs('search'))<span class="nav-active-indicator"></span>@endif
                     <i class="bi bi-search fs-5 me-3"></i>
                     <span>Search</span>
                 </a>
                 <a href="{{ route('explore') }}"
-                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 {{ request()->routeIs('explore') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('explore') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                    @if(request()->routeIs('explore'))<span class="nav-active-indicator"></span>@endif
                     <i class="bi bi-compass fs-5 me-3"></i>
                     <span>Explore</span>
                 </a>
+                <a href="{{ route('jobs.index') }}"
+                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('jobs.*') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                    @if(request()->routeIs('jobs.*'))<span class="nav-active-indicator"></span>@endif
+                    <i class="bi bi-briefcase fs-5 me-3"></i>
+                    <span>Jobs</span>
+                </a>
                 <a href="{{ route('messages.index') }}"
-                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 {{ request()->routeIs('messages.*') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('messages.*') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                    @if(request()->routeIs('messages.*'))<span class="nav-active-indicator"></span>@endif
                     <i class="bi bi-chat{{ request()->routeIs('messages.*') ? '-fill' : '' }} fs-5 me-3"></i>
                     <span>Messages</span>
                 </a>
                 <a href="{{ route('notifications.index') }}"
-                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 {{ request()->routeIs('notifications.*') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('notifications.*') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                    @if(request()->routeIs('notifications.*'))<span class="nav-active-indicator"></span>@endif
                     <i class="bi bi-heart{{ request()->routeIs('notifications.*') ? '-fill' : '' }} fs-5 me-3"></i>
                     <span>Notifications</span>
-                    @php $unreadCount = auth()->user()->unreadNotifications->count(); @endphp
+                    @auth
+                    @php $unreadCount = auth()->user()->unreadNotifications()->count(); @endphp
                     @if($unreadCount > 0)
                     <span class="badge bg-danger rounded-pill ms-auto">{{ $unreadCount }}</span>
                     @endif
+                    @endauth
                 </a>
                 <a href="{{ route('posts.create') }}"
-                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 {{ request()->routeIs('posts.create') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('posts.create') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                    @if(request()->routeIs('posts.create'))<span class="nav-active-indicator"></span>@endif
                     <i class="bi bi-plus-square{{ request()->routeIs('posts.create') ? '-fill' : '' }} fs-5 me-3"></i>
                     <span>Create</span>
                 </a>
-                <a href="{{ route('profile.show', auth()->user()->profile->username) }}"
-                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 {{ request()->routeIs('profile.show') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
-                    @if(auth()->user()->profile->avatar)
-                    <img src="{{ auth()->user()->profile->avatar_url }}" class="rounded-circle me-3"
-                        style="width: 20px; height: 20px; object-fit: cover;">
-                    @else
-                    <i class="bi bi-person-circle fs-5 me-3"></i>
-                    @endif
-                    <span>Profile</span>
+                <a href="{{ route('developers.index') }}"
+                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('developers.*') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                    @if(request()->routeIs('developers.*'))<span class="nav-active-indicator"></span>@endif
+                    <i class="bi bi-people fs-5 me-3"></i>
+                    <span>Developers</span>
                 </a>
             </div>
 
-            <!-- Groups Dropdown -->
+            <!-- Groups -->
             <div class="px-2 mb-3">
                 <div class="small text-secondary text-uppercase fw-semibold px-3 mb-2">Community</div>
                 <div class="dropdown">
                     <a href="#"
                         class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 dropdown-toggle"
-                        data-bs-toggle="dropdown">
+                        data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-people-fill fs-5 me-3"></i>
                         <span class="flex-grow-1">Groups</span>
                     </a>
                     <ul class="dropdown-menu w-100 mt-1 shadow-sm border-0">
                         <li><a class="dropdown-item py-2 {{ request()->routeIs('groups.index') ? 'active bg-light' : '' }}"
-                                href="{{ route('groups.index') }}"><i class="bi bi-compass me-2"></i> Discover
-                                Groups</a></li>
+                                href="{{ route('groups.index') }}"><i class="bi bi-compass me-2"></i> Discover</a></li>
                         <li><a class="dropdown-item py-2 {{ request()->routeIs('groups.my-groups') ? 'active bg-light' : '' }}"
-                                href="{{ route('groups.my-groups') }}"><i class="bi bi-bookmark-check me-2"></i> My
-                                Groups</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item py-2" href="{{ route('groups.create') }}"><i
-                                    class="bi bi-plus-circle me-2 text-primary"></i> Create Group</a></li>
+                                href="{{ route('groups.my-groups') }}"><i class="bi bi-bookmark-check me-2"></i> My Groups</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item py-2" href="{{ route('groups.create') }}"><i class="bi bi-plus-circle me-2 text-primary"></i> Create Group</a></li>
                     </ul>
                 </div>
             </div>
 
-            {{-- Working and add in further new updates --}}
-            <!-- Marketplace Section -->
-            {{-- <div class="px-2 mb-3">
+            @auth
+            <!-- Marketplace -->
+            <div class="px-2 mb-3">
                 <div class="small text-secondary text-uppercase fw-semibold px-3 mb-2">Marketplace</div>
-
-                <!-- Main Marketplace Links -->
                 <a href="{{ route('marketplace.index') }}"
-                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 {{ request()->routeIs('marketplace.index') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('marketplace.index') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                    @if(request()->routeIs('marketplace.index'))<span class="nav-active-indicator"></span>@endif
                     <i class="bi bi-shop fs-5 me-3"></i>
                     <span>Browse</span>
                 </a>
-
                 <a href="{{ route('marketplace.my-listings') }}"
-                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 {{ request()->routeIs('marketplace.my-listings') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('marketplace.my-listings') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                    @if(request()->routeIs('marketplace.my-listings'))<span class="nav-active-indicator"></span>@endif
                     <i class="bi bi-bag fs-5 me-3"></i>
                     <span class="flex-grow-1">My Listings</span>
-                    @php $activeListingsCount = auth()->user()->marketplaceListings()->where('status',
-                    'active')->count(); @endphp
+                    @php $activeListingsCount = auth()->user()->marketplaceListings()->where('status', 'active')->count(); @endphp
                     @if($activeListingsCount > 0)
-                    <span class="badge bg-success rounded-pill">{{ $activeListingsCount }}</span>
+                    <span class="badge bg-success rounded-pill ms-auto">{{ $activeListingsCount }}</span>
                     @endif
                 </a>
-
-                <!-- Interests Dropdown -->
                 <div class="dropdown mt-1">
                     <a href="#"
                         class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 dropdown-toggle"
-                        data-bs-toggle="dropdown">
+                        data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-chat-heart fs-5 me-3"></i>
                         <span class="flex-grow-1">Interests</span>
                     </a>
@@ -144,8 +179,8 @@
                                 <span><i class="bi bi-inbox me-2"></i> Received</span>
                                 @php
                                 $pendingReceived = auth()->user()->marketplaceListings()
-                                ->withCount(['interests' => function($q) { $q->where('status', 'pending'); }])
-                                ->get()->sum('interests_count');
+                                    ->withCount(['interests' => fn($q) => $q->where('status', 'pending')])
+                                    ->get()->sum('interests_count');
                                 @endphp
                                 @if($pendingReceived > 0)
                                 <span class="badge bg-warning rounded-pill">{{ $pendingReceived }}</span>
@@ -156,8 +191,7 @@
                             <a class="dropdown-item py-2 d-flex justify-content-between align-items-center"
                                 href="{{ route('marketplace.interests.sent') }}">
                                 <span><i class="bi bi-send me-2"></i> Sent</span>
-                                @php $pendingSent = auth()->user()->marketplaceInterests()->where('status',
-                                'pending')->count(); @endphp
+                                @php $pendingSent = auth()->user()->marketplaceInterests()->where('status', 'pending')->count(); @endphp
                                 @if($pendingSent > 0)
                                 <span class="badge bg-info rounded-pill">{{ $pendingSent }}</span>
                                 @endif
@@ -165,27 +199,37 @@
                         </li>
                     </ul>
                 </div>
-
                 <a href="{{ route('marketplace.saved') }}"
-                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 {{ request()->routeIs('marketplace.saved') ? 'bg-light fw-semibold' : '' }} hover-bg-light mt-1">
+                    class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('marketplace.saved') ? 'bg-light fw-semibold' : '' }} hover-bg-light mt-1">
+                    @if(request()->routeIs('marketplace.saved'))<span class="nav-active-indicator"></span>@endif
                     <i class="bi bi-bookmark fs-5 me-3"></i>
                     <span class="flex-grow-1">Saved</span>
                     @php $savedCount = auth()->user()->savedMarketplaceListings()->count(); @endphp
                     @if($savedCount > 0)
-                    <span class="badge bg-primary rounded-pill">{{ $savedCount }}</span>
+                    <span class="badge bg-primary rounded-pill ms-auto">{{ $savedCount }}</span>
                     @endif
                 </a>
-
                 <a href="{{ route('marketplace.create') }}"
                     class="d-flex align-items-center px-3 py-2 text-primary text-decoration-none rounded-3 hover-bg-light mt-2">
                     <i class="bi bi-plus-circle fs-5 me-3"></i>
                     <span>Sell Something</span>
                 </a>
-            </div> --}}
+            </div>
+            @endauth
         </div>
 
-        <!-- Logout Button -->
+        <!-- Bottom: Dark mode toggle + Admin + Logout -->
         <div class="p-3 border-top">
+            @auth
+            @if(auth()->user()->isAdmin())
+            <a href="{{ route('admin.dashboard') }}"
+                class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 hover-bg-light mb-1">
+                <i class="bi bi-shield-check fs-5 me-3"></i>
+                <span>Admin</span>
+            </a>
+            @endif
+            @endauth
+            @auth
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button type="submit"
@@ -194,12 +238,12 @@
                     <span>Logout</span>
                 </button>
             </form>
+            @endauth
         </div>
     </div>
 
-    <!-- Main Content Area -->
-    <main class="main-content" style="margin-left: 260px;">
-        <!-- Flash Messages -->
+    <!-- Main Content -->
+    <main class="main-content">
         @if(session('success'))
         <div class="container pt-3">
             <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
@@ -228,7 +272,7 @@
     </main>
 
     <!-- Mobile Bottom Navigation -->
-    <nav class="d-md-none fixed-bottom bg-white border-top py-2 px-3">
+    <nav class="d-md-none fixed-bottom bg-white border-top py-2 px-3" style="z-index: 1030;">
         <div class="d-flex justify-content-around align-items-center">
             <a href="{{ route('home') }}" class="text-dark text-decoration-none text-center">
                 <i class="bi bi-house-door{{ request()->routeIs('home') ? '-fill' : '' }} fs-5"></i>
@@ -238,165 +282,47 @@
                 <i class="bi bi-search fs-5"></i>
                 <small class="d-block" style="font-size: 10px;">Search</small>
             </a>
-            <a href="{{ route('marketplace.index') }}" class="text-primary text-decoration-none text-center">
+            <a href="{{ route('jobs.index') }}" class="text-dark text-decoration-none text-center">
+                <i class="bi bi-briefcase fs-5"></i>
+                <small class="d-block" style="font-size: 10px;">Jobs</small>
+            </a>
+            <a href="{{ route('marketplace.index') }}" class="text-dark text-decoration-none text-center">
                 <i class="bi bi-shop fs-5"></i>
                 <small class="d-block" style="font-size: 10px;">Shop</small>
+            </a>
+            <a href="#" id="darkModeToggleMobile" onclick="DevDoko.toggleTheme(); return false;"
+                class="text-dark text-decoration-none text-center">
+                <i class="bi bi-moon-fill fs-5"></i>
+                <small class="d-block" style="font-size: 10px;">Theme</small>
             </a>
             <a href="{{ route('notifications.index') }}"
                 class="text-dark text-decoration-none text-center position-relative">
                 <i class="bi bi-heart{{ request()->routeIs('notifications.*') ? '-fill' : '' }} fs-5"></i>
-                @if($unreadCount > 0)
+                @auth
+                @php $mobileUnread = auth()->user()->unreadNotifications()->count(); @endphp
+                @if($mobileUnread > 0)
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                    style="font-size: 8px;">{{ $unreadCount }}</span>
+                    style="font-size: 8px;">{{ $mobileUnread > 99 ? '99+' : $mobileUnread }}</span>
                 @endif
+                @endauth
                 <small class="d-block" style="font-size: 10px;">Activity</small>
             </a>
-            <a href="{{ route('profile.show', auth()->user()->profile->username) }}"
+            @auth
+            <a href="{{ route('profile.show', auth()->user()->profile?->username) }}"
                 class="text-dark text-decoration-none text-center">
-                @if(auth()->user()->profile->avatar)
-                <img src="{{ auth()->user()->profile->avatar_url }}" class="rounded-circle"
+                @if(auth()->user()->profile?->avatar)
+                <img src="{{ auth()->user()->profile?->avatar_url }}" class="rounded-circle"
                     style="width: 20px; height: 20px; object-fit: cover;">
                 @else
                 <i class="bi bi-person-circle fs-5"></i>
                 @endif
                 <small class="d-block" style="font-size: 10px;">Profile</small>
             </a>
+            @endauth
         </div>
     </nav>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof hljs !== 'undefined') {
-                document.querySelectorAll('pre code').forEach((block) => {
-                    hljs.highlightElement(block);
-                });
-            }
-        });
-    </script>
-
-    <!-- Marketplace Interactions -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Save/Unsave Listing
-            document.querySelectorAll('.save-listing-btn').forEach(btn => {
-                btn.addEventListener('click', async function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    const listingId = this.dataset.listingId;
-                    const icon = this.querySelector('i');
-                    const textSpan = this.querySelector('.save-text');
-
-                    if (!listingId) return;
-
-                    try {
-                        const response = await fetch(`/marketplace/save/${listingId}`, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json'
-                            }
-                        });
-
-                        const data = await response.json();
-
-                        if (data.success) {
-                            if (data.saved) {
-                                btn.classList.remove('btn-outline-primary');
-                                btn.classList.add('btn-primary');
-                                icon.classList.remove('bi-bookmark');
-                                icon.classList.add('bi-bookmark-fill');
-                                textSpan.textContent = 'Saved';
-                                btn.dataset.saved = 'true';
-                            } else {
-                                btn.classList.remove('btn-primary');
-                                btn.classList.add('btn-outline-primary');
-                                icon.classList.remove('bi-bookmark-fill');
-                                icon.classList.add('bi-bookmark');
-                                textSpan.textContent = btn.classList.contains('w-100') ? 'Save Listing' : 'Save';
-                                btn.dataset.saved = 'false';
-                            }
-                        }
-                    } catch (error) {
-                        console.error('Error:', error);
-                    }
-                });
-            });
-
-            // Express Interest Modal
-            window.showInterestModal = function(listingId, listingTitle) {
-                const modal = document.getElementById('interestModal');
-                if (!modal) return;
-
-                modal.dataset.listingId = listingId;
-                const modalTitle = modal.querySelector('.modal-title');
-                if (modalTitle) modalTitle.textContent = `Express Interest in "${listingTitle}"`;
-
-                new bootstrap.Modal(modal).show();
-            };
-
-            // Submit Interest
-            const submitInterestBtn = document.getElementById('submitInterestBtn');
-            if (submitInterestBtn) {
-                submitInterestBtn.addEventListener('click', async function() {
-                    const modal = document.getElementById('interestModal');
-                    const listingId = modal.dataset.listingId;
-
-                    if (!listingId) return;
-
-                    const message = modal.querySelector('textarea[name="message"]')?.value || '';
-                    const offeredPrice = modal.querySelector('input[name="offered_price"]')?.value || '';
-
-                    try {
-                        const response = await fetch(`/marketplace/interest/${listingId}`, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                message: message,
-                                offered_price: offeredPrice ? parseFloat(offeredPrice) : null
-                            })
-                        });
-
-                        const data = await response.json();
-
-                        if (response.ok && data.success) {
-                            bootstrap.Modal.getInstance(modal).hide();
-                            modal.querySelector('textarea[name="message"]').value = '';
-                            modal.querySelector('input[name="offered_price"]').value = '';
-                            alert('Interest expressed successfully!');
-                        } else {
-                            alert(data.error || 'Failed to express interest');
-                        }
-                    } catch (error) {
-                        console.error('Error:', error);
-                    }
-                });
-            }
-
-            // Delete Listing
-            window.deleteListing = function(listingId) {
-                if (confirm('Delete this listing?')) {
-                    fetch(`/marketplace/${listingId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Accept': 'application/json',
-                        }
-                    }).then(response => {
-                        if (response.ok) window.location.href = '{{ route("marketplace.index") }}';
-                    });
-                }
-            };
-        });
-    </script>
 </body>
 
 </html>

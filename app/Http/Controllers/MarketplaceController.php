@@ -430,6 +430,99 @@ class MarketplaceController extends Controller
             ->with('selectedCategory', $category);
     }
 
+    public function addImages(Request $request, MarketplaceListing $listing)
+    {
+        if (!$listing->canEdit(Auth::id())) {
+            abort(403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'images' => 'required|array|max:10',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $maxOrder = $listing->images()->max('order') ?? -1;
+
+        foreach ($request->file('images') as $index => $image) {
+            $path = $image->store('marketplace/' . $listing->id, 'public');
+
+            $listing->images()->create([
+                'image_path' => $path,
+                'thumbnail_path' => $path,
+                'order' => $maxOrder + 1 + $index,
+                'is_primary' => $listing->images()->count() === 0 && $index === 0,
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Images added successfully!',
+        ]);
+    }
+
+    public function deleteImage(MarketplaceListing $listing, MarketplaceListingImage $image)
+    {
+        if (!$listing->canEdit(Auth::id())) {
+            abort(403);
+        }
+
+        abort_if($image->listing_id !== $listing->id, 403);
+
+        Storage::disk('public')->delete($image->image_path);
+        $image->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Image deleted successfully!',
+        ]);
+    }
+
+    public function setPrimaryImage(MarketplaceListing $listing, MarketplaceListingImage $image)
+    {
+        if (!$listing->canEdit(Auth::id())) {
+            abort(403);
+        }
+
+        abort_if($image->listing_id !== $listing->id, 403);
+
+        $listing->images()->update(['is_primary' => false]);
+        $image->update(['is_primary' => true]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Primary image updated successfully!',
+        ]);
+    }
+
+    public function saveSearch(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'keyword' => 'nullable|string|max:255',
+            'category' => 'nullable|string|max:100',
+            'min_price' => 'nullable|numeric|min:0',
+            'max_price' => 'nullable|numeric|min:0',
+            'condition' => 'nullable|string|max:50',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $search = Auth::user()->savedMarketplaceSearches()->create(
+            $validator->validated()
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Search saved successfully!',
+            'search' => $search,
+        ]);
+    }
+
     public function toggleSaveById($id)
     {
         $listing = MarketplaceListing::findOrFail($id);

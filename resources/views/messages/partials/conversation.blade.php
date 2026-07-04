@@ -83,8 +83,8 @@
     </div>
 
     <!-- Messages Container -->
-    <div class="flex-grow-1 p-4" id="messagesContainer"
-        style="overflow-y: auto; max-height: 500px; background-color: #f8f9fa;">
+    <div class="flex-grow-1 p-4 bg-body-tertiary" id="messagesContainer"
+        style="overflow-y: auto; max-height: 500px;">
         @if(isset($groupedMessages) && $groupedMessages->count() > 0)
         @foreach($groupedMessages as $date => $messagesGroup)
         <div class="text-center mb-4">

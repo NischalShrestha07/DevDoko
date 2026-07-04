@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class FollowController extends Controller
@@ -16,12 +15,13 @@ class FollowController extends Controller
         if ($currentUser->isFollowing($user)) {
             return response()->json([
                 'following' => true,
-                'message' => 'Already following this user'
+                'message' => 'Already following this user',
             ]);
         }
 
         // Follow the user
         $currentUser->following()->attach($user->id);
+
         return redirect()->back();
     }
 
@@ -30,15 +30,16 @@ class FollowController extends Controller
         $currentUser = Auth::user();
 
         // Check if following
-        if (!$currentUser->isFollowing($user)) {
+        if (! $currentUser->isFollowing($user)) {
             return response()->json([
                 'following' => false,
-                'message' => 'Not following this user'
+                'message' => 'Not following this user',
             ]);
         }
 
         // Unfollow the user
         $currentUser->following()->detach($user->id);
+
         return redirect()->back();
     }
 
@@ -70,10 +71,10 @@ class FollowController extends Controller
         $authUser = Auth::user();
 
         if ($authUser->isFollowing($user)) {
-            $authUser->unfollow($user);
+            $authUser->following()->detach($user->id);
             $message = 'Unfollowed successfully.';
         } else {
-            $authUser->follow($user);
+            $authUser->following()->attach($user->id);
             $message = 'Followed successfully.';
         }
 

@@ -16,7 +16,7 @@
                 <a href="{{ route('projects.create') }}" class="btn btn-primary btn-lg">
                     <i class="bi bi-plus-circle me-2"></i> Add Project
                 </a>
-                <a href="{{ route('collaboration.index') }}" class="btn btn-outline-primary btn-lg">
+                <a href="{{ route('projects.index') }}" class="btn btn-outline-primary btn-lg">
                     <i class="bi bi-people me-2"></i> Find Collaborators
                 </a>
             </div>
@@ -122,13 +122,13 @@
     </div>
 
     <!-- Featured Projects -->
-    @if($projects->where('is_featured', true)->count() > 0)
+    @if(isset($featuredProjects) && $featuredProjects->count() > 0)
     <div class="mb-5 fade-in">
         <h3 class="fw-bold mb-4">
             <i class="bi bi-star-fill text-warning me-2"></i> Featured Projects
         </h3>
         <div class="row g-4">
-            @foreach($projects->where('is_featured', true)->take(3) as $project)
+            @foreach($featuredProjects as $project)
             <div class="col-md-4">
                 <div class="card border-0 shadow-sm h-100 project-card">
                     <div class="project-thumbnail" style="background: linear-gradient(45deg, #667eea, #764ba2);">
