@@ -247,7 +247,7 @@
                         <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
                             @foreach($techTopics as $topic)
                             <div class="col">
-                                <a href="{{ route('tags.show', strtolower($topic['name'])) }}"
+                                <a href="{{ route('tags.show', $topic['slug']) }}"
                                     class="text-decoration-none">
                                     <div class="card border-0 shadow-sm h-100"
                                         style="border-left: 4px solid {{ $topic['color'] }} !important;">

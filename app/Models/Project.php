@@ -44,22 +44,10 @@ class Project extends Model
         'likes_count' => 'integer'
     ];
 
-    protected $appends = ['thumbnail_url'];
-
     // Relationships
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function collaborations(): HasMany
-    {
-        return $this->hasMany(Collaboration::class);
-    }
-
-    public function likes(): HasMany
-    {
-        return $this->hasMany(ProjectLike::class);
     }
 
     public function forks(): HasMany

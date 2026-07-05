@@ -80,7 +80,7 @@
                                 </div>
                             </div>
 
-                            @if($post->user->profile->bio)
+                            @if($post->user?->profile?->bio)
                             <p class="mt-3 mb-0 text-secondary small">
                                 {{ $post->user->profile->bio }}
                             </p>
@@ -102,7 +102,7 @@
                             Comments
                         </h5>
                         <span class="badge bg-primary rounded-pill px-3 py-2">
-                            {{ $post->comments->count() }}
+                            {{ $post->comments_count }}
                         </span>
                     </div>
                 </div>
@@ -350,12 +350,58 @@ function confirmDelete(button) {
     }
 }
 
-// Handle comment form submission
-document.getElementById('commentForm')?.addEventListener('submit', function(e) {
+// Handle comment form submission (AJAX)
+document.getElementById('commentForm')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
     const input = document.getElementById('commentInput');
-    if (!input.value.trim()) {
-        e.preventDefault();
+    const submitBtn = document.getElementById('commentSubmit');
+    const content = input.value.trim();
+
+    if (!content) {
         input.focus();
+        return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+    try {
+        const formData = new FormData(this);
+        const response = await fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
+            }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            const container = document.querySelector('.comments-list');
+            const emptyMsg = container?.querySelector('.text-center.py-5');
+            if (emptyMsg) emptyMsg.remove();
+
+            if (container && data.html) {
+                container.insertAdjacentHTML('afterbegin', data.html);
+            }
+
+            input.value = '';
+            document.getElementById('charCount').textContent = '0/500';
+            const countBadge = document.querySelector('.badge.bg-primary.rounded-pill');
+            if (countBadge) {
+                countBadge.textContent = parseInt(countBadge.textContent) + 1;
+            }
+        } else if (data.errors) {
+            alert(Object.values(data.errors).flat().join('\n'));
+        }
+    } catch (error) {
+        console.error('Comment failed:', error);
+        alert('Failed to post comment. Please try again.');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Post';
     }
 });
 

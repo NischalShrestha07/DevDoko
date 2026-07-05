@@ -886,7 +886,7 @@ class GroupController extends Controller
 
     public function storeComment(Request $request, Group $group, GroupPost $post)
     {
-        if (!$group->is_member) {
+        if (!$group->isMember) {
             abort(403);
         }
 

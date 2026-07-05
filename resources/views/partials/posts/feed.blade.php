@@ -5,14 +5,14 @@
     <div class="card-header bg-white border-0 py-3">
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center">
-                <a href="{{ route('profile.show', $post->user->profile->username) }}" class="text-decoration-none me-3">
-                    <img src="{{ $post->user->profile->avatar_url }}" alt="{{ $post->user->name }}"
+                <a href="{{ route('profile.show', $post->user?->profile?->username ?? $post->user->name) }}" class="text-decoration-none me-3">
+                    <img src="{{ $post->user?->profile?->avatar_url }}" alt="{{ $post->user->name }}"
                         class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
                 </a>
                 <div>
-                    <a href="{{ route('profile.show', $post->user->profile->username) }}"
+                    <a href="{{ route('profile.show', $post->user?->profile?->username ?? $post->user->name) }}"
                         class="text-decoration-none text-dark fw-bold d-block">
-                        {{ $post->user->profile->username }}
+                        {{ $post->user?->profile?->username ?? $post->user->name }}
                     </a>
                     <small class="text-muted">{{ $post->time_ago }}</small>
                 </div>
@@ -212,17 +212,31 @@
             e.preventDefault();
 
             const formData = new FormData(this);
-            const response = await fetch(this.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json'
-                }
-            });
+            const button = this.querySelector('button');
+            const icon = button.querySelector('i');
 
-            if (response.ok) {
-                location.reload();
+            try {
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.liked) {
+                        icon.classList.add('text-danger', 'bi-heart-fill');
+                        icon.classList.remove('bi-heart');
+                    } else {
+                        icon.classList.remove('text-danger', 'bi-heart-fill');
+                        icon.classList.add('bi-heart');
+                    }
+                }
+            } catch (error) {
+                console.error('Like failed:', error);
             }
         });
     });
@@ -233,17 +247,35 @@
             e.preventDefault();
 
             const formData = new FormData(this);
-            const response = await fetch(this.action, {
-                method: this.querySelector('[name="_method"]') ? 'DELETE' : 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json'
-                }
-            });
+            const button = this.querySelector('button');
+            const icon = button.querySelector('i');
 
-            if (response.ok) {
-                location.reload();
+            try {
+                const response = await fetch(this.action, {
+                    method: this.querySelector('[name="_method"]') ? 'DELETE' : 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.saved) {
+                        icon.classList.add('bi-bookmark-fill');
+                        icon.classList.remove('bi-bookmark');
+                        const text = button.querySelector('span');
+                        if (text) text.textContent = ' Saved';
+                    } else {
+                        icon.classList.add('bi-bookmark');
+                        icon.classList.remove('bi-bookmark-fill');
+                        const text = button.querySelector('span');
+                        if (text) text.textContent = ' Save';
+                    }
+                }
+            } catch (error) {
+                console.error('Save failed:', error);
             }
         });
     });

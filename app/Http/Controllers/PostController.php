@@ -25,9 +25,9 @@ class PostController extends Controller
 
     public function index(Request $request)
     {
-        $query = Post::with(['user.profile', 'tags', 'likes', 'comments.user.profile'])
+        $query = Post::with(['user.profile', 'tags', 'likes', 'saves' => fn($q) => $q->where('user_id', Auth::id()), 'comments.user.profile'])
             ->visibleTo(Auth::user())
-            ->orderBy('created_at', 'desc');
+            ->latest();
 
         // Filter by type
         if ($request->has('type')) {
@@ -48,12 +48,8 @@ class PostController extends Controller
             ->limit(10)
             ->get();
 
-        $suggestedUsers = User::where('id', '!=', auth()->id())
-            ->whereDoesntHave('followers', function ($q) {
-                $q->where('follower_id', auth()->id());
-            })
+        $suggestedUsers = User::suggested(Auth::id())
             ->with('profile')
-            ->inRandomOrder()
             ->limit(5)
             ->get();
 
@@ -200,6 +196,7 @@ class PostController extends Controller
                     ->take(10);
             },
             'likes.user.profile',
+            'saves' => fn($q) => $q->where('user_id', Auth::id()),
             'tags',
             'media'
         ]);
@@ -215,10 +212,7 @@ class PostController extends Controller
             ->limit(4)
             ->get();
 
-        $isBookmarked = $post->is_saved;
-        $isLiked = $post->is_liked;
-
-        return view('posts.show', compact('post', 'relatedPosts', 'isBookmarked', 'isLiked'));
+        return view('posts.show', compact('post', 'relatedPosts'));
     }
 
     public function edit(Post $post)
@@ -577,7 +571,7 @@ class PostController extends Controller
             foreach ($followers as $follower) {
                 try {
                     // Create notification record
-                    \App\Models\Notification::create([
+                    Notification::create([
                         'user_id' => $follower->id,
                         'type' => 'new_post',
                         'data' => json_encode([

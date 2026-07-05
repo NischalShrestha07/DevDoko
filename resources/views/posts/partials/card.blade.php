@@ -173,7 +173,7 @@
                         @endif
                     </div>
                     <div>
-                        <button class="btn btn-sm btn-outline-light" onclick="copyCode('{{ $post->id }}')">
+                        <button class="btn btn-sm btn-outline-light" onclick="copyCode('{{ $post->id }}', this)">
                             <i class="bi bi-clipboard me-1"></i> Copy
                         </button>
                     </div>
@@ -266,7 +266,7 @@
                 </div>
                 <div class="d-flex align-items-center">
                     <i class="bi bi-bookmark me-1"></i>
-                    <span>{{ $post->saves()->count() }} saves</span>
+                    <span>{{ $post->saves_count ?? 0 }} saves</span>
                 </div>
             </div>
         </div>
@@ -441,165 +441,257 @@
 </div>
 
 <script>
-    // Handle like form submission with AJAX
-    document.querySelectorAll('.like-form').forEach(form => {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
+if (!window._cardInit) {
+    window._cardInit = true;
 
-            const formData = new FormData(this);
-            const postId = this.closest('.post-card').dataset.postId;
-            const likeButton = this.querySelector('button');
-            const likeIcon = likeButton.querySelector('i');
-            const likeCount = likeButton.querySelector('span');
+    // Handle like form submission (event delegation)
+    document.addEventListener('submit', async function(e) {
+        const form = e.target.closest('.like-form');
+        if (!form) return;
+        e.preventDefault();
 
-            try {
-                const response = await fetch(this.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Accept': 'application/json'
-                    }
-                });
+        const postId = form.closest('.post-card').dataset.postId;
+        const likeButton = form.querySelector('button');
+        const likeIcon = likeButton.querySelector('i');
+        const likeCount = likeButton.querySelector('span');
 
-                if (response.ok) {
-                    const data = await response.json();
-
-                    // Update UI
-                    if (data.liked) {
-                        likeIcon.classList.remove('bi-heart');
-                        likeIcon.classList.add('bi-heart-fill', 'text-danger');
-                    } else {
-                        likeIcon.classList.remove('bi-heart-fill', 'text-danger');
-                        likeIcon.classList.add('bi-heart');
-                    }
-
-                    // Update count
-                    likeCount.textContent = data.likes_count;
-
-                    // Add animation
-                    likeIcon.style.transform = 'scale(1.2)';
-                    setTimeout(() => {
-                        likeIcon.style.transform = 'scale(1)';
-                    }, 200);
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
                 }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        });
-    });
-
-    // Handle save form submission with AJAX
-    document.querySelectorAll('.save-form').forEach(form => {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const formData = new FormData(this);
-            const saveButton = this.querySelector('button');
-            const saveIcon = saveButton.querySelector('i');
-            const saveText = saveButton.querySelector('span');
-
-            try {
-                const response = await fetch(this.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Accept': 'application/json'
-                    }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-
-                    // Update UI
-                    if (data.saved) {
-                        saveIcon.classList.remove('bi-bookmark');
-                        saveIcon.classList.add('bi-bookmark-fill');
-                        saveText.textContent = 'Saved';
-                    } else {
-                        saveIcon.classList.remove('bi-bookmark-fill');
-                        saveIcon.classList.add('bi-bookmark');
-                        saveText.textContent = 'Save';
-                    }
-
-                    // Add animation
-                    saveIcon.style.transform = 'scale(1.2)';
-                    setTimeout(() => {
-                        saveIcon.style.transform = 'scale(1)';
-                    }, 200);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        });
-    });
-
-    // Toggle comments section
-    document.querySelectorAll('.comment-toggle').forEach(button => {
-        button.addEventListener('click', function() {
-            const postId = this.dataset.postId;
-            const commentsSection = document.getElementById(`comments-${postId}`);
-            const bsCollapse = new bootstrap.Collapse(commentsSection, {
-                toggle: true
             });
 
-            // Focus on comment input when opened
-            commentsSection.addEventListener('shown.bs.collapse', function() {
-                document.getElementById(`comment-input-${postId}`).focus();
-            });
-        });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.liked) {
+                    likeIcon.classList.remove('bi-heart');
+                    likeIcon.classList.add('bi-heart-fill', 'text-danger');
+                } else {
+                    likeIcon.classList.remove('bi-heart-fill', 'text-danger');
+                    likeIcon.classList.add('bi-heart');
+                }
+                likeCount.textContent = data.likes_count;
+                likeIcon.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    likeIcon.style.transform = 'scale(1)';
+                }, 200);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     });
 
-    // Handle comment form submission with AJAX
-    document.querySelectorAll('.comment-form').forEach(form => {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
+    // Handle save form submission (event delegation)
+    document.addEventListener('submit', async function(e) {
+        const form = e.target.closest('.save-form');
+        if (!form) return;
+        e.preventDefault();
 
-            const formData = new FormData(this);
-            const postId = this.id.split('-').pop();
-            const commentInput = document.getElementById(`comment-input-${postId}`);
+        const saveButton = form.querySelector('button');
+        const saveIcon = saveButton.querySelector('i');
+        const saveText = saveButton.querySelector('span');
 
-            try {
-                const response = await fetch(this.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Accept': 'application/json'
-                    }
-                });
+        try {
+            const response = await fetch(form.action, {
+                method: form.querySelector('[name="_method"]') ? 'DELETE' : 'POST',
+                body: new FormData(form),
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                }
+            });
 
-                if (response.ok) {
-                    const data = await response.json();
+            if (response.ok) {
+                const data = await response.json();
+                if (data.saved) {
+                    saveIcon.classList.remove('bi-bookmark');
+                    saveIcon.classList.add('bi-bookmark-fill');
+                    saveText.textContent = 'Saved';
+                } else {
+                    saveIcon.classList.remove('bi-bookmark-fill');
+                    saveIcon.classList.add('bi-bookmark');
+                    saveText.textContent = 'Save';
+                }
+                saveIcon.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    saveIcon.style.transform = 'scale(1)';
+                }, 200);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
 
-                    // Add new comment to list
-                    const commentsList = document.getElementById(`comments-list-${postId}`);
+    // Toggle comments section (event delegation)
+    document.addEventListener('click', function(e) {
+        const button = e.target.closest('.comment-toggle');
+        if (!button) return;
+        const postId = button.dataset.postId;
+        const commentsSection = document.getElementById(`comments-${postId}`);
+        if (!commentsSection) return;
+        const bsCollapse = new bootstrap.Collapse(commentsSection, { toggle: true });
+        commentsSection.addEventListener('shown.bs.collapse', function() {
+            const input = document.getElementById(`comment-input-${postId}`);
+            if (input) input.focus();
+        }, { once: true });
+    });
+
+    // Handle comment form submission (event delegation)
+    document.addEventListener('submit', async function(e) {
+        const form = e.target.closest('.comment-form');
+        if (!form) return;
+        e.preventDefault();
+
+        const postId = form.id.split('-').pop();
+        const commentInput = document.getElementById(`comment-input-${postId}`);
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const commentsList = document.getElementById(`comments-list-${postId}`);
+                if (commentsList) {
                     commentsList.insertAdjacentHTML('afterbegin', data.html);
-
-                    // Clear input
-                    commentInput.value = '';
-
-                    // Update comment count
-                    const commentCount = document.querySelector(`#post-${postId} .bi-chat + span`);
-                    if (commentCount) {
-                        commentCount.textContent = parseInt(commentCount.textContent) + 1;
-                    }
                 }
-            } catch (error) {
-                console.error('Error:', error);
+                if (commentInput) commentInput.value = '';
+                const commentCount = document.querySelector(`#post-${postId} .bi-chat-text + span`);
+                if (commentCount) {
+                    const current = parseInt(commentCount.textContent) || 0;
+                    commentCount.textContent = (current + 1) + ' comments';
+                }
             }
-        });
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+
+    // Toggle reply form (event delegation)
+    document.addEventListener('click', function(e) {
+        const button = e.target.closest('.reply-toggle');
+        if (!button) return;
+        const commentId = button.dataset.commentId;
+        const replyForm = document.getElementById(`reply-form-${commentId}`);
+        if (!replyForm) return;
+        replyForm.classList.toggle('d-none');
+        if (!replyForm.classList.contains('d-none')) {
+            const input = replyForm.querySelector('input');
+            if (input) input.focus();
+        }
+    });
+
+    // Toggle replies view (event delegation)
+    document.addEventListener('click', function(e) {
+        const button = e.target.closest('.view-replies-toggle');
+        if (!button) return;
+        const commentId = button.dataset.commentId;
+        const repliesContainer = document.getElementById(`replies-${commentId}`);
+        if (!repliesContainer) return;
+        const icon = button.querySelector('i');
+        repliesContainer.classList.toggle('d-none');
+        if (repliesContainer.classList.contains('d-none')) {
+            icon.classList.remove('bi-chevron-up');
+            icon.classList.add('bi-chevron-down');
+        } else {
+            icon.classList.remove('bi-chevron-down');
+            icon.classList.add('bi-chevron-up');
+        }
+    });
+
+    // Handle comment like form submission (event delegation)
+    document.addEventListener('submit', async function(e) {
+        const form = e.target.closest('.like-comment-form');
+        if (!form) return;
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const likeButton = form.querySelector('button');
+        const likeIcon = likeButton.querySelector('i');
+        const likeCount = likeButton.querySelector('span');
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.liked) {
+                    likeIcon.classList.remove('bi-heart');
+                    likeIcon.classList.add('bi-heart-fill', 'text-danger');
+                } else {
+                    likeIcon.classList.remove('bi-heart-fill', 'text-danger');
+                    likeIcon.classList.add('bi-heart');
+                }
+                likeCount.textContent = data.likes_count;
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+
+    // Handle reply form submission (event delegation)
+    document.addEventListener('submit', async function(e) {
+        const form = e.target.closest('.reply-form');
+        if (!form) return;
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const commentId = form.closest('.reply-form-container').id.split('-').pop();
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const repliesContainer = document.getElementById(`replies-${commentId}`);
+                if (repliesContainer) {
+                    repliesContainer.insertAdjacentHTML('beforeend', data.html);
+                    repliesContainer.classList.remove('d-none');
+                }
+                const viewRepliesBtn = document.querySelector(`.view-replies-toggle[data-comment-id="${commentId}"]`);
+                if (viewRepliesBtn) {
+                    const currentCount = parseInt(viewRepliesBtn.textContent.match(/\d+/)[0]);
+                    viewRepliesBtn.innerHTML = `<i class="bi bi-chevron-down"></i> ${currentCount + 1} replies`;
+                }
+                form.querySelector('input').value = '';
+                form.closest('.reply-form-container').classList.add('d-none');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     });
 
     // Copy code to clipboard
-    function copyCode(postId) {
+    function copyCode(postId, button) {
         const codeElement = document.getElementById(`code-${postId}`);
+        if (!codeElement) return;
         const code = codeElement.textContent;
 
         navigator.clipboard.writeText(code).then(() => {
-            // Show success message
-            const button = event.target.closest('button');
             const originalHTML = button.innerHTML;
             button.innerHTML = '<i class="bi bi-check"></i> Copied!';
             button.classList.add('btn-success');
@@ -673,6 +765,7 @@
             });
         }
     });
+}
 </script>
 
 <style>

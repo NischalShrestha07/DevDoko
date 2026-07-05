@@ -10,7 +10,7 @@ class DeveloperController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::with(['profile', 'posts']);
+        $query = User::with('profile')->withCount('posts');
 
         // Filter by search query
         if ($request->has('search')) {

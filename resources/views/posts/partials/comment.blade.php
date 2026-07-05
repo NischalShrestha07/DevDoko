@@ -143,141 +143,19 @@
 </div>
 
 <script>
-    // Edit comment
-    function editComment(commentId) {
-        const contentDiv = document.getElementById(`comment-content-${commentId}`);
-        const editForm = document.getElementById(`comment-edit-form-${commentId}`);
+function editComment(commentId) {
+    const contentDiv = document.getElementById(`comment-content-${commentId}`);
+    const editForm = document.getElementById(`comment-edit-form-${commentId}`);
+    contentDiv.classList.add('d-none');
+    editForm.classList.remove('d-none');
+}
 
-        contentDiv.classList.add('d-none');
-        editForm.classList.remove('d-none');
-    }
-
-    function cancelEditComment(commentId) {
-        const contentDiv = document.getElementById(`comment-content-${commentId}`);
-        const editForm = document.getElementById(`comment-edit-form-${commentId}`);
-
-        contentDiv.classList.remove('d-none');
-        editForm.classList.add('d-none');
-    }
-
-    // Toggle reply form
-    document.querySelectorAll('.reply-toggle').forEach(button => {
-        button.addEventListener('click', function() {
-            const commentId = this.dataset.commentId;
-            const replyForm = document.getElementById(`reply-form-${commentId}`);
-            replyForm.classList.toggle('d-none');
-
-            // Focus on input
-            if (!replyForm.classList.contains('d-none')) {
-                replyForm.querySelector('input').focus();
-            }
-        });
-    });
-
-    // Toggle replies view
-    document.querySelectorAll('.view-replies-toggle').forEach(button => {
-        button.addEventListener('click', function() {
-            const commentId = this.dataset.commentId;
-            const repliesContainer = document.getElementById(`replies-${commentId}`);
-            const icon = this.querySelector('i');
-
-            repliesContainer.classList.toggle('d-none');
-
-            if (repliesContainer.classList.contains('d-none')) {
-                icon.classList.remove('bi-chevron-up');
-                icon.classList.add('bi-chevron-down');
-            } else {
-                icon.classList.remove('bi-chevron-down');
-                icon.classList.add('bi-chevron-up');
-            }
-        });
-    });
-
-    // Handle comment like form submission
-    document.querySelectorAll('.like-comment-form').forEach(form => {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const formData = new FormData(this);
-            const likeButton = this.querySelector('button');
-            const likeIcon = likeButton.querySelector('i');
-            const likeCount = likeButton.querySelector('span');
-
-            try {
-                const response = await fetch(this.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Accept': 'application/json'
-                    }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-
-                    // Update UI
-                    if (data.liked) {
-                        likeIcon.classList.remove('bi-heart');
-                        likeIcon.classList.add('bi-heart-fill', 'text-danger');
-                    } else {
-                        likeIcon.classList.remove('bi-heart-fill', 'text-danger');
-                        likeIcon.classList.add('bi-heart');
-                    }
-
-                    // Update count
-                    likeCount.textContent = data.likes_count;
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        });
-    });
-
-    // Handle reply form submission
-    document.querySelectorAll('.reply-form').forEach(form => {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const formData = new FormData(this);
-            const commentId = this.closest('.reply-form-container').id.split('-').pop();
-
-            try {
-                const response = await fetch(this.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Accept': 'application/json'
-                    }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-
-                    // Add reply to replies container
-                    const repliesContainer = document.getElementById(`replies-${commentId}`);
-                    if (repliesContainer) {
-                        repliesContainer.insertAdjacentHTML('beforeend', data.html);
-                        repliesContainer.classList.remove('d-none');
-                    }
-
-                    // Update reply count
-                    const viewRepliesBtn = document.querySelector(`.view-replies-toggle[data-comment-id="${commentId}"]`);
-                    if (viewRepliesBtn) {
-                        const currentCount = parseInt(viewRepliesBtn.textContent.match(/\d+/)[0]);
-                        viewRepliesBtn.innerHTML = `<i class="bi bi-chevron-down"></i> ${currentCount + 1} replies`;
-                    }
-
-                    // Clear form
-                    this.querySelector('input').value = '';
-                    this.closest('.reply-form-container').classList.add('d-none');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        });
-    });
+function cancelEditComment(commentId) {
+    const contentDiv = document.getElementById(`comment-content-${commentId}`);
+    const editForm = document.getElementById(`comment-edit-form-${commentId}`);
+    contentDiv.classList.remove('d-none');
+    editForm.classList.add('d-none');
+}
 </script>
 
 <style>

@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Like;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Tag;
-use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class HomeController extends Controller
@@ -22,20 +21,17 @@ class HomeController extends Controller
         $stats = [
             'total_users' => User::count(),
             'total_posts' => Post::count(),
-            'active_today' => User::where('updated_at', '>=', Carbon::now()->subDay())->count(),
+            'active_today' => User::where('last_login_at', '>=', Carbon::now()->subDay())->count(),
             'code_snippets' => Post::where('type', 'code')->count(),
         ];
 
         $featuredPosts = Post::with(['user.profile', 'tags'])
             ->where('visibility', 'public')
-            ->orderBy('created_at', 'desc')
+            ->latest()
             ->take(6)
             ->get();
 
-        $topDevelopers = User::withCount(['posts', 'followers'])
-            ->orderBy('followers_count', 'desc')
-            ->take(5)
-            ->get();
+        $topDevelopers = User::popular()->take(5)->get();
 
         return view('welcome', compact('stats', 'featuredPosts', 'topDevelopers'));
     }
@@ -44,53 +40,32 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
-        $posts = Post::with(['user.profile', 'likes', 'comments.user.profile', 'tags'])
+        $posts = Post::with(['user.profile', 'likes', 'saves' => fn($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
             ->visibleTo($user)
-            ->orderBy('created_at', 'desc')
+            ->latest()
             ->paginate(10);
 
-        $suggestedUsers = User::where('id', '!=', $user->id)
-            ->whereDoesntHave('followers', function ($query) use ($user) {
-                $query->where('follower_id', $user->id);
-            })
-            ->with(['profile', 'posts' => function ($query) {
-                $query->latest()->take(3);
-            }])
-            ->inRandomOrder()
-            ->limit(8)
-            ->get();
-
-        $trendingTags = Tag::withCount('posts')
-            ->orderBy('posts_count', 'desc')
-            ->limit(12)
-            ->get();
-
-        $unreadNotifications = $user->notifications()->where('read_at', null)->count();
+        $unreadNotifications = $user->unreadNotificationsCount();
 
         $userStats = [
-            'posts_count' => $user->posts()->count(),
-            'followers_count' => $user->followers()->count(),
-            'following_count' => $user->following()->count(),
-            'likes_received' => DB::table('likes')
-                ->join('posts', 'likes.post_id', '=', 'posts.id')
-                ->where('posts.user_id', $user->id)
-                ->count(),
+            'posts_count' => $user->posts_count,
+            'followers_count' => $user->followers_count,
+            'following_count' => $user->following_count,
+            'likes_received' => Like::whereHas('post', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })->count(),
         ];
 
-        $trendingPosts = Post::where('created_at', '>=', Carbon::now()->subDays(3))
+        $trendingPosts = Post::where('created_at', '>=', Carbon::now()->subDays(7))
             ->with('user.profile')
-            ->withCount(['likes', 'comments'])
+            ->withCount(['likes', 'comments', 'saves'])
             ->orderByRaw('(likes_count * 3 + comments_count * 2 + views_count) DESC')
             ->take(5)
             ->get();
 
-        return view('home', compact(
-            'posts',
-            'suggestedUsers',
-            'trendingTags',
-            'unreadNotifications',
-            'userStats',
-            'trendingPosts'
+        return view('home', array_merge(
+            compact('posts', 'unreadNotifications', 'userStats', 'trendingPosts'),
+            $this->sidebarData($user),
         ));
     }
 
@@ -99,14 +74,14 @@ class HomeController extends Controller
         $user = Auth::user();
         $type = $request->get('type', 'all');
 
-        $posts = Post::with(['user.profile', 'likes', 'comments.user.profile', 'tags'])
+        $posts = Post::with(['user.profile', 'likes', 'saves' => fn($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
             ->visibleTo($user);
 
         if ($type && $type !== 'all') {
             $posts->where('type', $type);
         }
 
-        $posts = $posts->orderBy('created_at', 'desc')
+        $posts = $posts->latest()
             ->paginate(10);
 
         if ($request->ajax()) {
@@ -123,89 +98,68 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
-        $posts = Post::with(['user.profile', 'likes', 'comments.user.profile', 'tags'])
-            ->whereIn('user_id', $user->following()->pluck('following_id'))
+        $followingIds = $user->following()->pluck('following_id');
+
+        $posts = Post::with(['user.profile', 'likes', 'saves' => fn($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
+            ->whereIn('user_id', $followingIds)
             ->visibleTo($user)
-            ->orderBy('created_at', 'desc')
+            ->latest()
             ->paginate(10);
 
-        $suggestedUsers = User::where('id', '!=', $user->id)
-            ->whereDoesntHave('followers', function ($query) use ($user) {
-                $query->where('follower_id', $user->id);
-            })
-            ->with(['profile', 'posts' => function ($query) {
-                $query->latest()->take(3);
-            }])
-            ->inRandomOrder()
-            ->limit(8)
-            ->get();
-
-        $trendingTags = Tag::withCount('posts')
-            ->orderBy('posts_count', 'desc')
-            ->limit(12)
-            ->get();
-
-        return view('home', compact('posts', 'suggestedUsers', 'trendingTags'))
-            ->with('activeTab', 'following');
+        return view('home', array_merge(
+            compact('posts'),
+            $this->sidebarData($user),
+            ['activeTab' => 'following']
+        ));
     }
 
     public function popular(Request $request)
     {
         $user = Auth::user();
 
-        $posts = Post::with(['user.profile', 'likes', 'comments.user.profile', 'tags'])
+        $posts = Post::with(['user.profile', 'likes', 'saves' => fn($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
             ->visibleTo($user)
             ->where('created_at', '>=', Carbon::now()->subDays(7))
-            ->withCount(['likes', 'comments'])
+            ->withCount(['likes', 'comments', 'saves'])
             ->orderByRaw('(likes_count * 2 + comments_count) DESC')
             ->paginate(10);
 
-        $suggestedUsers = User::where('id', '!=', $user->id)
-            ->whereDoesntHave('followers', function ($query) use ($user) {
-                $query->where('follower_id', $user->id);
-            })
-            ->with(['profile', 'posts' => function ($query) {
-                $query->latest()->take(3);
-            }])
-            ->inRandomOrder()
-            ->limit(8)
-            ->get();
-
-        $trendingTags = Tag::withCount('posts')
-            ->orderBy('posts_count', 'desc')
-            ->limit(12)
-            ->get();
-
-        return view('home', compact('posts', 'suggestedUsers', 'trendingTags'))
-            ->with('activeTab', 'popular');
+        return view('home', array_merge(
+            compact('posts'),
+            $this->sidebarData($user),
+            ['activeTab' => 'popular']
+        ));
     }
 
     public function latest(Request $request)
     {
         $user = Auth::user();
 
-        $posts = Post::with(['user.profile', 'likes', 'comments.user.profile', 'tags'])
+        $posts = Post::with(['user.profile', 'likes', 'saves' => fn($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
             ->visibleTo($user)
-            ->orderBy('created_at', 'desc')
+            ->latest()
             ->paginate(10);
 
-        $suggestedUsers = User::where('id', '!=', $user->id)
-            ->whereDoesntHave('followers', function ($query) use ($user) {
-                $query->where('follower_id', $user->id);
-            })
-            ->with(['profile', 'posts' => function ($query) {
-                $query->latest()->take(3);
-            }])
-            ->inRandomOrder()
-            ->limit(8)
-            ->get();
+        return view('home', array_merge(
+            compact('posts'),
+            $this->sidebarData($user),
+            ['activeTab' => 'latest']
+        ));
+    }
 
-        $trendingTags = Tag::withCount('posts')
-            ->orderBy('posts_count', 'desc')
-            ->limit(12)
-            ->get();
-
-        return view('home', compact('posts', 'suggestedUsers', 'trendingTags'))
-            ->with('activeTab', 'latest');
+    private function sidebarData(User $user): array
+    {
+        return [
+            'suggestedUsers' => User::suggested($user->id)
+                ->with(['profile', 'posts' => function ($query) {
+                    $query->latest()->take(3);
+                }])
+                ->limit(8)
+                ->get(),
+            'trendingTags' => Tag::withCount('posts')
+                ->orderBy('posts_count', 'desc')
+                ->limit(12)
+                ->get(),
+        ];
     }
 }

@@ -280,6 +280,9 @@
 </div>
 
 <script>
+if (!window._groupPostCardInit) {
+    window._groupPostCardInit = true;
+
     // Open single image modal
 function openImageModal(imageUrl, caption = '') {
     const modal = new bootstrap.Modal(document.getElementById('imageModal'));
@@ -336,4 +339,5 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+}
 </script>

@@ -52,8 +52,6 @@ class Post extends Model
     protected $appends = [
         'excerpt',
         'time_ago',
-        'is_liked',
-        'is_saved',
         'image_url',
         'formatted_reading_time',
         'type_icon',
@@ -104,12 +102,6 @@ class Post extends Model
         return $this->hasMany(Media::class);
     }
 
-    // Relationship with reports
-    public function reports(): HasMany
-    {
-        return $this->hasMany(Report::class);
-    }
-
     // Accessor for code_snippet (no need for relationship since it's a column)
     public function getCodeSnippetAttribute(): ?string
     {
@@ -122,6 +114,9 @@ class Post extends Model
         if (!Auth::check()) {
             return false;
         }
+        if ($this->relationLoaded('likes')) {
+            return $this->likes->contains('user_id', Auth::id());
+        }
         return $this->likes()->where('user_id', Auth::id())->exists();
     }
 
@@ -130,6 +125,9 @@ class Post extends Model
     {
         if (!Auth::check()) {
             return false;
+        }
+        if ($this->relationLoaded('saves')) {
+            return $this->saves->contains('user_id', Auth::id());
         }
         return $this->saves()->where('user_id', Auth::id())->exists();
     }
@@ -229,7 +227,7 @@ class Post extends Model
     }
 
     // Helper method to check if user can view post
-    public function canView(User $user = null): bool
+    public function canView(?User $user = null): bool
     {
         if ($this->visibility === 'public') {
             return true;

@@ -27,7 +27,7 @@ class LikeController extends Controller
 
         return response()->json([
             'liked' => $liked,
-            'likes_count' => $post->likes()->count()
+            'likes_count' => $post->fresh()->likes_count,
         ]);
     }
 }

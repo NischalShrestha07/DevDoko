@@ -6,7 +6,7 @@ use App\Models\Post;
 use App\Models\User;
 use App\Models\Tag;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 class ExploreController extends Controller
@@ -46,17 +46,47 @@ class ExploreController extends Controller
             ->take(24)
             ->get();
 
-        // Top Tech Topics
-        $techTopics = [
-            ['name' => 'Laravel', 'icon' => 'bi-code-slash', 'color' => '#ff2d20', 'count' => Tag::where('name', 'like', '%laravel%')->count()],
-            ['name' => 'React', 'icon' => 'bi-braces', 'color' => '#61dafb', 'count' => Tag::where('name', 'like', '%react%')->count()],
-            ['name' => 'Vue.js', 'icon' => 'bi-braces-asterisk', 'color' => '#42b883', 'count' => Tag::where('name', 'like', '%vue%')->count()],
-            ['name' => 'JavaScript', 'icon' => 'bi-filetype-js', 'color' => '#f7df1e', 'count' => Tag::where('name', 'like', '%javascript%')->count()],
-            ['name' => 'Python', 'icon' => 'bi-filetype-py', 'color' => '#3776ab', 'count' => Tag::where('name', 'like', '%python%')->count()],
-            ['name' => 'Node.js', 'icon' => 'bi-node-plus', 'color' => '#339933', 'count' => Tag::where('name', 'like', '%node%')->count()],
-            ['name' => 'Docker', 'icon' => 'bi-box', 'color' => '#2496ed', 'count' => Tag::where('name', 'like', '%docker%')->count()],
-            ['name' => 'AWS', 'icon' => 'bi-cloud', 'color' => '#ff9900', 'count' => Tag::where('name', 'like', '%aws%')->count()],
+        // Top Tech Topics (batched into one query)
+        $topicKeywords = [
+            ['name' => 'Laravel', 'icon' => 'bi-code-slash', 'color' => '#ff2d20', 'keyword' => '%laravel%'],
+            ['name' => 'React', 'icon' => 'bi-braces', 'color' => '#61dafb', 'keyword' => '%react%'],
+            ['name' => 'Vue.js', 'icon' => 'bi-braces-asterisk', 'color' => '#42b883', 'keyword' => '%vue%'],
+            ['name' => 'JavaScript', 'icon' => 'bi-filetype-js', 'color' => '#f7df1e', 'keyword' => '%javascript%'],
+            ['name' => 'Python', 'icon' => 'bi-filetype-py', 'color' => '#3776ab', 'keyword' => '%python%'],
+            ['name' => 'Node.js', 'icon' => 'bi-node-plus', 'color' => '#339933', 'keyword' => '%node%'],
+            ['name' => 'Docker', 'icon' => 'bi-box', 'color' => '#2496ed', 'keyword' => '%docker%'],
+            ['name' => 'AWS', 'icon' => 'bi-cloud', 'color' => '#ff9900', 'keyword' => '%aws%'],
         ];
+
+        $topicCounts = Tag::selectRaw("COUNT(*) as count, 
+            CASE 
+                WHEN name LIKE '%laravel%' THEN '%laravel%'
+                WHEN name LIKE '%react%' THEN '%react%'
+                WHEN name LIKE '%vue%' THEN '%vue%'
+                WHEN name LIKE '%javascript%' THEN '%javascript%'
+                WHEN name LIKE '%python%' THEN '%python%'
+                WHEN name LIKE '%node%' THEN '%node%'
+                WHEN name LIKE '%docker%' THEN '%docker%'
+                WHEN name LIKE '%aws%' THEN '%aws%'
+            END as keyword")
+            ->where(function ($q) {
+                $q->where('name', 'like', '%laravel%')
+                  ->orWhere('name', 'like', '%react%')
+                  ->orWhere('name', 'like', '%vue%')
+                  ->orWhere('name', 'like', '%javascript%')
+                  ->orWhere('name', 'like', '%python%')
+                  ->orWhere('name', 'like', '%node%')
+                  ->orWhere('name', 'like', '%docker%')
+                  ->orWhere('name', 'like', '%aws%');
+            })
+            ->groupBy('keyword')
+            ->pluck('count', 'keyword');
+
+        $techTopics = array_map(function ($topic) use ($topicCounts) {
+            $topic['count'] = $topicCounts[$topic['keyword']] ?? 0;
+            $topic['slug'] = Str::slug($topic['name']);
+            return $topic;
+        }, $topicKeywords);
 
         return view('explore.index', compact(
             'trendingPosts',

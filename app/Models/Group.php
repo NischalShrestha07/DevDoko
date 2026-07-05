@@ -38,9 +38,6 @@ class Group extends Model
     ];
 
     protected $appends = [
-        'is_member',
-        'is_pending',
-        'member_role',
         'icon_url',
         'cover_url',
         'category_label',
@@ -347,28 +344,4 @@ class Group extends Model
         });
     }
 
-    public function groupPosts()
-    {
-        return $this->hasMany(GroupPost::class);
-    }
-
-    public function groupResources()
-    {
-        return $this->hasMany(GroupResource::class);
-    }
-
-    public function groupEvents()
-    {
-        return $this->hasMany(GroupEvent::class);
-    }
-
-    public function groupInvitations()
-    {
-        return $this->hasMany(GroupInvitation::class);
-    }
-
-    public function groupActivityLogs()
-    {
-        return $this->hasMany(GroupActivityLog::class);
-    }
 }

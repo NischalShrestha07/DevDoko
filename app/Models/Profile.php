@@ -10,7 +10,6 @@ class Profile extends Model
         'user_id',
         'username',
         'bio',
-        'name',
         'avatar',
         'cover_image',
         'github_link',

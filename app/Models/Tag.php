@@ -12,6 +12,11 @@ class Tag extends Model
 
     protected $fillable = ['name', 'slug', 'description', 'icon', 'color'];
 
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     public function posts(): BelongsToMany
     {
         return $this->belongsToMany(Post::class, 'post_tag');

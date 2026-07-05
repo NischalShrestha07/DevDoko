@@ -27,14 +27,14 @@ class SaveController extends Controller
     /**
      * Save a post.
      */
-    public function store(Post $post)
+    public function store(Request $request, Post $post)
     {
-        $save = Save::firstOrCreate([
+        Save::firstOrCreate([
             'user_id' => Auth::id(),
             'post_id' => $post->id,
         ]);
 
-        if ($save->wasRecentlyCreated) {
+        if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
                 'saved' => true,
@@ -42,23 +42,19 @@ class SaveController extends Controller
             ]);
         }
 
-        return response()->json([
-            'success' => false,
-            'saved' => false,
-            'message' => 'Post already saved!'
-        ]);
+        return back()->with('success', 'Post saved successfully!');
     }
 
     /**
      * Unsave a post.
      */
-    public function destroy(Post $post)
+    public function destroy(Request $request, Post $post)
     {
-        $deleted = Save::where('user_id', Auth::id())
+        Save::where('user_id', Auth::id())
             ->where('post_id', $post->id)
             ->delete();
 
-        if ($deleted) {
+        if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
                 'saved' => false,
@@ -66,10 +62,6 @@ class SaveController extends Controller
             ]);
         }
 
-        return response()->json([
-            'success' => false,
-            'saved' => true,
-            'message' => 'Post was not saved!'
-        ]);
+        return back()->with('success', 'Post removed from saved!');
     }
 }

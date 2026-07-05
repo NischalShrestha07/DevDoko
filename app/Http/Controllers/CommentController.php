@@ -27,7 +27,10 @@ class CommentController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            if ($request->expectsJson()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+            return back()->withErrors($validator)->withInput();
         }
 
         $comment = $post->comments()->create([
@@ -45,10 +48,17 @@ class CommentController extends Controller
         // Load user relationship for response
         $comment->load('user.profile');
 
-        return response()->json([
-            'comment' => $comment,
-            'message' => 'Comment added successfully',
-        ]);
+        if ($request->expectsJson()) {
+            $html = view('posts.partials.comment', compact('comment'))->render();
+
+            return response()->json([
+                'html' => $html,
+                'comment' => $comment,
+                'message' => 'Comment added successfully',
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Comment added successfully');
     }
 
     public function index(Post $post)
@@ -96,7 +106,7 @@ class CommentController extends Controller
         return back()->with('success', 'Comment deleted successfully');
     }
 
-    public function like(Comment $comment)
+    public function like(Request $request, Comment $comment)
     {
         $user = Auth::user();
         $like = $comment->likes()->where('user_id', $user->id)->first();
@@ -104,16 +114,21 @@ class CommentController extends Controller
         if ($like) {
             $like->delete();
             $liked = false;
+            $comment->decrementLikes();
         } else {
             $comment->likes()->create(['user_id' => $user->id]);
             $liked = true;
+            $comment->incrementLikes();
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'liked' => $liked,
+                'likes_count' => $comment->fresh()->likes_count,
+            ]);
         }
 
         return redirect()->back();
-        // return response()->json([
-        //     'liked' => $liked,
-        //     'likes_count' => $comment->likes()->count()
-        // ]);
     }
 
     public function reply(Request $request, Comment $comment)
@@ -141,7 +156,10 @@ class CommentController extends Controller
 
         $reply->load('user.profile');
 
+        $html = view('posts.partials.comment', ['comment' => $reply])->render();
+
         return response()->json([
+            'html' => $html,
             'reply' => $reply,
             'message' => 'Reply added successfully',
         ]);

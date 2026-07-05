@@ -3,44 +3,43 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class FollowController extends Controller
 {
-    public function follow(User $user)
+    public function follow(Request $request, User $user)
     {
         $currentUser = Auth::user();
 
-        // Check if already following
         if ($currentUser->isFollowing($user)) {
-            return response()->json([
-                'following' => true,
-                'message' => 'Already following this user',
-            ]);
+            return $request->expectsJson()
+                ? response()->json(['following' => true, 'message' => 'Already following this user'])
+                : back()->with('info', 'Already following this user');
         }
 
-        // Follow the user
         $currentUser->following()->attach($user->id);
 
-        return redirect()->back();
+        return $request->expectsJson()
+            ? response()->json(['following' => true, 'message' => 'Followed successfully'])
+            : back()->with('success', 'Followed successfully');
     }
 
-    public function unfollow(User $user)
+    public function unfollow(Request $request, User $user)
     {
         $currentUser = Auth::user();
 
-        // Check if following
         if (! $currentUser->isFollowing($user)) {
-            return response()->json([
-                'following' => false,
-                'message' => 'Not following this user',
-            ]);
+            return $request->expectsJson()
+                ? response()->json(['following' => false, 'message' => 'Not following this user'])
+                : back()->with('info', 'Not following this user');
         }
 
-        // Unfollow the user
         $currentUser->following()->detach($user->id);
 
-        return redirect()->back();
+        return $request->expectsJson()
+            ? response()->json(['following' => false, 'message' => 'Unfollowed successfully'])
+            : back()->with('success', 'Unfollowed successfully');
     }
 
     public function followers(User $user)

@@ -416,7 +416,7 @@ class MessageController extends Controller
                 ->orWhere('receiver_id', $user->id);
         })
             ->where(function ($q) use ($request) {
-                $query = $request->query;
+                $query = $request->query('query');
 
                 $q->where('content', 'LIKE', '%' . $query . '%')
                     ->orWhere('code_snippet', 'LIKE', '%' . $query . '%')

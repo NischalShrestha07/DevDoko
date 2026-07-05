@@ -22,9 +22,7 @@ class Comment extends Model
         'replies_count'
     ];
 
-    protected $with = ['user.profile'];
-
-    protected $appends = ['is_liked', 'time_ago'];
+    protected $appends = ['time_ago'];
 
     // Relationship with user
     public function user(): BelongsTo
@@ -61,6 +59,9 @@ class Comment extends Model
     {
         if (!Auth::check()) {
             return false;
+        }
+        if ($this->relationLoaded('likes')) {
+            return $this->likes->contains('user_id', Auth::id());
         }
         return $this->likes()->where('user_id', Auth::id())->exists();
     }

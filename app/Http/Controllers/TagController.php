@@ -10,10 +10,8 @@ use Illuminate\Support\Facades\DB;
 
 class TagController extends Controller
 {
-    public function show($tag)
+    public function show(Tag $tag)
     {
-        $tag = Tag::where('name', $tag)->firstOrFail();
-
         $posts = Post::with(['user.profile', 'likes', 'comments'])
             ->whereHas('tags', function ($query) use ($tag) {
                 $query->where('tags.id', $tag->id);
@@ -30,7 +28,7 @@ class TagController extends Controller
         $tag = Tag::where('name', $technology)->orWhere('slug', $technology)->first();
 
         if ($tag) {
-            return redirect()->route('tags.show', $tag->name);
+            return redirect()->route('tags.show', $tag);
         }
 
         abort(404);
