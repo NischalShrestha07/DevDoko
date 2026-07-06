@@ -51,13 +51,15 @@ class Notification extends Model
 
         return match ($this->type) {
             'like', 'comment', 'reply', 'share' => $this->getPostUrl(),
-            'post_like', 'post_comment' => $this->getPostUrl(),
+            'post_like', 'post_comment', 'new_post' => $this->getPostUrl(),
+            'post_shared' => $this->getPostUrl(),
             'comment_like' => $this->getCommentUrl(),
             'follow' => $this->getProfileUrl(),
             'mention' => $this->getMentionUrl(),
             'message' => $this->getMessageUrl(),
             'group_invite' => $this->getGroupUrl(),
             'event_reminder' => $this->getEventUrl(),
+            'collaboration_request' => $this->getCollaborationUrl(),
             default => null,
         };
     }
@@ -128,6 +130,15 @@ class Notification extends Model
         return null;
     }
 
+    private function getCollaborationUrl(): ?string
+    {
+        if (isset($this->data['project_id'])) {
+            return route('projects.show', $this->data['project_id']);
+        }
+
+        return null;
+    }
+
     public function getFormattedMessageAttribute()
     {
         if ($this->message) {
@@ -153,6 +164,8 @@ class Notification extends Model
             'message' => $username.' sent you a message',
             'group_invite' => $username.' invited you to join a group',
             'event_reminder' => 'Reminder: '.($this->data['event_title'] ?? 'Event').' starts soon',
+            'new_post' => $username.' created a new post',
+            'collaboration_request' => $username.' wants to collaborate on a project',
             default => 'New notification from '.$username,
         };
     }

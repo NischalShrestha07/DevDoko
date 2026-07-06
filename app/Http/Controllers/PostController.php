@@ -64,6 +64,19 @@ class PostController extends Controller
         return view('posts.create', compact('type', 'tags'));
     }
 
+    public function uploadImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+        ]);
+
+        $path = $request->file('image')->store('uploads/images', 'public');
+
+        return response()->json([
+            'url' => Storage::url($path),
+        ]);
+    }
+
     public function store(Request $request)
     {
         try {
@@ -573,15 +586,14 @@ class PostController extends Controller
                     // Create notification record
                     Notification::create([
                         'user_id' => $follower->id,
+                        'from_user_id' => Auth::id(),
                         'type' => 'new_post',
-                        'data' => json_encode([
+                        'message' => Auth::user()->name . ' created a new post',
+                        'data' => [
                             'post_id' => $post->id,
                             'post_title' => $post->title ?? 'New Post',
                             'user_name' => Auth::user()->name,
-                            'user_id' => Auth::id(),
-                            'message' => Auth::user()->name . ' created a new post'
-                        ]),
-                        'read_at' => null
+                        ],
                     ]);
                 } catch (\Exception $e) {
                     Log::error('Failed to create notification for follower', [

@@ -311,38 +311,6 @@
                                 @enderror
                             </div>
 
-                            <!-- Advanced Options (Collapsible) -->
-                            <div class="mb-4">
-                                <button class="btn btn-link text-decoration-none p-0" type="button"
-                                    data-bs-toggle="collapse" data-bs-target="#advancedOptions">
-                                    <i class="bi bi-gear"></i> Advanced Options
-                                </button>
-                                <div class="collapse mt-2" id="advancedOptions">
-                                    <div class="card card-body">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="enableComments"
-                                                name="enable_comments" value="1" checked>
-                                            <label class="form-check-label" for="enableComments">
-                                                Allow comments
-                                            </label>
-                                        </div>
-                                        <div class="form-check mt-2">
-                                            <input class="form-check-input" type="checkbox" id="enableLikes"
-                                                name="enable_likes" value="1" checked>
-                                            <label class="form-check-label" for="enableLikes">
-                                                Allow likes
-                                            </label>
-                                        </div>
-                                        <div class="form-check mt-2">
-                                            <input class="form-check-input" type="checkbox" id="enableSharing"
-                                                name="enable_sharing" value="1" checked>
-                                            <label class="form-check-label" for="enableSharing">
-                                                Allow sharing
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                         <!-- Form Actions -->
@@ -356,6 +324,9 @@
                                     <a href="{{ route('home') }}" class="btn btn-outline-secondary">
                                         <i class="bi bi-x-circle"></i> Cancel
                                     </a>
+                                    <button type="button" onclick="showPreview()" class="btn btn-outline-secondary">
+                                        <i class="bi bi-eye"></i> Preview
+                                    </button>
                                     <button type="submit" id="submitBtn" class="btn btn-primary">
                                         <span id="submitText">
                                             <i class="bi bi-send"></i> Publish Post
@@ -1007,7 +978,106 @@
         return isValid;
     }
 
-    // Form submission
+    // Live preview function
+    window.showPreview = function() {
+        const previewContent = document.getElementById('previewContent');
+        const type = currentActiveType;
+        let html = '';
+
+        if (type === 'code' && codeTextarea) {
+            html = '<pre><code class="language-' + (document.getElementById('code_language')?.value || 'plaintext') + '">'
+                + escapeHtml(codeTextarea.value) + '</code></pre>';
+        } else if (type === 'image' && imagePreview && imagePreview.src) {
+            html = '<img src="' + imagePreview.src + '" class="img-fluid rounded mb-3" alt="Preview">'
+                + (contentTextarea?.value ? '<hr>' + marked.parse(contentTextarea.value) : '');
+        } else if (type === 'link') {
+            html = '<div class="card p-3 mb-3">'
+                + (document.getElementById('link_image')?.value ? '<img src="' + document.getElementById('link_image').value + '" class="img-fluid rounded mb-2" style="max-height:200px">' : '')
+                + '<h5>' + (document.getElementById('link_title')?.value || 'Untitled') + '</h5>'
+                + '<p class="text-muted small">' + (document.getElementById('link_description')?.value || '') + '</p>'
+                + '<a href="' + (document.getElementById('link_url')?.value || '#') + '" target="_blank" class="btn btn-sm btn-outline-primary">Visit Link</a>'
+                + '</div>';
+        } else {
+            html = contentTextarea?.value ? marked.parse(contentTextarea.value) : '<p class="text-muted">No content yet.</p>';
+        }
+
+        previewContent.innerHTML = html;
+        if (typeof hljs !== 'undefined') previewContent.querySelectorAll('pre code').forEach(hljs.highlightElement);
+        const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+        previewModal.show();
+    };
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Auto-save draft to localStorage
+    const DRAFT_KEY = 'devdoko_draft_' + window.location.pathname;
+    let saveDraftTimer;
+
+    function saveDraft() {
+        const draft = {
+            type: currentActiveType,
+            title: document.getElementById('title')?.value || '',
+            content: contentTextarea?.value || '',
+            code_snippet: codeTextarea?.value || '',
+            code_language: document.getElementById('code_language')?.value || '',
+            link_url: document.getElementById('link_url')?.value || '',
+            link_title: document.getElementById('link_title')?.value || '',
+            link_description: document.getElementById('link_description')?.value || '',
+            link_image: document.getElementById('link_image')?.value || '',
+            tags: Array.from(selectedTags),
+            visibility: document.querySelector('input[name="visibility"]:checked')?.value || 'public',
+            savedAt: Date.now()
+        };
+        try {
+            localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+        } catch (e) {}
+    }
+
+    function restoreDraft() {
+        try {
+            const raw = localStorage.getItem(DRAFT_KEY);
+            if (!raw) return;
+            const draft = JSON.parse(raw);
+            if (!draft.content && !draft.code_snippet && !draft.title) return;
+            const age = Date.now() - (draft.savedAt || 0);
+            if (age > 86400000) { localStorage.removeItem(DRAFT_KEY); return; } // >24h old, discard
+            if (!confirm('You have an unsaved draft from ' + new Date(draft.savedAt).toLocaleTimeString() + '. Restore it?')) return;
+            if (draft.type) activatePostType(draft.type);
+            setTimeout(() => {
+                if (draft.title) document.getElementById('title').value = draft.title;
+                if (draft.content && contentTextarea) contentTextarea.value = draft.content;
+                if (draft.code_snippet && codeTextarea) codeTextarea.value = draft.code_snippet;
+                if (draft.code_language) document.getElementById('code_language').value = draft.code_language;
+                if (draft.link_url) document.getElementById('link_url').value = draft.link_url;
+                if (draft.link_title) document.getElementById('link_title').value = draft.link_title;
+                if (draft.link_description) document.getElementById('link_description').value = draft.link_description;
+                if (draft.link_image) document.getElementById('link_image').value = draft.link_image;
+                if (draft.visibility) {
+                    const radio = document.querySelector('input[name="visibility"][value="' + draft.visibility + '"]');
+                    if (radio) radio.checked = true;
+                }
+                if (draft.tags?.length) {
+                    draft.tags.forEach(t => addTag(t));
+                }
+                updateCharCounts();
+                updateReadingTime();
+            }, 100);
+        } catch (e) {}
+    }
+
+    // Auto-save on input changes
+    document.querySelectorAll('#createPostForm input, #createPostForm textarea, #createPostForm select').forEach(el => {
+        el.addEventListener('input', function() {
+            clearTimeout(saveDraftTimer);
+            saveDraftTimer = setTimeout(saveDraft, 2000);
+        });
+    });
+
+    // Clear draft on successful submit
     if (form) {
         form.addEventListener('submit', function(e) {
             if (!validateForm()) {
@@ -1015,15 +1085,50 @@
                 alert('Please fill in all required fields.');
                 return;
             }
-
-            // Show loading state
+            try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
             if (submitBtn) submitBtn.disabled = true;
             if (submitText) submitText.classList.add('d-none');
             if (submitSpinner) submitSpinner.classList.remove('d-none');
         });
     }
 
+    // Image paste support for content textarea
+    if (contentTextarea) {
+        contentTextarea.addEventListener('paste', async function(e) {
+            const items = e.clipboardData?.items;
+            if (!items) return;
+            for (const item of items) {
+                if (item.type.startsWith('image/')) {
+                    e.preventDefault();
+                    const file = item.getAsFile();
+                    const formData = new FormData();
+                    formData.append('image', file);
+                    formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.content);
+                    try {
+                        const res = await fetch('/posts/upload-image', {
+                            method: 'POST',
+                            body: formData,
+                            headers: { 'Accept': 'application/json' }
+                        });
+                        if (res.ok) {
+                            const data = await res.json();
+                            const cursorPos = contentTextarea.selectionStart;
+                            const textBefore = contentTextarea.value.substring(0, cursorPos);
+                            const textAfter = contentTextarea.value.substring(cursorPos);
+                            contentTextarea.value = textBefore + '\n![image](' + data.url + ')\n' + textAfter;
+                            updateCharCounts();
+                        }
+                    } catch (e) {}
+                    return;
+                }
+            }
+        });
+    }
+
     // Initialize the form
     initializeFromOldInput();
+    if (!document.querySelector('input[name="tags"]')?.value) {
+        restoreDraft();
+    }
 });
 </script>

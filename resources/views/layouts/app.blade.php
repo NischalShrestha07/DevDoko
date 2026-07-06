@@ -32,6 +32,18 @@
         </div>
     </div>
 
+    @auth
+    @php
+        $recentNotifications = auth()->user()->notifications()
+            ->with('fromUser.profile')
+            ->latest()
+            ->take(5)
+            ->get();
+        $unreadCount = $recentNotifications->whereNull('read_at')->count();
+        if (!$unreadCount) $unreadCount = auth()->user()->unreadNotifications()->count();
+    @endphp
+    @endauth
+
     <!-- Top Header Bar -->
     <header class="top-header d-flex align-items-center px-3 py-0 border-bottom">
         <div class="d-flex align-items-center flex-grow-1">
@@ -42,6 +54,58 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-2">
+            @auth
+            <div class="dropdown" id="headerNotifContainer">
+                <a href="#" class="btn btn-sm position-relative text-secondary border-0 notification-bell-btn" data-bs-toggle="dropdown" aria-expanded="false" id="headerNotifBell" style="background: transparent;">
+                    <i class="bi bi-bell fs-5"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge-header" id="notifBadgeHeader" style="font-size: 9px;">{{ $unreadCount }}</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="width: 380px; max-height: 480px; overflow-y: auto; border-radius: 12px; margin-top: 8px !important;" id="notifDropdown">
+                    <div class="dropdown-header d-flex justify-content-between align-items-center px-3 py-2">
+                        <strong class="fs-6"><i class="bi bi-bell-fill me-2"></i>Notifications</strong>
+                        <form action="{{ route('notifications.mark-all-read') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-link text-primary text-decoration-none p-0 small">Mark all read</button>
+                        </form>
+                    </div>
+                    <div class="dropdown-divider my-0"></div>
+                    @forelse($recentNotifications as $notif)
+                    <a href="{{ $notif->action_url ?? '#' }}" class="dropdown-item px-3 py-3 notif-item {{ !$notif->read_at ? 'bg-light' : '' }}" data-notif-id="{{ $notif->id }}" style="border-bottom: 1px solid #f0f0f0;">
+                        <div class="d-flex gap-2 align-items-start">
+                            <div class="position-relative flex-shrink-0">
+                                @if($notif->fromUser)
+                                <img src="{{ $notif->fromUser->avatar_url }}" alt="" class="rounded-circle" style="width: 36px; height: 36px; object-fit: cover;">
+                                @else
+                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                    <i class="bi bi-person text-muted" style="font-size: 14px;"></i>
+                                </div>
+                                @endif
+                            </div>
+                            <div class="flex-grow-1 min-width-0">
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <small class="text-muted" style="font-size: 11px; white-space: nowrap;">{{ $notif->time_ago }}</small>
+                                    @if(!$notif->read_at)
+                                    <span class="badge bg-primary rounded-pill" style="font-size: 8px; width: 8px; height: 8px; padding: 0;"></span>
+                                    @endif
+                                </div>
+                                <div style="font-size: 13px; line-height: 1.3; word-break: break-word;">{{ Str::limit($notif->message ?? 'New notification', 80) }}</div>
+                            </div>
+                        </div>
+                    </a>
+                    @empty
+                    <div class="text-center py-4 px-3">
+                        <i class="bi bi-bell-slash text-muted" style="font-size: 24px;"></i>
+                        <p class="text-muted small mt-2 mb-0">No notifications yet</p>
+                    </div>
+                    @endforelse
+                    <div class="dropdown-divider my-0"></div>
+                    <a href="{{ route('notifications.index') }}" class="dropdown-item text-center py-2 fw-semibold text-primary" style="font-size: 13px;">
+                        View All Notifications
+                        <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+            @endauth
             <button id="darkModeToggleHeader" onclick="DevDoko.toggleTheme()"
                 class="btn btn-sm rounded-pill d-flex align-items-center gap-1 text-secondary border-0"
                 aria-label="Toggle dark mode"
@@ -98,18 +162,15 @@
                     <i class="bi bi-chat{{ request()->routeIs('messages.*') ? '-fill' : '' }} fs-5 me-3"></i>
                     <span>Messages</span>
                 </a>
+                @auth
                 <a href="{{ route('notifications.index') }}"
                     class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('notifications.*') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
                     @if(request()->routeIs('notifications.*'))<span class="nav-active-indicator"></span>@endif
-                    <i class="bi bi-heart{{ request()->routeIs('notifications.*') ? '-fill' : '' }} fs-5 me-3"></i>
+                    <i class="bi bi-bell{{ request()->routeIs('notifications.*') ? '-fill' : '' }} fs-5 me-3"></i>
                     <span>Notifications</span>
-                    @auth
-                    @php $unreadCount = auth()->user()->unreadNotifications()->count(); @endphp
-                    @if($unreadCount > 0)
-                    <span class="badge bg-danger rounded-pill ms-auto">{{ $unreadCount }}</span>
-                    @endif
-                    @endauth
+                    <span class="badge bg-danger rounded-pill ms-auto" id="notifBadge">{{ $unreadCount }}</span>
                 </a>
+                @endauth
                 <a href="{{ route('posts.create') }}"
                     class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('posts.create') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
                     @if(request()->routeIs('posts.create'))<span class="nav-active-indicator"></span>@endif
@@ -297,13 +358,10 @@
             </a>
             <a href="{{ route('notifications.index') }}"
                 class="text-dark text-decoration-none text-center position-relative">
-                <i class="bi bi-heart{{ request()->routeIs('notifications.*') ? '-fill' : '' }} fs-5"></i>
+                <i class="bi bi-bell fs-5"></i>
                 @auth
-                @php $mobileUnread = auth()->user()->unreadNotifications()->count(); @endphp
-                @if($mobileUnread > 0)
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                    style="font-size: 8px;">{{ $mobileUnread > 99 ? '99+' : $mobileUnread }}</span>
-                @endif
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge-mobile"
+                    style="font-size: 8px;">{{ $unreadCount > 99 ? '99+' : ($unreadCount ?: '') }}</span>
                 @endauth
                 <small class="d-block" style="font-size: 10px;">Activity</small>
             </a>
@@ -323,6 +381,95 @@
     </nav>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    @auth
+    <script>
+    // Notification system
+    (function() {
+        let prevCount = {{ $unreadCount ?? 0 }};
+
+        async function pollUnread() {
+            try {
+                const res = await fetch('/notifications/count', {
+                    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const count = data.count || 0;
+                    const badge = document.getElementById('notifBadge');
+                    const headerBadge = document.getElementById('notifBadgeHeader');
+                    const mobileBadge = document.querySelector('.notification-badge-mobile');
+                    const bellBtn = document.querySelector('.notification-bell-btn');
+
+                    [badge, headerBadge].forEach(el => {
+                        if (el) {
+                            el.textContent = count || '';
+                            el.style.display = count > 0 ? '' : 'none';
+                        }
+                    });
+
+                    if (mobileBadge) {
+                        mobileBadge.textContent = count > 99 ? '99+' : (count || '');
+                        mobileBadge.style.display = count > 0 ? '' : 'none';
+                    }
+
+                    // Trigger bell animation when count increases
+                    if (count > prevCount && bellBtn) {
+                        bellBtn.classList.add('has-unread');
+                        setTimeout(() => bellBtn.classList.remove('has-unread'), 1500);
+                    }
+                    if (bellBtn && count > 0) {
+                        bellBtn.classList.add('has-unread');
+                    } else if (bellBtn) {
+                        bellBtn.classList.remove('has-unread');
+                    }
+                    prevCount = count;
+
+                    if (count > 0 && document.title.indexOf(')') === -1) {
+                        document.title = '(' + count + ') ' + document.title.replace(/^\(\d+\)\s*/, '');
+                    } else if (!count) {
+                        document.title = document.title.replace(/^\(\d+\)\s*/, '');
+                    }
+                }
+            } catch (e) {}
+        }
+
+        // Mark notification as read inline when clicking
+        document.addEventListener('click', async function(e) {
+            const item = e.target.closest('.notif-item');
+            if (!item) return;
+            const notifId = item.dataset.notifId;
+            if (!notifId || item.dataset.reading) return;
+            item.dataset.reading = '1';
+            try {
+                await fetch('/notifications/' + notifId + '/read', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
+                    }
+                });
+                // Visually mark as read without waiting for server
+                item.classList.remove('bg-light');
+                const dot = item.querySelector('.badge.bg-primary');
+                if (dot) dot.remove();
+            } catch (e) {}
+        });
+
+        // Refresh dropdown content on open
+        document.getElementById('headerNotifContainer')?.addEventListener('show.bs.dropdown', function() {
+            pollUnread();
+        });
+
+        setInterval(pollUnread, 30000);
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) pollUnread();
+        });
+
+        // Initial bell state
+        pollUnread();
+    })();
+    </script>
+    @endauth
 </body>
 
 </html>

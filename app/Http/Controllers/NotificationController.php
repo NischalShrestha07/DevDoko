@@ -18,9 +18,19 @@ class NotificationController extends Controller
         $query = Auth::user()->notifications()
             ->with('fromUser.profile');
 
-        // Filter by type
+        // Filter by type (support grouped types)
         if ($request->has('type') && ! empty($request->type)) {
-            $query->where('type', $request->type);
+            $typeMap = [
+                'like' => ['like', 'post_like', 'comment_like'],
+                'comment' => ['comment', 'reply'],
+                'follow' => ['follow'],
+                'message' => ['message'],
+                'mention' => ['mention'],
+                'share' => ['share', 'post_shared'],
+                'new_post' => ['new_post'],
+            ];
+            $types = $typeMap[$request->type] ?? [$request->type];
+            $query->whereIn('type', $types);
         }
 
         // Get notifications

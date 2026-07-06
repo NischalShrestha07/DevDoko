@@ -129,6 +129,27 @@ class NotificationService
     }
 
     /**
+     * Send a follow notification
+     */
+    public function followNotification(User $follower, User $followed): void
+    {
+        if ($follower->id === $followed->id) {
+            return;
+        }
+
+        $this->create([
+            'user_id' => $followed->id,
+            'from_user_id' => $follower->id,
+            'type' => 'follow',
+            'message' => $follower->name . ' started following you',
+            'data' => [
+                'follower_id' => $follower->id,
+                'follower_name' => $follower->name,
+            ],
+        ]);
+    }
+
+    /**
      * Send a message notification
      */
     public function messageNotification(User $sender, User $receiver, $messageContent, $messageType = 'text'): void

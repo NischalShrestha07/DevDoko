@@ -3,11 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class FollowController extends Controller
 {
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     public function follow(Request $request, User $user)
     {
         $currentUser = Auth::user();
@@ -19,6 +27,7 @@ class FollowController extends Controller
         }
 
         $currentUser->following()->attach($user->id);
+        $this->notificationService->followNotification($currentUser, $user);
 
         return $request->expectsJson()
             ? response()->json(['following' => true, 'message' => 'Followed successfully'])
@@ -62,7 +71,6 @@ class FollowController extends Controller
 
     public function toggle(User $user)
     {
-        // Prevent user from following themselves
         if (Auth::id() === $user->id) {
             return back()->with('error', 'You cannot follow yourself.');
         }
@@ -74,6 +82,7 @@ class FollowController extends Controller
             $message = 'Unfollowed successfully.';
         } else {
             $authUser->following()->attach($user->id);
+            $this->notificationService->followNotification($authUser, $user);
             $message = 'Followed successfully.';
         }
 

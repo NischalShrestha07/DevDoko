@@ -55,6 +55,11 @@
                 <i class="bi bi-person-plus me-2"></i>
                 Follows
             </a>
+            <a href="{{ route('notifications.index', ['type' => 'share']) }}"
+                class="btn btn-sm {{ request('type') === 'share' ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-4">
+                <i class="bi bi-share me-2"></i>
+                Shares
+            </a>
             <a href="{{ route('notifications.index', ['type' => 'mention']) }}"
                 class="btn btn-sm {{ request('type') === 'mention' ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-4">
                 <i class="bi bi-at me-2"></i>
@@ -89,10 +94,29 @@
                             @endif
 
                             <!-- Notification Type Icon -->
-                            <div class="position-absolute bottom-0 end-0 bg-{{ $notification->type === 'message' ? 'primary' : ($notification->type === 'like' ? 'danger' : ($notification->type === 'comment' ? 'success' : ($notification->type === 'follow' ? 'info' : 'warning'))) }}
+                            @php
+                                $iconMap = [
+                                    'message' => ['icon' => 'chat', 'color' => 'primary'],
+                                    'like' => ['icon' => 'heart-fill', 'color' => 'danger'],
+                                    'post_like' => ['icon' => 'heart-fill', 'color' => 'danger'],
+                                    'comment_like' => ['icon' => 'heart-fill', 'color' => 'danger'],
+                                    'comment' => ['icon' => 'chat-text', 'color' => 'success'],
+                                    'reply' => ['icon' => 'chat-text', 'color' => 'success'],
+                                    'follow' => ['icon' => 'person-plus-fill', 'color' => 'info'],
+                                    'mention' => ['icon' => 'at', 'color' => 'warning'],
+                                    'share' => ['icon' => 'share-fill', 'color' => 'secondary'],
+                                    'post_shared' => ['icon' => 'share-fill', 'color' => 'secondary'],
+                                    'new_post' => ['icon' => 'file-text', 'color' => 'primary'],
+                                    'collaboration_request' => ['icon' => 'people', 'color' => 'success'],
+                                    'group_invite' => ['icon' => 'people-fill', 'color' => 'info'],
+                                    'event_reminder' => ['icon' => 'calendar-event', 'color' => 'warning'],
+                                ];
+                                $ntype = $iconMap[$notification->type] ?? ['icon' => 'bell', 'color' => 'warning'];
+                            @endphp
+                            <div class="position-absolute bottom-0 end-0 bg-{{ $ntype['color'] }}
                                                 rounded-circle border border-2 border-white d-flex align-items-center justify-content-center"
                                 style="width: 24px; height: 24px;">
-                                <i class="bi bi-{{ $notification->type === 'message' ? 'chat' : ($notification->type === 'like' ? 'heart-fill' : ($notification->type === 'comment' ? 'chat-text' : ($notification->type === 'follow' ? 'person-plus-fill' : 'at'))) }} text-white"
+                                <i class="bi bi-{{ $ntype['icon'] }} text-white"
                                     style="font-size: 12px;"></i>
                             </div>
                         </div>
@@ -144,11 +168,38 @@
                             </div>
                             @endif
 
-                            @if($notification->type === 'like' && isset($notification->data['post_title']))
+                            @if(in_array($notification->type, ['like', 'post_like']) && isset($notification->data['post_title']))
                             <div class="mt-2">
                                 <span class="badge bg-light text-dark px-3 py-2 rounded-pill">
                                     <i class="bi bi-heart-fill text-danger me-1"></i>
                                     Liked your post: "{{ Str::limit($notification->data['post_title'], 50) }}"
+                                </span>
+                            </div>
+                            @endif
+
+                            @if(in_array($notification->type, ['share', 'post_shared']) && isset($notification->data['post_title']))
+                            <div class="mt-2">
+                                <span class="badge bg-light text-dark px-3 py-2 rounded-pill">
+                                    <i class="bi bi-share-fill text-secondary me-1"></i>
+                                    Shared your post: "{{ Str::limit($notification->data['post_title'], 50) }}"
+                                </span>
+                            </div>
+                            @endif
+
+                            @if($notification->type === 'new_post' && isset($notification->data['post_title']))
+                            <div class="mt-2">
+                                <span class="badge bg-light text-dark px-3 py-2 rounded-pill">
+                                    <i class="bi bi-file-text text-primary me-1"></i>
+                                    New post: "{{ Str::limit($notification->data['post_title'], 50) }}"
+                                </span>
+                            </div>
+                            @endif
+
+                            @if($notification->type === 'collaboration_request' && isset($notification->data['project_title']))
+                            <div class="mt-2">
+                                <span class="badge bg-light text-dark px-3 py-2 rounded-pill">
+                                    <i class="bi bi-people text-success me-1"></i>
+                                    Wants to collaborate on "{{ Str::limit($notification->data['project_title'], 50) }}"
                                 </span>
                             </div>
                             @endif
@@ -172,8 +223,8 @@
                                 </a>
                                 @endif
 
-                                @if($notification->type === 'like' && isset($notification->data['post_id']))
-                                <a href="{{ route('posts.show', $notification->data['post_id']) }}"
+                                @if(in_array($notification->type, ['like', 'post_like', 'post_shared', 'new_post', 'reply']) && isset($notification->data['post_id']))
+                                <a href="{{ route('posts.show', $notification->data['post_id']) }}{{ $notification->type === 'reply' ? '#comments' : '' }}"
                                     class="btn btn-sm btn-outline-primary rounded-pill px-4">
                                     <i class="bi bi-file-text me-1"></i>
                                     View Post
@@ -188,7 +239,15 @@
                                 </a>
                                 @endif
 
-                                @if($notification->type === 'follow' && $notification->fromUser)
+                                @if($notification->type === 'collaboration_request' && isset($notification->data['project_id']))
+                                <a href="{{ route('projects.show', $notification->data['project_id']) }}"
+                                    class="btn btn-sm btn-outline-primary rounded-pill px-4">
+                                    <i class="bi bi-briefcase me-1"></i>
+                                    View Project
+                                </a>
+                                @endif
+
+                                @if(in_array($notification->type, ['follow', 'mention']) && $notification->fromUser)
                                 <a href="{{ route('profile.show', $notification->fromUser->profile?->username ?? $notification->fromUser->name) }}"
                                     class="btn btn-sm btn-outline-primary rounded-pill px-4">
                                     <i class="bi bi-person me-1"></i>

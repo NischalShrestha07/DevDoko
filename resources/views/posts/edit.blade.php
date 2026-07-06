@@ -296,7 +296,7 @@
                                             @foreach($tags->take(15) as $tag)
                                             <button type="button"
                                                 class="btn btn-sm btn-outline-secondary tag-suggestion"
-                                                data-tag-name="{{ $tag->name }}">
+                                                data-tag-id="{{ $tag->id }}" data-tag-name="{{ $tag->name }}">
                                                 <i class="bi bi-hash"></i>{{ $tag->name }}
                                             </button>
                                             @endforeach
@@ -353,38 +353,6 @@
                                 @enderror
                             </div>
 
-                            <!-- Advanced Options -->
-                            <div class="mb-4">
-                                <button class="btn btn-link text-decoration-none p-0" type="button"
-                                    data-bs-toggle="collapse" data-bs-target="#advancedOptions">
-                                    <i class="bi bi-gear"></i> Advanced Options
-                                </button>
-                                <div class="collapse mt-2" id="advancedOptions">
-                                    <div class="card card-body">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="enableComments"
-                                                name="enable_comments" value="1" checked>
-                                            <label class="form-check-label" for="enableComments">
-                                                Allow comments
-                                            </label>
-                                        </div>
-                                        <div class="form-check mt-2">
-                                            <input class="form-check-input" type="checkbox" id="enableLikes"
-                                                name="enable_likes" value="1" checked>
-                                            <label class="form-check-label" for="enableLikes">
-                                                Allow likes
-                                            </label>
-                                        </div>
-                                        <div class="form-check mt-2">
-                                            <input class="form-check-input" type="checkbox" id="enableSharing"
-                                                name="enable_sharing" value="1" checked>
-                                            <label class="form-check-label" for="enableSharing">
-                                                Allow sharing
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                         <!-- Form Actions -->
@@ -463,11 +431,6 @@
     const selectedTagsDiv = document.getElementById('selectedTags');
     const tagsInput = document.getElementById('tagsInput');
     const popularTags = document.querySelectorAll('.tag-suggestion');
-
-    // State
-    let selectedTags = new Set(
-        tagsInput.value ? tagsInput.value.split(',').filter(id => id) : []
-    );
 
     // Character counter for content
     if (contentTextarea && charCount && readingTime) {
@@ -573,53 +536,70 @@
     function addTag(tagName, tagId = null) {
         tagName = tagName.trim();
 
-        if (!tagName || selectedTags.size >= 10) return;
+        if (!tagName) return;
+
+        // Check max tags
+        if (selectedTagsDiv.querySelectorAll('.selected-tag').length >= 10) return;
 
         // Check if tag already exists
         const existingTags = Array.from(selectedTagsDiv.querySelectorAll('.selected-tag'))
-            .map(el => el.querySelector('span')?.textContent?.replace('#', '') || '');
+            .map(el => {
+                const btn = el.querySelector('.btn-close');
+                return btn ? btn.dataset.tagName : '';
+            });
 
         if (existingTags.some(tag => tag.toLowerCase() === tagName.toLowerCase())) {
-            alert('Tag already added!');
             return;
         }
 
         // Add to UI
         const tagElement = document.createElement('div');
         tagElement.className = 'selected-tag rounded-pill px-3 py-1 d-flex align-items-center';
+
+        let closeBtnHtml = `<button type="button" class="btn-close btn-close-sm ms-2"`;
+        if (tagId) {
+            closeBtnHtml += ` data-tag-id="${tagId}"`;
+        }
+        closeBtnHtml += ` data-tag-name="${tagName}"></button>`;
+
         tagElement.innerHTML = `
             <i class="bi bi-hash me-1"></i>${tagName}
-            <button type="button" class="btn-close btn-close-sm ms-2" data-tag-name="${tagName}"></button>
+            ${closeBtnHtml}
         `;
 
         selectedTagsDiv.appendChild(tagElement);
-
-        // Add to hidden input
-        if (tagId) {
-            selectedTags.add(tagId);
-        }
         updateTagsInput();
     }
 
-    function removeTag(tagName) {
-        // Remove from UI
+    function removeTag(tagName, tagId = null) {
         const tags = selectedTagsDiv.querySelectorAll('.selected-tag');
         tags.forEach(tag => {
-            if (tag.querySelector('span')?.textContent === '#' + tagName ||
-                tag.textContent.includes(tagName)) {
-                tag.remove();
+            const btn = tag.querySelector('.btn-close');
+            if (btn) {
+                const matchesName = btn.dataset.tagName === tagName;
+                const matchesId = tagId && btn.dataset.tagId && btn.dataset.tagId === String(tagId);
+                if (matchesName || matchesId) {
+                    tag.remove();
+                }
             }
         });
-
-        // Remove from hidden input (you'll need to map tag names to IDs)
-        // This is simplified - you might need a more sophisticated approach
         updateTagsInput();
     }
 
     function updateTagsInput() {
-        // You need to maintain a mapping of tag names to IDs
-        // For now, we'll just clear it and let the form submit with existing tags
-        // The backend will handle tag updates
+        const values = [];
+        const tags = selectedTagsDiv.querySelectorAll('.selected-tag');
+        tags.forEach(tag => {
+            const btn = tag.querySelector('.btn-close');
+            if (btn) {
+                if (btn.dataset.tagId) {
+                    values.push(btn.dataset.tagId);
+                } else {
+                    values.push(btn.dataset.tagName);
+                }
+            }
+        });
+        tagsInput.value = values.join(',');
     }
 
     // Add tag from input
@@ -629,6 +609,7 @@
             if (tagName) {
                 addTag(tagName);
                 tagInput.value = '';
+                tagInput.focus();
             }
         });
 
@@ -649,7 +630,8 @@
         popularTags.forEach(tag => {
             tag.addEventListener('click', function() {
                 const tagName = this.dataset.tagName;
-                addTag(tagName);
+                const tagId = this.dataset.tagId;
+                addTag(tagName, tagId);
             });
         });
     }
@@ -659,7 +641,8 @@
         selectedTagsDiv.addEventListener('click', function(e) {
             if (e.target.classList.contains('btn-close')) {
                 const tagName = e.target.dataset.tagName;
-                removeTag(tagName);
+                const tagId = e.target.dataset.tagId;
+                removeTag(tagName, tagId);
             }
         });
     }
