@@ -3,77 +3,100 @@
 @section('title', 'Register - DevDoko')
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card shadow-sm border-0">
-            <div class="card-body p-5">
-                <div class="text-center mb-4">
-                    <h2 class="fw-bold">
-                        <img src="{{ asset('assets/devdoko.png') }}" width="50" height="50"
-                            style="border: 1px solid black;" class="rounded-circle" alt="DevDoko"> DevDoko
-                    </h2>
-                    <p class="text-muted">Join the developer community</p>
-                </div>
+<div class="auth-form-header">
+    <img src="{{ asset('assets/devdoko.png') }}" alt="DevDoko" class="logo-mobile">
+    <h1>Create your account</h1>
+    <p>Join the developer community today</p>
+</div>
 
-                <form method="POST" action="{{ route('register') }}">
-                    @csrf
+<form method="POST" action="{{ route('register') }}" id="registerForm">
+    @csrf
 
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Full Name</label>
-                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
-                            name="name" value="{{ old('name') }}" required autofocus>
-                        @error('name')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email Address</label>
-                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
-                            name="email" value="{{ old('email') }}" required>
-                        @error('email')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control @error('username') is-invalid @enderror" id="username"
-                            name="username" value="{{ old('username') }}" required>
-                        @error('username')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <small class="text-muted">This will be your public profile name (e.g., @username)</small>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control @error('password') is-invalid @enderror"
-                            id="password" name="password" required>
-                        @error('password')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="password_confirmation" class="form-label">Confirm Password</label>
-                        <input type="password" class="form-control" id="password_confirmation"
-                            name="password_confirmation" required>
-                    </div>
-
-                    <div class="d-grid mb-3">
-                        <button type="submit" class="btn btn-primary btn-lg">Sign Up</button>
-                    </div>
-
-                    <div class="text-center">
-                        <p class="mb-0">
-                            Already have an account?
-                            <a href="{{ route('login') }}" class="text-decoration-none">Log in</a>
-                        </p>
-                    </div>
-                </form>
-            </div>
+    <div class="auth-input-group">
+        <label for="name">Full name</label>
+        <div class="auth-input-wrapper">
+            <i class="bi bi-person input-icon"></i>
+            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
+                name="name" value="{{ old('name') }}" placeholder="John Doe" required autofocus>
+            @error('name')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
     </div>
-</div>
+
+    <div class="auth-input-group">
+        <label for="email">Email address</label>
+        <div class="auth-input-wrapper">
+            <i class="bi bi-envelope input-icon"></i>
+            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
+                name="email" value="{{ old('email') }}" placeholder="you@example.com" required>
+            @error('email')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+
+    <div class="auth-input-group">
+        <label for="username">Username</label>
+        <div class="auth-input-wrapper">
+            <i class="bi bi-at input-icon"></i>
+            <input type="text" class="form-control @error('username') is-invalid @enderror" id="username"
+                name="username" value="{{ old('username') }}" placeholder="johndoe" required>
+            @error('username')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+        <p class="auth-helper-text">This will be your public profile URL: devdoko.com/<strong>@username</strong></p>
+    </div>
+
+    <div class="auth-input-group">
+        <label for="password">Password</label>
+        <div class="auth-input-wrapper">
+            <i class="bi bi-lock input-icon"></i>
+            <input type="password" class="form-control @error('password') is-invalid @enderror"
+                id="password" name="password" placeholder="Create a strong password" required>
+            <button type="button" class="auth-password-toggle" onclick="togglePassword('password', this)" aria-label="Toggle password visibility">
+                <i class="bi bi-eye"></i>
+            </button>
+            @error('password')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+
+    <div class="auth-input-group">
+        <label for="password_confirmation">Confirm password</label>
+        <div class="auth-input-wrapper">
+            <i class="bi bi-lock-fill input-icon"></i>
+            <input type="password" class="form-control" id="password_confirmation"
+                name="password_confirmation" placeholder="Re-enter your password" required>
+            <button type="button" class="auth-password-toggle" onclick="togglePassword('password_confirmation', this)" aria-label="Toggle password visibility">
+                <i class="bi bi-eye"></i>
+            </button>
+        </div>
+    </div>
+
+    <button type="submit" class="auth-submit-btn" style="margin-top: 0.5rem;">
+        Create Account
+    </button>
+</form>
+
+<p class="auth-footer-text">
+    Already have an account?
+    <a href="{{ route('login') }}">Sign in</a>
+</p>
+
+<script>
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'bi bi-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'bi bi-eye';
+    }
+}
+</script>
 @endsection

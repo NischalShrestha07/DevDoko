@@ -3,60 +3,77 @@
 @section('title', 'Reset Password - DevDoko')
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card shadow-sm border-0">
-            <div class="card-body p-5">
-                <div class="text-center mb-4">
-                    <h2 class="fw-bold">
-                        <img src="{{ asset('assets/devdoko.png') }}" width="50" height="50"
-                            style="border: 1px solid black;" class="rounded-circle" alt="DevDoko"> DevDoko
-                    </h2>
-                    <p class="text-muted">Set a new password</p>
-                </div>
+<div class="auth-form-header">
+    <img src="{{ asset('assets/devdoko.png') }}" alt="DevDoko" class="logo-mobile">
+    <h1>Set new password</h1>
+    <p>Choose a strong password for your account</p>
+</div>
 
-                <form method="POST" action="{{ route('password.update') }}">
-                    @csrf
+<form method="POST" action="{{ route('password.update') }}">
+    @csrf
 
-                    <input type="hidden" name="token" value="{{ $token }}">
+    <input type="hidden" name="token" value="{{ $token }}">
 
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email Address</label>
-                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
-                            name="email" value="{{ old('email', $email ?? '') }}" required autofocus>
-                        @error('email')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="password" class="form-label">New Password</label>
-                        <input type="password" class="form-control @error('password') is-invalid @enderror"
-                            id="password" name="password" required>
-                        @error('password')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="password_confirmation" class="form-label">Confirm New Password</label>
-                        <input type="password" class="form-control" id="password_confirmation"
-                            name="password_confirmation" required>
-                    </div>
-
-                    <div class="d-grid mb-3">
-                        <button type="submit" class="btn btn-primary btn-lg">Reset Password</button>
-                    </div>
-
-                    <div class="text-center">
-                        <p class="mb-0">
-                            Remember your password?
-                            <a href="{{ route('login') }}" class="text-decoration-none">Log in</a>
-                        </p>
-                    </div>
-                </form>
-            </div>
+    <div class="auth-input-group">
+        <label for="email">Email address</label>
+        <div class="auth-input-wrapper">
+            <i class="bi bi-envelope input-icon"></i>
+            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
+                name="email" value="{{ old('email', $email ?? '') }}" placeholder="you@example.com" required autofocus>
+            @error('email')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
     </div>
-</div>
+
+    <div class="auth-input-group">
+        <label for="password">New password</label>
+        <div class="auth-input-wrapper">
+            <i class="bi bi-lock input-icon"></i>
+            <input type="password" class="form-control @error('password') is-invalid @enderror"
+                id="password" name="password" placeholder="Enter new password" required>
+            <button type="button" class="auth-password-toggle" onclick="togglePassword('password', this)" aria-label="Toggle password visibility">
+                <i class="bi bi-eye"></i>
+            </button>
+            @error('password')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+
+    <div class="auth-input-group">
+        <label for="password_confirmation">Confirm new password</label>
+        <div class="auth-input-wrapper">
+            <i class="bi bi-lock-fill input-icon"></i>
+            <input type="password" class="form-control" id="password_confirmation"
+                name="password_confirmation" placeholder="Re-enter new password" required>
+            <button type="button" class="auth-password-toggle" onclick="togglePassword('password_confirmation', this)" aria-label="Toggle password visibility">
+                <i class="bi bi-eye"></i>
+            </button>
+        </div>
+    </div>
+
+    <button type="submit" class="auth-submit-btn" style="margin-top: 0.5rem;">
+        Reset Password
+    </button>
+</form>
+
+<p class="auth-footer-text">
+    Remember your password?
+    <a href="{{ route('login') }}">Back to sign in</a>
+</p>
+
+<script>
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'bi bi-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'bi bi-eye';
+    }
+}
+</script>
 @endsection

@@ -1042,10 +1042,18 @@
             const raw = localStorage.getItem(DRAFT_KEY);
             if (!raw) return;
             const draft = JSON.parse(raw);
-            if (!draft.content && !draft.code_snippet && !draft.title) return;
-            const age = Date.now() - (draft.savedAt || 0);
-            if (age > 86400000) { localStorage.removeItem(DRAFT_KEY); return; } // >24h old, discard
-            if (!confirm('You have an unsaved draft from ' + new Date(draft.savedAt).toLocaleTimeString() + '. Restore it?')) return;
+            if (!draft.content && !draft.code_snippet && !draft.title) {
+                localStorage.removeItem(DRAFT_KEY);
+                return;
+            }
+
+            const savedAt = Number(draft.savedAt || 0);
+            const age = Date.now() - savedAt;
+            if (age > 86400000) {
+                localStorage.removeItem(DRAFT_KEY);
+                return;
+            }
+
             if (draft.type) activatePostType(draft.type);
             setTimeout(() => {
                 if (draft.title) document.getElementById('title').value = draft.title;
@@ -1066,6 +1074,11 @@
                 updateCharCounts();
                 updateReadingTime();
             }, 100);
+
+            if (window.DevDoko?.toast) {
+                const timeLabel = savedAt ? new Date(savedAt).toLocaleTimeString() : 'earlier';
+                window.DevDoko.toast('Restored your draft saved at ' + timeLabel + '.', 'info', 3500);
+            }
         } catch (e) {}
     }
 

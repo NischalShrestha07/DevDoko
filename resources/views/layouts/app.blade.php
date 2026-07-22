@@ -16,6 +16,8 @@
 <body>
     <div id="toast-container" class="toast-container"></div>
 
+    @php $unreadCount = 0; @endphp
+
     <!-- Confirmation Modal -->
     <div class="modal fade" id="confirmModal" tabindex="-1">
         <div class="modal-dialog modal-sm modal-dialog-centered">
@@ -28,6 +30,146 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-danger btn-confirm-yes">Confirm</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="offcanvas offcanvas-start mobile-nav-drawer" tabindex="-1" id="mobileNavDrawer" aria-labelledby="mobileNavDrawerLabel">
+        <div class="offcanvas-header border-bottom">
+            <a href="{{ route('home') }}" class="d-flex align-items-center text-decoration-none text-dark" id="mobileNavDrawerLabel">
+                <img src="{{ asset('/assets/devdoko.png') }}" alt="DevDoko" class="rounded-circle me-2" style="width: 36px; height: 36px; object-fit: cover;">
+                <span class="fw-bold fs-5">DevDoko</span>
+            </a>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0 d-flex flex-column">
+            <div class="flex-grow-1 overflow-auto py-2">
+                <div class="px-2 mb-3">
+                    <div class="small text-secondary text-uppercase fw-semibold px-3 mb-2">Main</div>
+                    <a href="{{ route('home') }}"
+                        class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('home') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                        @if(request()->routeIs('home'))<span class="nav-active-indicator"></span>@endif
+                        <i class="bi bi-house-door{{ request()->routeIs('home') ? '-fill' : '' }} fs-5 me-3"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="{{ route('search') }}"
+                        class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('search') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                        @if(request()->routeIs('search'))<span class="nav-active-indicator"></span>@endif
+                        <i class="bi bi-search fs-5 me-3"></i>
+                        <span>Search</span>
+                    </a>
+                    <a href="{{ route('explore') }}"
+                        class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('explore') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                        @if(request()->routeIs('explore'))<span class="nav-active-indicator"></span>@endif
+                        <i class="bi bi-compass fs-5 me-3"></i>
+                        <span>Explore</span>
+                    </a>
+                    <a href="{{ route('jobs.index') }}"
+                        class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('jobs.*') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                        @if(request()->routeIs('jobs.*'))<span class="nav-active-indicator"></span>@endif
+                        <i class="bi bi-briefcase fs-5 me-3"></i>
+                        <span>Jobs</span>
+                    </a>
+                    <a href="{{ route('messages.index') }}"
+                        class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('messages.*') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                        @if(request()->routeIs('messages.*'))<span class="nav-active-indicator"></span>@endif
+                        <i class="bi bi-chat{{ request()->routeIs('messages.*') ? '-fill' : '' }} fs-5 me-3"></i>
+                        <span>Messages</span>
+                    </a>
+                    @auth
+                    <a href="{{ route('notifications.index') }}"
+                        class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('notifications.*') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                        @if(request()->routeIs('notifications.*'))<span class="nav-active-indicator"></span>@endif
+                        <i class="bi bi-bell{{ request()->routeIs('notifications.*') ? '-fill' : '' }} fs-5 me-3"></i>
+                        <span class="flex-grow-1">Notifications</span>
+                        <span class="badge bg-danger rounded-pill ms-auto">{{ $unreadCount }}</span>
+                    </a>
+                    @endauth
+                    <a href="{{ route('posts.create') }}"
+                        class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('posts.create') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                        @if(request()->routeIs('posts.create'))<span class="nav-active-indicator"></span>@endif
+                        <i class="bi bi-plus-square{{ request()->routeIs('posts.create') ? '-fill' : '' }} fs-5 me-3"></i>
+                        <span>Create</span>
+                    </a>
+                    <a href="{{ route('developers.index') }}"
+                        class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('developers.*') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                        @if(request()->routeIs('developers.*'))<span class="nav-active-indicator"></span>@endif
+                        <i class="bi bi-people fs-5 me-3"></i>
+                        <span>Developers</span>
+                    </a>
+                </div>
+
+                <div class="px-2 mb-3">
+                    <div class="small text-secondary text-uppercase fw-semibold px-3 mb-2">Community</div>
+                    <div class="dropdown">
+                        <a href="#"
+                            class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 dropdown-toggle"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-people-fill fs-5 me-3"></i>
+                            <span class="flex-grow-1">Groups</span>
+                        </a>
+                        <ul class="dropdown-menu w-100 mt-1 shadow-sm border-0">
+                            <li><a class="dropdown-item py-2 {{ request()->routeIs('groups.index') ? 'active bg-light' : '' }}"
+                                    href="{{ route('groups.index') }}"><i class="bi bi-compass me-2"></i> Discover</a></li>
+                            <li><a class="dropdown-item py-2 {{ request()->routeIs('groups.my-groups') ? 'active bg-light' : '' }}"
+                                    href="{{ route('groups.my-groups') }}"><i class="bi bi-bookmark-check me-2"></i> My Groups</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item py-2" href="{{ route('groups.create') }}"><i class="bi bi-plus-circle me-2 text-primary"></i> Create Group</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                @auth
+                <div class="px-2 mb-3">
+                    <div class="small text-secondary text-uppercase fw-semibold px-3 mb-2">Marketplace</div>
+                    <a href="{{ route('marketplace.index') }}"
+                        class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('marketplace.index') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                        @if(request()->routeIs('marketplace.index'))<span class="nav-active-indicator"></span>@endif
+                        <i class="bi bi-shop fs-5 me-3"></i>
+                        <span>Browse</span>
+                    </a>
+                    <a href="{{ route('marketplace.my-listings') }}"
+                        class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('marketplace.my-listings') ? 'bg-light fw-semibold' : '' }} hover-bg-light">
+                        @if(request()->routeIs('marketplace.my-listings'))<span class="nav-active-indicator"></span>@endif
+                        <i class="bi bi-bag fs-5 me-3"></i>
+                        <span class="flex-grow-1">My Listings</span>
+                    </a>
+                    <a href="{{ route('marketplace.saved') }}"
+                        class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 position-relative {{ request()->routeIs('marketplace.saved') ? 'bg-light fw-semibold' : '' }} hover-bg-light mt-1">
+                        @if(request()->routeIs('marketplace.saved'))<span class="nav-active-indicator"></span>@endif
+                        <i class="bi bi-bookmark fs-5 me-3"></i>
+                        <span>Saved</span>
+                    </a>
+                    <a href="{{ route('marketplace.create') }}"
+                        class="d-flex align-items-center px-3 py-2 text-primary text-decoration-none rounded-3 hover-bg-light mt-2">
+                        <i class="bi bi-plus-circle fs-5 me-3"></i>
+                        <span>Sell Something</span>
+                    </a>
+                </div>
+                @endauth
+            </div>
+
+            <div class="p-3 border-top mobile-drawer-footer">
+                <button type="button" class="btn btn-outline-secondary w-100 mb-2" onclick="DevDoko.toggleTheme()">
+                    <i class="bi bi-moon-fill me-2"></i>
+                    Theme
+                </button>
+                @auth
+                @if(auth()->user()->isAdmin())
+                <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center px-3 py-2 text-dark text-decoration-none rounded-3 hover-bg-light mb-2">
+                    <i class="bi bi-shield-check fs-5 me-3"></i>
+                    <span>Admin</span>
+                </a>
+                @endif
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="d-flex align-items-center w-100 px-3 py-2 text-dark bg-transparent border-0 rounded-3 hover-bg-light">
+                        <i class="bi bi-box-arrow-right fs-5 me-3"></i>
+                        <span>Logout</span>
+                    </button>
+                </form>
+                @endauth
             </div>
         </div>
     </div>
@@ -45,15 +187,18 @@
     @endauth
 
     <!-- Top Header Bar -->
-    <header class="top-header d-flex align-items-center px-3 py-0 border-bottom">
-        <div class="d-flex align-items-center flex-grow-1">
+    <header class="top-header d-flex align-items-center justify-content-between px-2 px-md-3 py-0 border-bottom">
+        <div class="d-flex align-items-center flex-grow-1 min-width-0">
+            <button type="button" class="btn btn-sm btn-outline-secondary d-md-none me-2 mobile-nav-toggle" data-bs-toggle="offcanvas" data-bs-target="#mobileNavDrawer" aria-controls="mobileNavDrawer" aria-label="Open navigation menu">
+                <i class="bi bi-list fs-5"></i>
+            </button>
             <a href="{{ route('home') }}" class="d-flex align-items-center text-decoration-none text-dark fw-bold fs-6">
                 <img src="{{ asset('/assets/devdoko.png') }}" alt="DevDoko" class="rounded-circle me-2 d-md-none"
                     style="width: 32px; height: 32px; object-fit: cover;">
                 <span class="d-md-none">DevDoko</span>
             </a>
         </div>
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2 flex-shrink-0">
             @auth
             <div class="dropdown" id="headerNotifContainer">
                 <a href="#" class="btn btn-sm position-relative text-secondary border-0 notification-bell-btn" data-bs-toggle="dropdown" aria-expanded="false" id="headerNotifBell" style="background: transparent;">
@@ -250,7 +395,7 @@
                         </li>
                         <li>
                             <a class="dropdown-item py-2 d-flex justify-content-between align-items-center"
-                                href="{{ route('marketplace.interests.sent') }}">
+                        <nav class="d-md-none fixed-bottom bg-white border-top py-2 px-3 mobile-bottom-nav" style="z-index: 1030;">
                                 <span><i class="bi bi-send me-2"></i> Sent</span>
                                 @php $pendingSent = auth()->user()->marketplaceInterests()->where('status', 'pending')->count(); @endphp
                                 @if($pendingSent > 0)
