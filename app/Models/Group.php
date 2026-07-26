@@ -1,4 +1,5 @@
 <?php
+
 // app/Models/Group.php
 
 namespace App\Models;
@@ -6,8 +7,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class Group extends Model
 {
@@ -121,7 +122,9 @@ class Group extends Model
     // Accessors
     public function getIsMemberAttribute()
     {
-        if (!Auth::check()) return false;
+        if (! Auth::check()) {
+            return false;
+        }
 
         return $this->members()
             ->where('user_id', Auth::id())
@@ -131,7 +134,9 @@ class Group extends Model
 
     public function getIsPendingAttribute()
     {
-        if (!Auth::check()) return false;
+        if (! Auth::check()) {
+            return false;
+        }
 
         return $this->members()
             ->where('user_id', Auth::id())
@@ -141,7 +146,9 @@ class Group extends Model
 
     public function getMemberRoleAttribute()
     {
-        if (!Auth::check()) return null;
+        if (! Auth::check()) {
+            return null;
+        }
 
         $member = $this->members()
             ->where('user_id', Auth::id())
@@ -153,12 +160,12 @@ class Group extends Model
 
     public function getIconUrlAttribute()
     {
-        return $this->icon ? asset('storage/' . $this->icon) : null;
+        return $this->icon ? asset('storage/'.$this->icon) : null;
     }
 
     public function getCoverUrlAttribute()
     {
-        return $this->cover_image ? asset('storage/' . $this->cover_image) : null;
+        return $this->cover_image ? asset('storage/'.$this->cover_image) : null;
     }
 
     public function getCategoryLabelAttribute()
@@ -204,7 +211,7 @@ class Group extends Model
         $this->logActivity(
             $user,
             $this->member_approval === 'anyone' ? 'member_joined' : 'membership_requested',
-            $user->name . ' ' . ($this->member_approval === 'anyone' ? 'joined' : 'requested to join') . ' the group'
+            $user->name.' '.($this->member_approval === 'anyone' ? 'joined' : 'requested to join').' the group'
         );
 
         return true;
@@ -224,7 +231,7 @@ class Group extends Model
         $this->logActivity(
             $approvedBy,
             'member_approved',
-            $user->name . ' was approved to join the group by ' . $approvedBy->name
+            $user->name.' was approved to join the group by '.$approvedBy->name
         );
     }
 
@@ -236,7 +243,7 @@ class Group extends Model
         $this->logActivity(
             Auth::user(),
             'member_left',
-            $user->name . ' left the group'
+            $user->name.' left the group'
         );
     }
 
@@ -249,7 +256,7 @@ class Group extends Model
         $this->logActivity(
             $updatedBy,
             'member_role_updated',
-            $updatedBy->name . ' updated ' . $user->name . '\'s role to ' . $role
+            $updatedBy->name.' updated '.$user->name.'\'s role to '.$role
         );
     }
 
@@ -259,7 +266,7 @@ class Group extends Model
             return true;
         }
 
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -276,7 +283,12 @@ class Group extends Model
 
     public function canPost(User $user)
     {
-        if (!$this->isMember && $user->id !== $this->owner_id) {
+        $membership = $this->members()
+            ->where('user_id', $user->id)
+            ->wherePivot('status', 'active')
+            ->first();
+
+        if (! $membership && $user->id !== $this->owner_id) {
             return false;
         }
 
@@ -288,7 +300,9 @@ class Group extends Model
         }
 
         if ($postPermission === 'admins_only') {
-            return in_array($this->member_role, ['owner', 'admin', 'moderator']);
+            $role = $user->id === $this->owner_id ? 'owner' : $membership->pivot->role;
+
+            return in_array($role, ['owner', 'admin', 'moderator']);
         }
 
         return false;
@@ -300,14 +314,14 @@ class Group extends Model
             return true;
         }
 
-        if ($this->isMember && in_array($this->member_role, ['admin', 'moderator'])) {
-            return true;
-        }
-
-        return false;
+        return $this->members()
+            ->where('user_id', $user->id)
+            ->wherePivotIn('role', ['admin', 'moderator'])
+            ->wherePivot('status', 'active')
+            ->exists();
     }
 
-    public function logActivity(User $user, string $action, string $description = null, array $data = [])
+    public function logActivity(User $user, string $action, ?string $description = null, array $data = [])
     {
         return $this->activityLogs()->create([
             'user_id' => $user->id,
@@ -343,5 +357,4 @@ class Group extends Model
             ]);
         });
     }
-
 }

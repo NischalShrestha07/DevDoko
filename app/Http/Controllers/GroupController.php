@@ -1,24 +1,25 @@
 <?php
+
 // app/Http/Controllers/GroupController.php
 
 namespace App\Http\Controllers;
 
 use App\Models\Group;
-use App\Models\GroupPost;
-use App\Models\GroupPostLike;
-use App\Models\GroupPostComment;
 use App\Models\GroupCommentLike;
-use App\Models\GroupResource;
-use App\Models\GroupResourceLike;
 use App\Models\GroupEvent;
 use App\Models\GroupInvitation;
+use App\Models\GroupPost;
+use App\Models\GroupPostComment;
+use App\Models\GroupPostLike;
+use App\Models\GroupResource;
+use App\Models\GroupResourceLike;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class GroupController extends Controller
 {
@@ -42,8 +43,8 @@ class GroupController extends Controller
         // Search
         if ($request->search) {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                    ->orWhere('description', 'like', '%' . $request->search . '%');
+                $q->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('description', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -123,7 +124,7 @@ class GroupController extends Controller
             $slug = Str::slug($request->name);
             $count = 1;
             while (Group::where('slug', $slug)->exists()) {
-                $slug = Str::slug($request->name) . '-' . $count;
+                $slug = Str::slug($request->name).'-'.$count;
                 $count++;
             }
             $data['slug'] = $slug;
@@ -169,7 +170,7 @@ class GroupController extends Controller
 
     public function show(Group $group)
     {
-        if (!$group->canView(Auth::user())) {
+        if (! $group->canView(Auth::user())) {
             abort(403, 'You do not have permission to view this group.');
         }
 
@@ -180,7 +181,7 @@ class GroupController extends Controller
                 $q->with('user.profile')
                     ->withCount('likes', 'comments')
                     ->latest();
-            }
+            },
         ]);
 
         $posts = GroupPost::where('group_id', $group->id)
@@ -232,7 +233,6 @@ class GroupController extends Controller
         ));
     }
 
-
     public function edit(Group $group)
     {
         $this->authorize('update', $group);
@@ -253,7 +253,7 @@ class GroupController extends Controller
         $this->authorize('update', $group);
 
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:100|unique:groups,name,' . $group->id,
+            'name' => 'required|string|max:100|unique:groups,name,'.$group->id,
             'description' => 'required|string|max:2000',
             'category' => 'required|in:tech-stack,location,interest,project,learning',
             'tags' => 'nullable|string|max:500',
@@ -312,6 +312,7 @@ class GroupController extends Controller
                 ->with('success', 'Group updated successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return redirect()->back()
                 ->with('error', 'Failed to update group. Please try again.')
                 ->withInput();
@@ -340,6 +341,7 @@ class GroupController extends Controller
                 ->with('success', 'Group deleted successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return redirect()->back()
                 ->with('error', 'Failed to delete group. Please try again.');
         }
@@ -395,13 +397,14 @@ class GroupController extends Controller
     public function leave(Group $group)
     {
         $group->removeMember(Auth::user());
+
         return redirect()->route('groups.show', $group->slug)
             ->with('success', 'You have left the group.');
     }
 
     public function members(Group $group)
     {
-        if (!$group->canView(Auth::user())) {
+        if (! $group->canView(Auth::user())) {
             abort(403);
         }
 
@@ -431,7 +434,8 @@ class GroupController extends Controller
     {
         $this->authorize('manage', $group);
         $group->approveMember($user, Auth::user());
-        return redirect()->back()->with('success', $user->name . ' has been approved to join.');
+
+        return redirect()->back()->with('success', $user->name.' has been approved to join.');
     }
 
     public function rejectMember(Group $group, User $user)
@@ -439,6 +443,7 @@ class GroupController extends Controller
         $this->authorize('manage', $group);
         $group->members()->detach($user->id);
         $group->decrement('pending_requests');
+
         return redirect()->back()->with('success', 'Membership request rejected.');
     }
 
@@ -447,7 +452,8 @@ class GroupController extends Controller
         $this->authorize('manage', $group);
         $group->members()->detach($user->id);
         $group->decrement('members_count');
-        return redirect()->back()->with('success', $user->name . ' has been removed from the group.');
+
+        return redirect()->back()->with('success', $user->name.' has been removed from the group.');
     }
 
     public function updateMemberRole(Request $request, Group $group, User $user)
@@ -463,7 +469,8 @@ class GroupController extends Controller
         }
 
         $group->updateMemberRole($user, $request->role, Auth::user());
-        return redirect()->back()->with('success', $user->name . '\'s role updated to ' . $request->role);
+
+        return redirect()->back()->with('success', $user->name.'\'s role updated to '.$request->role);
     }
 
     // ============== INVITATIONS ==============
@@ -503,20 +510,21 @@ class GroupController extends Controller
             ->where('expires_at', '>', now())
             ->firstOrFail();
 
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return redirect()->route('login')
                 ->with('info', 'Please login to accept the invitation.');
         }
 
-        $user = User::where('email', $invitation->email)->first();
+        $user = Auth::user();
 
-        if (!$user) {
-            return redirect()->route('register')
-                ->with('info', 'Please create an account to join the group.');
+        if ($user->email !== $invitation->email) {
+            return redirect()->route('groups.show', $invitation->group->slug)
+                ->with('error', 'This invitation was sent to a different email address.');
         }
 
         if ($invitation->group->isMember) {
             $invitation->update(['status' => 'accepted', 'responded_at' => now()]);
+
             return redirect()->route('groups.show', $invitation->group->slug)
                 ->with('info', 'You are already a member of this group.');
         }
@@ -536,7 +544,7 @@ class GroupController extends Controller
 
     public function storePost(Request $request, Group $group)
     {
-        if (!$group->canPost(Auth::user())) {
+        if (! $group->canPost(Auth::user())) {
             abort(403, 'You do not have permission to post in this group.');
         }
 
@@ -559,7 +567,7 @@ class GroupController extends Controller
         if ($request->hasFile('attachments')) {
             $attachments = [];
             foreach ($request->file('attachments') as $file) {
-                $path = $file->store('groups/posts/' . $group->id, 'public');
+                $path = $file->store('groups/posts/'.$group->id, 'public');
                 $attachments[] = [
                     'name' => $file->getClientOriginalName(),
                     'path' => $path,
@@ -585,7 +593,7 @@ class GroupController extends Controller
                 $q->with('user.profile', 'replies.user.profile')
                     ->orderBy('created_at', 'desc');
             },
-            'likes'
+            'likes',
         ])->findOrFail($postId);
 
         if ($post->group_id !== $group->id) {
@@ -657,7 +665,7 @@ class GroupController extends Controller
 
     public function resources(Group $group)
     {
-        if (!$group->canView(Auth::user())) {
+        if (! $group->canView(Auth::user())) {
             abort(403);
         }
 
@@ -681,7 +689,7 @@ class GroupController extends Controller
 
     public function storeResource(Request $request, Group $group)
     {
-        if (!$group->isMember) {
+        if (! $group->isMember) {
             abort(403);
         }
 
@@ -706,7 +714,7 @@ class GroupController extends Controller
         $data['tags'] = $request->tags ? array_map('trim', explode(',', $request->tags)) : [];
 
         if ($request->hasFile('file')) {
-            $data['file_path'] = $request->file('file')->store('groups/resources/' . $group->id, 'public');
+            $data['file_path'] = $request->file('file')->store('groups/resources/'.$group->id, 'public');
             $data['metadata'] = [
                 'size' => $request->file('file')->getSize(),
                 'mime' => $request->file('file')->getMimeType(),
@@ -730,7 +738,7 @@ class GroupController extends Controller
 
     public function events(Group $group)
     {
-        if (!$group->canView(Auth::user())) {
+        if (! $group->canView(Auth::user())) {
             abort(403);
         }
 
@@ -744,7 +752,7 @@ class GroupController extends Controller
 
     public function storeEvent(Request $request, Group $group)
     {
-        if (!$group->isMember) {
+        if (! $group->isMember) {
             abort(403);
         }
 
@@ -777,7 +785,7 @@ class GroupController extends Controller
 
     public function attendEvent(Group $group, GroupEvent $event)
     {
-        if (!$group->isMember) {
+        if (! $group->isMember) {
             abort(403);
         }
 
@@ -886,7 +894,7 @@ class GroupController extends Controller
 
     public function storeComment(Request $request, Group $group, GroupPost $post)
     {
-        if (!$group->isMember) {
+        if (! $group->isMember) {
             abort(403);
         }
 
@@ -918,7 +926,7 @@ class GroupController extends Controller
     {
         $post = $comment->post;
 
-        if ($comment->user_id !== Auth::id() && !$group->canManage(Auth::user())) {
+        if ($comment->user_id !== Auth::id() && ! $group->canManage(Auth::user())) {
             abort(403);
         }
 
@@ -966,11 +974,11 @@ class GroupController extends Controller
      */
     public function downloadResource(Group $group, GroupResource $resource)
     {
-        if (!$group->canView(Auth::user())) {
+        if (! $group->canView(Auth::user())) {
             abort(403);
         }
 
-        if (!$resource->file_path || !Storage::disk('public')->exists($resource->file_path)) {
+        if (! $resource->file_path || ! Storage::disk('public')->exists($resource->file_path)) {
             abort(404);
         }
 
@@ -984,7 +992,7 @@ class GroupController extends Controller
      */
     public function deleteResource(Group $group, GroupResource $resource)
     {
-        if ($resource->user_id !== Auth::id() && !$group->canManage(Auth::user())) {
+        if ($resource->user_id !== Auth::id() && ! $group->canManage(Auth::user())) {
             abort(403);
         }
 
@@ -1035,7 +1043,7 @@ class GroupController extends Controller
      */
     public function deleteEvent(Group $group, GroupEvent $event)
     {
-        if ($event->user_id !== Auth::id() && !$group->canManage(Auth::user())) {
+        if ($event->user_id !== Auth::id() && ! $group->canManage(Auth::user())) {
             abort(403);
         }
 
@@ -1137,7 +1145,7 @@ class GroupController extends Controller
 
         $newOwner = User::find($request->user_id);
 
-        if (!$group->isMember || $newOwner->id === $group->owner_id) {
+        if (! $group->isMember || $newOwner->id === $group->owner_id) {
             return redirect()->back()->with('error', 'Invalid user or user is not a member.');
         }
 
@@ -1185,7 +1193,7 @@ class GroupController extends Controller
      */
     public function editPost(Group $group, GroupPost $post)
     {
-        if ($post->user_id !== Auth::id() && !$group->canManage(Auth::user())) {
+        if ($post->user_id !== Auth::id() && ! $group->canManage(Auth::user())) {
             abort(403, 'You do not have permission to edit this post.');
         }
 
@@ -1204,12 +1212,13 @@ class GroupController extends Controller
 
         return view('groups.edit-post', compact('group', 'post', 'postTypes'));
     }
+
     /**
      * Update post
      */
     public function updatePost(Request $request, Group $group, GroupPost $post)
     {
-        if ($post->user_id !== Auth::id() && !$group->canManage(Auth::user())) {
+        if ($post->user_id !== Auth::id() && ! $group->canManage(Auth::user())) {
             abort(403);
         }
 
@@ -1234,7 +1243,7 @@ class GroupController extends Controller
      */
     public function deletePost(Group $group, GroupPost $post)
     {
-        if ($post->user_id !== Auth::id() && !$group->canManage(Auth::user())) {
+        if ($post->user_id !== Auth::id() && ! $group->canManage(Auth::user())) {
             abort(403);
         }
 
@@ -1252,13 +1261,12 @@ class GroupController extends Controller
             ->with('success', 'Post deleted successfully!');
     }
 
-
     /**
      * Mark post as important
      */
     public function markImportant(Group $group, GroupPost $post)
     {
-        if (!$group->canManage(Auth::user())) {
+        if (! $group->canManage(Auth::user())) {
             abort(403, 'You do not have permission to mark posts as important.');
         }
 
@@ -1273,7 +1281,7 @@ class GroupController extends Controller
         $group->logActivity(
             Auth::user(),
             'post_marked_important',
-            Auth::user()->name . ' marked post as important: ' . $post->title
+            Auth::user()->name.' marked post as important: '.$post->title
         );
 
         return redirect()->back()->with('success', 'Post marked as important!');
@@ -1284,7 +1292,7 @@ class GroupController extends Controller
      */
     public function unmarkImportant(Group $group, GroupPost $post)
     {
-        if (!$group->canManage(Auth::user())) {
+        if (! $group->canManage(Auth::user())) {
             abort(403, 'You do not have permission to unmark posts as important.');
         }
 
@@ -1299,7 +1307,7 @@ class GroupController extends Controller
         $group->logActivity(
             Auth::user(),
             'post_unmarked_important',
-            Auth::user()->name . ' unmarked post as important: ' . $post->title
+            Auth::user()->name.' unmarked post as important: '.$post->title
         );
 
         return redirect()->back()->with('success', 'Post unmarked as important!');
@@ -1310,7 +1318,7 @@ class GroupController extends Controller
      */
     public function updateComment(Request $request, Group $group, GroupPostComment $comment)
     {
-        if ($comment->user_id !== Auth::id() && !$group->canManage(Auth::user())) {
+        if ($comment->user_id !== Auth::id() && ! $group->canManage(Auth::user())) {
             abort(403, 'You do not have permission to edit this comment.');
         }
 
@@ -1330,7 +1338,7 @@ class GroupController extends Controller
             return response()->json([
                 'success' => true,
                 'content' => $comment->content,
-                'message' => 'Comment updated successfully!'
+                'message' => 'Comment updated successfully!',
             ]);
         }
 
