@@ -90,6 +90,7 @@ window.DevDoko = {
                 bsModal.hide();
                 resolve(false);
             };
+            modal.addEventListener('hidden.bs.modal', () => resolve(false), { once: true });
         });
     },
 

@@ -28,7 +28,7 @@
                     <p class="confirm-message mb-0 fw-semibold">Are you sure?</p>
                 </div>
                 <div class="modal-footer justify-content-center border-0 pt-0">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary btn-confirm-no" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-danger btn-confirm-yes">Confirm</button>
                 </div>
             </div>
@@ -444,6 +444,7 @@
                 <i class="bi bi-chat{{ request()->routeIs('messages.*') ? '-fill' : '' }} fs-5"></i>
                 <small>Chat</small>
             </a>
+            @auth
             <a href="{{ route('profile.show', auth()->user()->profile?->username) }}" class="app-bottom-nav-item text-center">
                 @if(auth()->user()->profile?->avatar)
                 <img src="{{ auth()->user()->profile?->avatar_url }}" class="rounded-circle"
@@ -453,6 +454,12 @@
                 @endif
                 <small>Profile</small>
             </a>
+            @else
+            <a href="{{ route('login') }}" class="app-bottom-nav-item text-center">
+                <i class="bi bi-person-circle fs-5"></i>
+                <small>Login</small>
+            </a>
+            @endauth
         </div>
     </nav>
 
