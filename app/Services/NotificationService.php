@@ -1,12 +1,13 @@
 <?php
+
 // app/Services/NotificationService.php
 
 namespace App\Services;
 
-use App\Models\Notification;
-use App\Models\User;
-use App\Models\Post;
 use App\Models\Comment;
+use App\Models\Notification;
+use App\Models\Post;
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
 class NotificationService
@@ -33,12 +34,12 @@ class NotificationService
             $data['post_id'] = $likeable->id;
             $data['post_title'] = $likeable->title ?? 'post';
             $notificationType = 'post_like';
-            $message = $liker->name . ' liked your post';
+            $message = $liker->name.' liked your post';
         } else {
             $data['comment_id'] = $likeable->id;
             $data['post_id'] = $likeable->commentable_id ?? $likeable->post_id;
             $notificationType = 'comment_like';
-            $message = $liker->name . ' liked your comment';
+            $message = $liker->name.' liked your comment';
         }
 
         $this->create([
@@ -64,7 +65,7 @@ class NotificationService
             'user_id' => $post->user_id,
             'from_user_id' => $commenter->id,
             'type' => 'comment',
-            'message' => $commenter->name . ' commented on your post',
+            'message' => $commenter->name.' commented on your post',
             'data' => [
                 'commenter_id' => $commenter->id,
                 'commenter_name' => $commenter->name,
@@ -90,7 +91,7 @@ class NotificationService
             'user_id' => $parentComment->user_id,
             'from_user_id' => $replier->id,
             'type' => 'reply',
-            'message' => $replier->name . ' replied to your comment',
+            'message' => $replier->name.' replied to your comment',
             'data' => [
                 'replier_id' => $replier->id,
                 'replier_name' => $replier->name,
@@ -101,7 +102,6 @@ class NotificationService
             ],
         ]);
     }
-
 
     /**
      * Send a share notification
@@ -117,7 +117,7 @@ class NotificationService
             'user_id' => $originalPost->user_id,
             'from_user_id' => $sharer->id,
             'type' => 'post_shared',
-            'message' => $sharer->name . ' shared your post',
+            'message' => $sharer->name.' shared your post',
             'data' => [
                 'sharer_id' => $sharer->id,
                 'sharer_name' => $sharer->name,
@@ -141,7 +141,7 @@ class NotificationService
             'user_id' => $followed->id,
             'from_user_id' => $follower->id,
             'type' => 'follow',
-            'message' => $follower->name . ' started following you',
+            'message' => $follower->name.' started following you',
             'data' => [
                 'follower_id' => $follower->id,
                 'follower_name' => $follower->name,
@@ -163,7 +163,7 @@ class NotificationService
             'user_id' => $receiver->id,
             'from_user_id' => $sender->id,
             'type' => 'message',
-            'message' => $sender->name . ' sent you a message',
+            'message' => $sender->name.' sent you a message',
             'data' => [
                 'sender_id' => $sender->id,
                 'sender_name' => $sender->name,
@@ -173,11 +173,10 @@ class NotificationService
         ]);
     }
 
-
     /**
      * Create a notification
      */
-    private function create(array $data): Notification
+    private function create(array $data): ?Notification
     {
         try {
             return Notification::create($data);
@@ -186,6 +185,7 @@ class NotificationService
                 'error' => $e->getMessage(),
                 'data' => $data,
             ]);
+
             return null;
         }
     }

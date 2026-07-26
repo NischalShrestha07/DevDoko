@@ -36,8 +36,11 @@ class NotificationController extends Controller
         // Get notifications
         $notifications = $query->latest()->paginate(20);
 
-        // Mark as read when viewed
-        Auth::user()->notifications()->unread()->update(['read_at' => now()]);
+        // Mark only the notifications actually shown (respecting the type filter) as read
+        Auth::user()->notifications()
+            ->whereIn('id', $notifications->pluck('id'))
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
 
         return view('notifications.index', compact('notifications'));
     }

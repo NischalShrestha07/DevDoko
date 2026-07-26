@@ -85,7 +85,7 @@ class Notification extends Model
     private function getProfileUrl(): ?string
     {
         if ($this->fromUser) {
-            return route('profile.show', $this->fromUser->username ?? $this->fromUser->name);
+            return route('profile.show', $this->fromUser->profile->username ?? $this->fromUser->name);
         }
 
         return null;
