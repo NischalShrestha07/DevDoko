@@ -11,11 +11,11 @@
             <div class="card border-0 shadow-sm mb-4 home-create-card">
                 <div class="card-body p-3">
                     <div class="d-flex align-items-center gap-3">
-                        <img src="{{ auth()->user()->profile?->avatar_url }}" alt="{{ auth()->user()->name }}"
+                        <img src="{{ auth()->user()->profile->avatar_url }}" alt="{{ auth()->user()->name }}"
                             class="rounded-circle flex-shrink-0" style="width: 44px; height: 44px; object-fit: cover;">
                         <a href="{{ route('posts.create') }}"
                             class="flex-grow-1 text-decoration-none home-post-input rounded-pill px-4 py-2">
-                            What's on your mind, {{ auth()->user()->profile?->username ?? auth()->user()->name }}?
+                            What's on your mind, {{ auth()->user()->profile->username ?? auth()->user()->name }}?
                         </a>
                     </div>
                     <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
@@ -108,16 +108,16 @@
                 <div class="home-profile-banner"></div>
                 <div class="card-body text-center pt-0 pb-3">
                     <div class="home-profile-avatar mx-auto mb-2">
-                        <img src="{{ auth()->user()->profile?->avatar_url }}" alt="{{ auth()->user()->name }}"
+                        <img src="{{ auth()->user()->profile->avatar_url }}" alt="{{ auth()->user()->name }}"
                             class="rounded-circle" style="width: 72px; height: 72px; object-fit: cover; border: 3px solid var(--card-bg, #fff);">
                     </div>
-                    <a href="{{ route('profile.show', auth()->user()->profile?->username) }}"
+                    <a href="{{ route('profile.show', auth()->user()->profile->username ?? '') }}"
                         class="text-decoration-none fw-bold d-block fs-6 app-text-primary mb-0">
                         {{ auth()->user()->name }}
                     </a>
-                    <small class="text-muted d-block mb-3">@{{ auth()->user()->profile?->username }}</small>
+                    <small class="text-muted d-block mb-3">{{ '@' . (auth()->user()->profile->username ?? '') }}</small>
                     <div class="d-flex justify-content-around text-center border-top border-bottom py-3 mb-2">
-                        <a href="{{ route('profile.show', auth()->user()->profile?->username) }}"
+                        <a href="{{ route('profile.show', auth()->user()->profile->username ?? '') }}"
                             class="text-decoration-none">
                             <div class="fw-bold app-text-primary">{{ auth()->user()->posts()->count() }}</div>
                             <small class="text-muted">Posts</small>
@@ -126,7 +126,7 @@
                             <div class="fw-bold app-text-primary">{{ auth()->user()->followers()->count() }}</div>
                             <small class="text-muted">Followers</small>
                         </div>
-                        <a href="{{ route('profile.show', auth()->user()->profile?->username) }}"
+                        <a href="{{ route('profile.show', auth()->user()->profile->username ?? '') }}"
                             class="text-decoration-none">
                             <div class="fw-bold app-text-primary">{{ auth()->user()->following()->count() }}</div>
                             <small class="text-muted">Following</small>
@@ -149,15 +149,15 @@
 
                     @foreach($suggestedUsers as $user)
                     <div class="d-flex align-items-center {{ !$loop->last ? 'pb-3 mb-3 border-bottom' : '' }}">
-                        <a href="{{ route('profile.show', $user->profile?->username ?? $user->id) }}"
+                        <a href="{{ route('profile.show', $user->profile->username ?? $user->id) }}"
                             class="text-decoration-none flex-shrink-0 me-3">
-                            <img src="{{ $user->profile?->avatar_url }}" alt="{{ $user->name }}"
+                            <img src="{{ $user->profile->avatar_url }}" alt="{{ $user->name }}"
                                 class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
                         </a>
                         <div class="flex-grow-1 min-width-0">
-                            <a href="{{ route('profile.show', $user->profile?->username ?? $user->id) }}"
+                            <a href="{{ route('profile.show', $user->profile->username ?? $user->id) }}"
                                 class="text-decoration-none fw-semibold app-text-primary d-block text-truncate">
-                                {{ $user->profile?->username }}
+                                {{ $user->profile->username ?? '' }}
                             </a>
                             <small class="text-muted">{{ $user->followers->count() ?? 0 }} followers</small>
                         </div>

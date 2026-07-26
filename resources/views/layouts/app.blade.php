@@ -254,8 +254,8 @@
                 <i class="bi bi-moon-fill fs-6"></i>
             </button>
             @auth
-            <a href="{{ route('profile.show', auth()->user()->profile?->username) }}" class="d-none d-md-flex align-items-center text-decoration-none ms-1">
-                <img src="{{ auth()->user()->profile?->avatar_url }}" alt="{{ auth()->user()->name }}"
+            <a href="{{ route('profile.show', auth()->user()->profile->username ?? '') }}" class="d-none d-md-flex align-items-center text-decoration-none ms-1">
+                <img src="{{ auth()->user()->profile->avatar_url }}" alt="{{ auth()->user()->name }}"
                     class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover; border: 2px solid var(--brand-purple);">
             </a>
             @endauth
@@ -445,9 +445,9 @@
                 <small>Chat</small>
             </a>
             @auth
-            <a href="{{ route('profile.show', auth()->user()->profile?->username) }}" class="app-bottom-nav-item text-center">
-                @if(auth()->user()->profile?->avatar)
-                <img src="{{ auth()->user()->profile?->avatar_url }}" class="rounded-circle"
+            <a href="{{ route('profile.show', auth()->user()->profile->username ?? '') }}" class="app-bottom-nav-item text-center">
+                @if(auth()->user()->profile->avatar ?? null)
+                <img src="{{ auth()->user()->profile->avatar_url }}" class="rounded-circle"
                     style="width: 22px; height: 22px; object-fit: cover;">
                 @else
                 <i class="bi bi-person-circle fs-5"></i>

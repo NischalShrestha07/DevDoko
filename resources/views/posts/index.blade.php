@@ -179,14 +179,14 @@
                     @foreach($suggestedUsers ?? [] as $suggestedUser)
                     <div class="list-group-item border-0 p-3">
                         <div class="d-flex align-items-center gap-3">
-                            <img src="{{ $suggestedUser->profile?->avatar_url }}" class="rounded-circle border"
+                            <img src="{{ $suggestedUser->profile->avatar_url }}" class="rounded-circle border"
                                 style="width: 48px; height: 48px; object-fit: cover;">
                             <div class="flex-grow-1">
-                                <a href="{{ route('profile.show', $suggestedUser->profile?->username ?? $suggestedUser->id) }}"
+                                <a href="{{ route('profile.show', $suggestedUser->profile->username ?? $suggestedUser->name) }}"
                                     class="text-decoration-none text-dark fw-semibold d-block">
-                                    {{ $suggestedUser->profile?->username ?? $suggestedUser->name }}
+                                    {{ $suggestedUser->profile->username ?? $suggestedUser->name }}
                                 </a>
-                                <small class="text-muted">{{ $suggestedUser->profile?->title ?? 'Developer' }}</small>
+                                <small class="text-muted">{{ $suggestedUser->profile->title ?? 'Developer' }}</small>
                             </div>
                             <form action="{{ route('users.follow', $suggestedUser) }}" method="POST">
                                 @csrf

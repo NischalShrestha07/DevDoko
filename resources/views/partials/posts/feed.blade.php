@@ -5,14 +5,14 @@
     <div class="card-header bg-white border-0 py-3">
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center">
-                <a href="{{ route('profile.show', $post->user?->profile?->username ?? $post->user->name) }}" class="text-decoration-none me-3">
-                    <img src="{{ $post->user?->profile?->avatar_url }}" alt="{{ $post->user->name }}"
+                <a href="{{ route('profile.show', $post->user?->profile->username ?? $post->user->name) }}" class="text-decoration-none me-3">
+                    <img src="{{ $post->user?->profile->avatar_url }}" alt="{{ $post->user->name }}"
                         class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
                 </a>
                 <div>
-                    <a href="{{ route('profile.show', $post->user?->profile?->username ?? $post->user->name) }}"
+                    <a href="{{ route('profile.show', $post->user?->profile->username ?? $post->user->name) }}"
                         class="text-decoration-none text-dark fw-bold d-block">
-                        {{ $post->user?->profile?->username ?? $post->user->name }}
+                        {{ $post->user?->profile->username ?? $post->user->name }}
                     </a>
                     <small class="text-muted">{{ $post->time_ago }}</small>
                 </div>

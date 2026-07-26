@@ -31,7 +31,10 @@ class HomeController extends Controller
             ->take(6)
             ->get();
 
-        $topDevelopers = User::popular()->take(5)->get();
+        $topDevelopers = User::popular()
+            ->with(['profile.techTags'])
+            ->take(5)
+            ->get();
 
         return view('welcome', compact('stats', 'featuredPosts', 'topDevelopers'));
     }

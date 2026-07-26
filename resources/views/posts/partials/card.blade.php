@@ -6,17 +6,17 @@
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center">
                 <!-- User Avatar -->
-                <a href="{{ route('profile.show', $post->user->profile?->username) }}" class="text-decoration-none">
-                    <img src="{{ $post->user->profile?->avatar_url }}" alt="{{ $post->user->name }}"
+                <a href="{{ route('profile.show', $post->user->profile->username ?? '') }}" class="text-decoration-none">
+                    <img src="{{ $post->user->profile->avatar_url }}" alt="{{ $post->user->name }}"
                         class="rounded-circle border" style="width: 42px; height: 42px; object-fit: cover;">
                 </a>
 
                 <!-- User Info -->
                 <div class="ms-3">
                     <div class="d-flex align-items-center">
-                        <a href="{{ route('profile.show', $post->user->profile?->username) }}"
+                        <a href="{{ route('profile.show', $post->user->profile->username ?? '') }}"
                             class="text-decoration-none text-dark fw-bold">
-                            {{ $post->user->profile?->username }}
+                            {{ $post->user->profile->username ?? '' }}
                         </a>
 
                         @if($post->user->is_verified)

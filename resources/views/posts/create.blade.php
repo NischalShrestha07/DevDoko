@@ -19,34 +19,16 @@
                 <div class="card-body p-0">
                     <!-- Post Type Selection -->
                     <div class="border-bottom px-4 py-3">
-                        <div class="d-flex flex-wrap gap-2">
-                            <button type="button" class="btn btn-outline-primary post-type-btn active" data-type="text">
-                                <i class="bi bi-text-paragraph me-1"></i> Text
-                            </button>
-                            <button type="button" class="btn btn-outline-primary post-type-btn" data-type="code">
-                                <i class="bi bi-code-slash me-1"></i> Code
-                            </button>
-                            <button type="button" class="btn btn-outline-primary post-type-btn" data-type="image">
-                                <i class="bi bi-image me-1"></i> Image
-                            </button>
-                            <button type="button" class="btn btn-outline-primary post-type-btn" data-type="video">
-                                <i class="bi bi-play-circle me-1"></i> Video
-                            </button>
-                            <button type="button" class="btn btn-outline-primary post-type-btn" data-type="link">
-                                <i class="bi bi-link-45deg me-1"></i> Link
-                            </button>
-                            <button type="button" class="btn btn-outline-primary post-type-btn" data-type="question">
-                                <i class="bi bi-question-circle me-1"></i> Question
-                            </button>
-                            <button type="button" class="btn btn-outline-primary post-type-btn" data-type="project">
-                                <i class="bi bi-briefcase me-1"></i> Project
-                            </button>
-                            <button type="button" class="btn btn-outline-primary post-type-btn" data-type="article">
-                                <i class="bi bi-file-text me-1"></i> Article
-                            </button>
-                            <button type="button" class="btn btn-outline-primary post-type-btn" data-type="status">
-                                <i class="bi bi-chat-dots me-1"></i> Status
-                            </button>
+                        <div class="row g-1 row-cols-3 row-cols-md-5 row-cols-lg-9">
+                            <div class="col"><button type="button" class="btn btn-outline-primary post-type-btn active w-100 py-2" data-type="text"><i class="bi bi-text-paragraph d-block fs-5 mb-1"></i><small>Text</small></button></div>
+                            <div class="col"><button type="button" class="btn btn-outline-primary post-type-btn w-100 py-2" data-type="code"><i class="bi bi-code-slash d-block fs-5 mb-1"></i><small>Code</small></button></div>
+                            <div class="col"><button type="button" class="btn btn-outline-primary post-type-btn w-100 py-2" data-type="image"><i class="bi bi-image d-block fs-5 mb-1"></i><small>Image</small></button></div>
+                            <div class="col"><button type="button" class="btn btn-outline-primary post-type-btn w-100 py-2" data-type="video"><i class="bi bi-play-circle d-block fs-5 mb-1"></i><small>Video</small></button></div>
+                            <div class="col"><button type="button" class="btn btn-outline-primary post-type-btn w-100 py-2" data-type="link"><i class="bi bi-link-45deg d-block fs-5 mb-1"></i><small>Link</small></button></div>
+                            <div class="col"><button type="button" class="btn btn-outline-primary post-type-btn w-100 py-2" data-type="question"><i class="bi bi-question-circle d-block fs-5 mb-1"></i><small>Question</small></button></div>
+                            <div class="col"><button type="button" class="btn btn-outline-primary post-type-btn w-100 py-2" data-type="project"><i class="bi bi-briefcase d-block fs-5 mb-1"></i><small>Project</small></button></div>
+                            <div class="col"><button type="button" class="btn btn-outline-primary post-type-btn w-100 py-2" data-type="article"><i class="bi bi-file-text d-block fs-5 mb-1"></i><small>Article</small></button></div>
+                            <div class="col"><button type="button" class="btn btn-outline-primary post-type-btn w-100 py-2" data-type="status"><i class="bi bi-chat-dots d-block fs-5 mb-1"></i><small>Status</small></button></div>
                         </div>
                     </div>
 
@@ -125,8 +107,8 @@
 
                             <!-- Image Upload Section -->
                             <div id="imageSection" class="mb-3 d-none">
-                                <div class="border rounded p-4 text-center">
-                                    <div id="imagePreview" class="d-none mb-3">
+                                <div class="border rounded p-4">
+                                    <div id="imagePreview" class="d-none mb-3 text-center">
                                         <img src="" alt="Preview" class="img-fluid rounded" style="max-height: 300px;">
                                         <div class="mt-2">
                                             <button type="button" id="removeImage" class="btn btn-sm btn-danger">
@@ -134,7 +116,7 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <div id="imageUploadArea" class="py-5">
+                                    <div id="imageUploadArea" class="py-5 text-center">
                                         <i class="bi bi-cloud-arrow-up fs-1 text-muted d-block mb-3"></i>
                                         <p class="text-muted mb-3">Drag & drop an image or click to browse</p>
                                         <input type="file" id="image" name="image" accept="image/*" class="d-none">
@@ -143,6 +125,21 @@
                                         </button>
                                         <div class="form-text mt-2">
                                             Maximum file size: 20MB. Supported: JPEG, PNG, GIF, WebP, SVG
+                                        </div>
+                                    </div>
+                                    <!-- Image Caption -->
+                                    <div id="imageCaptionWrap" class="mt-3">
+                                        <textarea class="form-control border-0" id="imageCaption"
+                                            rows="3" placeholder="Add a caption... (optional)"
+                                            maxlength="20000">{{ old('content') }}</textarea>
+                                        <div class="d-flex justify-content-between align-items-center mt-1">
+                                            <div class="text-muted small">
+                                                <span id="imageCaptionCount">0</span>/20000
+                                            </div>
+                                            <div class="small">
+                                                <i class="bi bi-clock"></i>
+                                                <span id="imageCaptionReadTime">0 min read</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -370,19 +367,20 @@
 <style>
     .post-type-btn {
         transition: all 0.2s;
+        border-radius: 10px;
     }
 
     .post-type-btn.active {
         background-color: var(--primary-color);
         color: white;
         border-color: var(--primary-color);
-        transform: translateY(-2px);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
     }
 
     .post-type-btn:hover:not(.active) {
-        background-color: rgba(13, 110, 253, 0.1);
+        background-color: rgba(13, 110, 253, 0.08);
         border-color: var(--primary-color);
+        color: var(--primary-color);
     }
 
     #imageUploadArea,
@@ -703,6 +701,20 @@
         codeTextarea.dispatchEvent(new Event('input'));
     }
 
+    // Image caption character counter + read time
+    const imageCaption = document.getElementById('imageCaption');
+    const imageCaptionCount = document.getElementById('imageCaptionCount');
+    const imageCaptionReadTime = document.getElementById('imageCaptionReadTime');
+    if (imageCaption) {
+        imageCaption.addEventListener('input', function() {
+            if (imageCaptionCount) imageCaptionCount.textContent = this.value.length;
+            const words = this.value.trim().split(/\s+/).length;
+            const minutes = Math.max(1, Math.ceil(words / 200));
+            if (imageCaptionReadTime) imageCaptionReadTime.textContent = `${minutes} min read`;
+            validateForm();
+        });
+    }
+
     // Image upload handling
     if (browseImageBtn && imageInput) {
         browseImageBtn.addEventListener('click', () => imageInput.click());
@@ -942,7 +954,7 @@
 
             case 'image':
                 if (imageInput && !imageInput.files.length &&
-                    contentTextarea && !contentTextarea.value.trim()) {
+                    imageCaption && !imageCaption.value.trim()) {
                     isValid = false;
                     errorMessage = 'Please add an image or description.';
                 }
@@ -988,8 +1000,9 @@
             html = '<pre><code class="language-' + (document.getElementById('code_language')?.value || 'plaintext') + '">'
                 + escapeHtml(codeTextarea.value) + '</code></pre>';
         } else if (type === 'image' && imagePreview?.querySelector('img')?.src) {
+            const caption = document.getElementById('imageCaption')?.value || contentTextarea?.value || '';
             html = '<img src="' + imagePreview.querySelector('img').src + '" class="img-fluid rounded mb-3" alt="Preview">'
-                + (contentTextarea?.value ? '<hr>' + marked.parse(contentTextarea.value) : '');
+                + (caption ? '<hr>' + marked.parse(caption) : '');
         } else if (type === 'link') {
             html = '<div class="card p-3 mb-3">'
                 + (document.getElementById('link_image')?.value ? '<img src="' + document.getElementById('link_image').value + '" class="img-fluid rounded mb-2" style="max-height:200px">' : '')
@@ -1022,6 +1035,7 @@
             type: currentActiveType,
             title: document.getElementById('title')?.value || '',
             content: contentTextarea?.value || '',
+            image_caption: document.getElementById('imageCaption')?.value || '',
             code_snippet: codeTextarea?.value || '',
             code_language: document.getElementById('code_language')?.value || '',
             link_url: document.getElementById('link_url')?.value || '',
@@ -1042,7 +1056,7 @@
             const raw = localStorage.getItem(DRAFT_KEY);
             if (!raw) return;
             const draft = JSON.parse(raw);
-            if (!draft.content && !draft.code_snippet && !draft.title) {
+            if (!draft.content && !draft.image_caption && !draft.code_snippet && !draft.title) {
                 localStorage.removeItem(DRAFT_KEY);
                 return;
             }
@@ -1054,10 +1068,17 @@
                 return;
             }
 
-            if (draft.type) activatePostType(draft.type);
+            if (draft.type) {
+                const draftBtn = document.querySelector(`.post-type-btn[data-type="${draft.type}"]`);
+                if (draftBtn) activatePostType(draft.type, draftBtn);
+            }
             setTimeout(() => {
                 if (draft.title) document.getElementById('title').value = draft.title;
                 if (draft.content && contentTextarea) contentTextarea.value = draft.content;
+                if (draft.image_caption) {
+                    const ic = document.getElementById('imageCaption');
+                    if (ic) ic.value = draft.image_caption;
+                }
                 if (draft.code_snippet && codeTextarea) codeTextarea.value = draft.code_snippet;
                 if (draft.code_language) document.getElementById('code_language').value = draft.code_language;
                 if (draft.link_url) document.getElementById('link_url').value = draft.link_url;
@@ -1072,6 +1093,8 @@
                     draft.tags.forEach(t => addTag(t));
                 }
                 contentTextarea?.dispatchEvent(new Event('input'));
+                const ic = document.getElementById('imageCaption');
+                if (ic) ic.dispatchEvent(new Event('input'));
             }, 100);
 
             if (window.DevDoko?.toast) {
@@ -1092,6 +1115,11 @@
     // Clear draft on successful submit
     if (form) {
         form.addEventListener('submit', function(e) {
+            // Sync image caption to content field before submit
+            if (currentActiveType === 'image' && imageCaption && contentTextarea) {
+                contentTextarea.value = imageCaption.value;
+            }
+
             if (!validateForm()) {
                 e.preventDefault();
                 alert('Please fill in all required fields.');

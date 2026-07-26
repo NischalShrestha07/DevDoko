@@ -1,6 +1,6 @@
 @extends('layouts.app', ['hideSidebar' => true])
 
-@section('title', '@' . $post->user->profile?->username . ' - ' . Str::limit($post->title, 50) . ' | DevDoko')
+@section('title', '@' . $post->user->profile->username ?? '' . ' - ' . Str::limit($post->title, 50) . ' | DevDoko')
 
 @section('content')
 <div class="container py-4">
@@ -53,8 +53,8 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-start gap-3">
-                        <a href="{{ route('profile.show', $post->user->profile?->username) }}">
-                            <img src="{{ $post->user->profile?->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($post->user->name) . '&size=64' }}"
+                        <a href="{{ route('profile.show', $post->user->profile->username ?? '') }}">
+                            <img src="{{ $post->user->profile->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($post->user->name) . '&size=64' }}"
                                 alt="{{ $post->user->name }}" class="rounded-circle border"
                                 style="width: 64px; height: 64px; object-fit: cover;" loading="lazy">
                         </a>
@@ -62,9 +62,9 @@
                         <div class="flex-grow-1">
                             <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
                                 <div>
-                                    <a href="{{ route('profile.show', $post->user->profile?->username) }}"
+                                    <a href="{{ route('profile.show', $post->user->profile->username ?? '') }}"
                                         class="text-decoration-none app-text-primary fw-semibold fs-5">
-                                        {{ $post->user->profile?->username }}
+                                        {{ $post->user->profile->username ?? '' }}
                                     </a>
                                     <div class="d-flex gap-3 mt-1">
                                         <small class="text-muted">
@@ -79,7 +79,7 @@
                                 </div>
                             </div>
 
-                            @if($post->user?->profile?->bio)
+                            @if($post->user->profile->bio ?? null)
                             <p class="mt-3 mb-0 text-secondary small">
                                 {{ $post->user->profile->bio }}
                             </p>
@@ -112,17 +112,17 @@
                         @forelse($post->comments as $comment)
                         <div class="p-3 border-bottom">
                             <div class="d-flex gap-2">
-                                <a href="{{ route('profile.show', $comment->user->profile?->username) }}">
-                                    <img src="{{ $comment->user->profile?->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($comment->user->name) . '&size=32' }}"
+                                <a href="{{ route('profile.show', $comment->user->profile->username ?? '') }}">
+                                    <img src="{{ $comment->user->profile->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($comment->user->name) . '&size=32' }}"
                                         alt="{{ $comment->user->name }}" class="rounded-circle"
                                         style="width: 32px; height: 32px; object-fit: cover;">
                                 </a>
                                 <div class="flex-grow-1">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div>
-                                            <a href="{{ route('profile.show', $comment->user->profile?->username) }}"
+                                            <a href="{{ route('profile.show', $comment->user->profile->username ?? '') }}"
                                                 class="text-decoration-none app-text-primary fw-semibold small">
-                                                {{ $comment->user->profile?->username }}
+                                                {{ $comment->user->profile->username ?? '' }}
                                             </a>
                                             <span class="text-secondary small ms-2">
                                                 {{ $comment->created_at->diffForHumans() }}
@@ -162,7 +162,7 @@
                     <form action="{{ route('comments.store', $post) }}" method="POST" id="commentForm">
                         @csrf
                         <div class="d-flex gap-2 align-items-start">
-                            <img src="{{ auth()->user()->profile?->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&size=36' }}"
+                            <img src="{{ auth()->user()->profile->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&size=36' }}"
                                 alt="{{ auth()->user()->name }}" class="rounded-circle"
                                 style="width: 36px; height: 36px; object-fit: cover;">
                             <div class="flex-grow-1">
@@ -195,7 +195,7 @@
                 <div class="card-header border-0 py-3">
                     <h5 class="fw-semibold mb-0">
                         <i class="bi bi-grid-3x3-gap-fill me-2"></i>
-                        More from {{ $post->user->profile?->username }}
+                        More from {{ $post->user->profile->username ?? '' }}
                     </h5>
                 </div>
                 <div class="card-body p-0">

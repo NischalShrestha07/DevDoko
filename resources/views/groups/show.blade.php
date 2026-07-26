@@ -136,9 +136,9 @@
                         </small><br>
                         <small class="text-muted">
                             <i class="bi bi-person"></i> By
-                            <a href="{{ route('profile.show', $group->owner->profile?->username) }}"
+                            <a href="{{ route('profile.show', $group->owner->profile->username ?? '') }}"
                                 class="text-decoration-none">
-                                {{ $group->owner->profile?->username ?? $group->owner->name }}
+                                {{ $group->owner->profile->username ?? '' ?? $group->owner->name }}
                             </a>
                         </small>
                     </div>
@@ -305,12 +305,12 @@
                         <div class="card-body pt-0">
                             @foreach($group->admins as $admin)
                             <div class="d-flex align-items-center mb-3">
-                                <img src="{{ $admin->profile?->avatar_url }}" class="rounded-circle me-2"
+                                <img src="{{ $admin->profile->avatar_url }}" class="rounded-circle me-2"
                                     style="width: 32px; height: 32px; object-fit: cover;">
                                 <div class="flex-grow-1">
-                                    <a href="{{ route('profile.show', $admin->profile?->username) }}"
+                                    <a href="{{ route('profile.show', $admin->profile->username ?? '') }}"
                                         class="text-decoration-none text-dark fw-semibold small">
-                                        {{ $admin->profile?->username }}
+                                        {{ $admin->profile->username ?? '' }}
                                     </a>
                                     <span class="badge bg-light text-dark ms-2 small">
                                         {{ $admin->pivot->role }}

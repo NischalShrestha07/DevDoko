@@ -82,10 +82,10 @@
 
             <!-- Project Owner -->
             <div class="d-flex align-items-center mb-4 p-3 border rounded">
-                <img src="{{ $project->user->profile?->avatar_url }}" alt="{{ $project->user->name }}"
+                <img src="{{ $project->user->profile->avatar_url }}" alt="{{ $project->user->name }}"
                     class="rounded-circle me-3" style="width: 56px; height: 56px; object-fit: cover;">
                 <div style="flex: 1;">
-                    <a href="{{ route('profile.show', $project->user->profile?->username ?? $project->user->id) }}"
+                    <a href="{{ route('profile.show', $project->user->profile->username ?? $project->user->id) }}"
                         class="fw-bold text-dark text-decoration-none d-block">
                         {{ $project->user->name }}
                     </a>

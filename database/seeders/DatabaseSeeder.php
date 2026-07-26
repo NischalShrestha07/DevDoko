@@ -17,13 +17,12 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             TagSeeder::class,
-            MarketplaceCategorySeeder::class,
         ]);
 
         $admin = User::create([
             'name' => 'Anup Ghimire',
             'email' => 'admin@gmail.com',
-            'password' => Hash::make('admin123'),
+            'password' => Hash::make('password'),
             'role' => 'admin',
         ]);
 
@@ -33,7 +32,35 @@ class DatabaseSeeder extends Seeder
             'github_link' => 'https://github.com/anupghimire',
         ]);
 
-        $users = User::factory(10)->create();
+        $user1 = User::create([
+            'name' => 'Rohan Shrestha',
+            'email' => 'rohan@gmail.com',
+            'email_verified_at' => now(),
+            'password' => Hash::make('password'),
+        ]);
+
+        $user2 = User::create([
+            'name' => 'Priya Gurung',
+            'email' => 'priya@gmail.com',
+            'email_verified_at' => now(),
+            'password' => Hash::make('password'),
+        ]);
+
+        $user3 = User::create([
+            'name' => 'Manish Tamang',
+            'email' => 'manish@gmail.com',
+            'email_verified_at' => now(),
+            'password' => Hash::make('password'),
+        ]);
+
+        $user4 = User::create([
+            'name' => 'Sita Rai',
+            'email' => 'sita@gmail.com',
+            'email_verified_at' => now(),
+            'password' => Hash::make('password'),
+        ]);
+
+        $users = collect([$user1, $user2, $user3, $user4]);
 
         $techTags = [
             'Laravel',
@@ -169,7 +196,6 @@ class DatabaseSeeder extends Seeder
             JobSeeder::class,
             GroupSeeder::class,
             MessageSeeder::class,
-            MarketplaceListingSeeder::class,
         ]);
     }
 }

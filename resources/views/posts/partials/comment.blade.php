@@ -3,8 +3,8 @@
     <div class="d-flex">
         <!-- Commenter Avatar -->
         <div class="flex-shrink-0 me-3">
-            <a href="{{ route('profile.show', $comment->user->profile?->username) }}" class="text-decoration-none">
-                <img src="{{ $comment->user->profile?->avatar_url }}" alt="{{ $comment->user->name }}"
+            <a href="{{ route('profile.show', $comment->user->profile->username ?? '') }}" class="text-decoration-none">
+                <img src="{{ $comment->user->profile->avatar_url }}" alt="{{ $comment->user->name }}"
                     class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
             </a>
         </div>
@@ -16,9 +16,9 @@
                     <!-- Comment Header -->
                     <div class="d-flex justify-content-between align-items-start mb-1">
                         <div>
-                            <a href="{{ route('profile.show', $comment->user->profile?->username) }}"
+                            <a href="{{ route('profile.show', $comment->user->profile->username ?? '') }}"
                                 class="text-decoration-none fw-bold text-dark">
-                                {{ $comment->user->profile?->username }}
+                                {{ $comment->user->profile->username ?? '' }}
                             </a>
                             @if($comment->user->is_verified)
                             <span class="badge bg-primary ms-1" style="font-size: 8px; padding: 1px 4px;">
@@ -115,7 +115,7 @@
                     @csrf
                     <div class="d-flex">
                         <div class="flex-shrink-0 me-2">
-                            <img src="{{ auth()->user()->profile?->avatar_url }}" alt="{{ auth()->user()->name }}"
+                            <img src="{{ auth()->user()->profile->avatar_url }}" alt="{{ auth()->user()->name }}"
                                 class="rounded-circle" style="width: 28px; height: 28px; object-fit: cover;">
                         </div>
                         <div class="flex-grow-1">
