@@ -96,21 +96,16 @@
                     </div>
 
                     <!-- Skills/Tags -->
-                    @if($developer->profile->skills)
+                    @if($developer->profile->techTags->count() > 0)
                     <div class="mb-3">
-                        @php
-                        $skills = is_array($developer->profile->skills)
-                        ? $developer->profile->skills
-                        : explode(',', $developer->profile->skills);
-                        @endphp
-                        @foreach(array_slice($skills, 0, 3) as $skill)
+                        @foreach($developer->profile->techTags->take(3) as $tag)
                         <span class="badge bg-light text-dark me-1 mb-1 px-3 py-2 rounded-pill">
-                            {{ trim($skill) }}
+                            {{ $tag->name }}
                         </span>
                         @endforeach
-                        @if(count($skills) > 3)
+                        @if($developer->profile->techTags->count() > 3)
                         <span class="badge bg-light text-dark px-3 py-2 rounded-pill">
-                            +{{ count($skills) - 3 }}
+                            +{{ $developer->profile->techTags->count() - 3 }}
                         </span>
                         @endif
                     </div>

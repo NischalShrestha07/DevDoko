@@ -20,6 +20,12 @@ class FollowController extends Controller
     {
         $currentUser = Auth::user();
 
+        if ($currentUser->id === $user->id) {
+            return $request->expectsJson()
+                ? response()->json(['error' => 'You cannot follow yourself'], 400)
+                : back()->with('error', 'You cannot follow yourself.');
+        }
+
         if ($currentUser->isFollowing($user)) {
             return $request->expectsJson()
                 ? response()->json(['following' => true, 'message' => 'Already following this user'])

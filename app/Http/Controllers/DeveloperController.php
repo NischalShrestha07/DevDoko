@@ -1,4 +1,5 @@
 <?php
+
 // app/Http/Controllers/DeveloperController.php
 
 namespace App\Http\Controllers;
@@ -10,7 +11,7 @@ class DeveloperController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::with('profile')->withCount('posts');
+        $query = User::with('profile.techTags')->withCount('posts');
 
         // Filter by search query
         if ($request->has('search')) {
@@ -26,9 +27,9 @@ class DeveloperController extends Controller
         }
 
         // Filter by skill/tag
-        if ($request->has('skill')) {
-            $query->whereHas('profile', function ($q) use ($request) {
-                $q->where('skills', 'LIKE', "%{$request->skill}%");
+        if ($request->filled('skill')) {
+            $query->whereHas('profile.techTags', function ($q) use ($request) {
+                $q->where('name', 'LIKE', "%{$request->skill}%");
             });
         }
 
