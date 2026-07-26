@@ -1,10 +1,10 @@
 <?php
+
 // app/Http/Controllers/MarketplaceInterestController.php
 
 namespace App\Http\Controllers;
 
 use App\Models\MarketplaceInterest;
-use App\Models\MarketplaceListing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -56,7 +56,7 @@ class MarketplaceInterestController extends Controller
      */
     public function show(MarketplaceInterest $interest)
     {
-        if (!$interest->canBeManagedBy(Auth::id())) {
+        if (! $interest->canBeManagedBy(Auth::id())) {
             abort(403);
         }
 
@@ -80,6 +80,13 @@ class MarketplaceInterestController extends Controller
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator);
+        }
+
+        $requiredStatus = $request->action === 'complete' ? 'accepted' : 'pending';
+        if ($interest->status !== $requiredStatus) {
+            return redirect()->back()->withErrors([
+                'action' => "Cannot {$request->action} an interest that is already {$interest->status}.",
+            ]);
         }
 
         switch ($request->action) {
@@ -106,7 +113,7 @@ class MarketplaceInterestController extends Controller
      */
     public function messages(MarketplaceInterest $interest)
     {
-        if (!$interest->canBeManagedBy(Auth::id())) {
+        if (! $interest->canBeManagedBy(Auth::id())) {
             abort(403);
         }
 
@@ -126,7 +133,7 @@ class MarketplaceInterestController extends Controller
 
         if ($interest->status !== 'pending') {
             return response()->json([
-                'error' => 'Can only cancel pending interests'
+                'error' => 'Can only cancel pending interests',
             ], 422);
         }
 
@@ -134,7 +141,7 @@ class MarketplaceInterestController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Interest cancelled successfully'
+            'message' => 'Interest cancelled successfully',
         ]);
     }
 }
