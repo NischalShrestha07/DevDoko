@@ -1,4 +1,5 @@
 <?php
+
 // app/Models/Message.php
 
 namespace App\Models;
@@ -26,7 +27,7 @@ class Message extends Model
         'is_thread_start',
         'reactions',
         'is_starred_by_sender',
-        'is_starred_by_receiver'
+        'is_starred_by_receiver',
     ];
 
     protected $casts = [
@@ -91,6 +92,21 @@ class Message extends Model
         return $query->where('type', 'code');
     }
 
+    /**
+     * Only messages this user hasn't deleted on their own side —
+     * checks the sender/receiver deletion flag matching their role in each row.
+     */
+    public function scopeVisibleTo($query, $userId)
+    {
+        return $query->where(function ($q) use ($userId) {
+            $q->where(function ($q2) use ($userId) {
+                $q2->where('sender_id', $userId)->whereNull('deleted_for_sender_at');
+            })->orWhere(function ($q2) use ($userId) {
+                $q2->where('receiver_id', $userId)->whereNull('deleted_for_receiver_at');
+            });
+        });
+    }
+
     // Accessors
     public function getFileUrlAttribute()
     {
@@ -120,14 +136,14 @@ class Message extends Model
     // Methods
     public function markAsDelivered()
     {
-        if (!$this->delivered_at) {
+        if (! $this->delivered_at) {
             $this->update(['delivered_at' => now()]);
         }
     }
 
     public function markAsRead()
     {
-        if (!$this->read_at) {
+        if (! $this->read_at) {
             $this->update(['read_at' => now()]);
         }
     }
@@ -136,7 +152,7 @@ class Message extends Model
     {
         return $this->reactions()->firstOrCreate([
             'user_id' => $userId,
-            'reaction' => $reaction
+            'reaction' => $reaction,
         ]);
     }
 
@@ -151,9 +167,9 @@ class Message extends Model
     public function toggleStar($userId)
     {
         if ($userId === $this->sender_id) {
-            $this->update(['is_starred_by_sender' => !$this->is_starred_by_sender]);
+            $this->update(['is_starred_by_sender' => ! $this->is_starred_by_sender]);
         } elseif ($userId === $this->receiver_id) {
-            $this->update(['is_starred_by_receiver' => !$this->is_starred_by_receiver]);
+            $this->update(['is_starred_by_receiver' => ! $this->is_starred_by_receiver]);
         }
     }
 

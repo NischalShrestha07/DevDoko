@@ -1,18 +1,16 @@
 <?php
+
 // app/Http/Controllers/MessageController.php
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Message;
-use App\Models\MessageReaction;
 use App\Models\Notification;
+use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 class MessageController extends Controller
 {
@@ -42,8 +40,7 @@ class MessageController extends Controller
                 $q->where('sender_id', $user->id)
                     ->orWhere('receiver_id', $user->id);
             })
-            ->whereNull('deleted_for_sender_at')
-            ->whereNull('deleted_for_receiver_at')
+            ->visibleTo($user->id)
             ->groupBy('other_user_id')
             ->orderBy('last_message_at', 'desc')
             ->get();
@@ -52,7 +49,9 @@ class MessageController extends Controller
         $conversations = $conversations->map(function ($conversation) use ($user) {
             $otherUser = User::with('profile')->find($conversation->other_user_id);
 
-            if (!$otherUser) return null;
+            if (! $otherUser) {
+                return null;
+            }
 
             $lastMessage = Message::where(function ($query) use ($otherUser, $user) {
                 $query->where('sender_id', $user->id)
@@ -61,8 +60,7 @@ class MessageController extends Controller
                 $query->where('sender_id', $otherUser->id)
                     ->where('receiver_id', $user->id);
             })
-                ->whereNull('deleted_for_sender_at')
-                ->whereNull('deleted_for_receiver_at')
+                ->visibleTo($user->id)
                 ->latest()
                 ->first();
 
@@ -110,9 +108,9 @@ class MessageController extends Controller
         // Filter by status if requested
         $filter = $request->get('filter', 'all');
         if ($filter === 'unread') {
-            $conversations = $conversations->filter(fn($c) => $c['unread_count'] > 0);
+            $conversations = $conversations->filter(fn ($c) => $c['unread_count'] > 0);
         } elseif ($filter === 'code') {
-            $conversations = $conversations->filter(fn($c) => $c['code_snippet_count'] > 0);
+            $conversations = $conversations->filter(fn ($c) => $c['code_snippet_count'] > 0);
         }
 
         return view('messages.index', compact('conversations', 'starredMessages', 'codeSnippets', 'filter'));
@@ -146,8 +144,7 @@ class MessageController extends Controller
             $query->where('sender_id', $user->id)
                 ->where('receiver_id', $currentUser->id);
         })
-            ->whereNull('deleted_for_sender_at')
-            ->whereNull('deleted_for_receiver_at')
+            ->visibleTo($currentUser->id)
             ->with(['sender.profile', 'receiver.profile', 'replyTo', 'reactions.user.profile'])
             ->orderBy('created_at', 'asc')
             ->get();
@@ -181,8 +178,7 @@ class MessageController extends Controller
                 $q->where('sender_id', $user->id)
                     ->orWhere('receiver_id', $user->id);
             })
-            ->whereNull('deleted_for_sender_at')
-            ->whereNull('deleted_for_receiver_at')
+            ->visibleTo($user->id)
             ->groupBy('other_user_id')
             ->orderBy('last_message_at', 'desc')
             ->get();
@@ -190,7 +186,9 @@ class MessageController extends Controller
         return $conversations->map(function ($conversation) use ($user) {
             $otherUser = User::with('profile')->find($conversation->other_user_id);
 
-            if (!$otherUser) return null;
+            if (! $otherUser) {
+                return null;
+            }
 
             $lastMessage = Message::where(function ($query) use ($otherUser, $user) {
                 $query->where('sender_id', $user->id)
@@ -199,6 +197,7 @@ class MessageController extends Controller
                 $query->where('sender_id', $otherUser->id)
                     ->where('receiver_id', $user->id);
             })
+                ->visibleTo($user->id)
                 ->latest()
                 ->first();
 
@@ -235,6 +234,7 @@ class MessageController extends Controller
             if ($request->ajax()) {
                 return response()->json(['errors' => $validator->errors()], 422);
             }
+
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
@@ -257,7 +257,7 @@ class MessageController extends Controller
             case 'file':
                 if ($request->hasFile('file')) {
                     $file = $request->file('file');
-                    $path = $file->store('messages/' . date('Y/m'), 'public');
+                    $path = $file->store('messages/'.date('Y/m'), 'public');
                     $messageData['file_path'] = $path;
                     $messageData['file_name'] = $file->getClientOriginalName();
                     $messageData['file_size'] = $file->getSize();
@@ -283,7 +283,7 @@ class MessageController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => view('messages.partials.message', ['message' => $message])->render(),
-                'message_id' => $message->id
+                'message_id' => $message->id,
             ]);
         }
 
@@ -296,11 +296,11 @@ class MessageController extends Controller
     public function addReaction(Request $request, Message $message)
     {
         $request->validate([
-            'reaction' => 'required|string|in:👍,❤️,🎉,🚀,👨‍💻,🔥,⭐,🤔,💡,✅'
+            'reaction' => 'required|string|in:👍,❤️,🎉,🚀,👨‍💻,🔥,⭐,🤔,💡,✅',
         ]);
 
         // Check if user has permission (must be participant)
-        if (!in_array(Auth::id(), [$message->sender_id, $message->receiver_id])) {
+        if (! in_array(Auth::id(), [$message->sender_id, $message->receiver_id])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -310,7 +310,7 @@ class MessageController extends Controller
             return response()->json([
                 'success' => true,
                 'reaction' => $reaction,
-                'summary' => $message->fresh()->reaction_summary
+                'summary' => $message->fresh()->reaction_summary,
             ]);
         }
 
@@ -323,7 +323,7 @@ class MessageController extends Controller
     public function removeReaction(Request $request, Message $message)
     {
         $request->validate([
-            'reaction' => 'required|string'
+            'reaction' => 'required|string',
         ]);
 
         $message->removeReaction(Auth::id(), $request->reaction);
@@ -331,7 +331,7 @@ class MessageController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'summary' => $message->fresh()->reaction_summary
+                'summary' => $message->fresh()->reaction_summary,
             ]);
         }
 
@@ -343,7 +343,7 @@ class MessageController extends Controller
      */
     public function toggleStar(Message $message)
     {
-        if (!in_array(Auth::id(), [$message->sender_id, $message->receiver_id])) {
+        if (! in_array(Auth::id(), [$message->sender_id, $message->receiver_id])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -353,7 +353,7 @@ class MessageController extends Controller
             'success' => true,
             'starred' => Auth::id() === $message->sender_id
                 ? $message->is_starred_by_sender
-                : $message->is_starred_by_receiver
+                : $message->is_starred_by_receiver,
         ]);
     }
 
@@ -362,7 +362,7 @@ class MessageController extends Controller
      */
     public function destroy(Message $message)
     {
-        if (!in_array(Auth::id(), [$message->sender_id, $message->receiver_id])) {
+        if (! in_array(Auth::id(), [$message->sender_id, $message->receiver_id])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -383,7 +383,7 @@ class MessageController extends Controller
 
         return response()->json([
             'success' => true,
-            'count' => $updated
+            'count' => $updated,
         ]);
     }
 
@@ -406,7 +406,7 @@ class MessageController extends Controller
     public function search(Request $request)
     {
         $request->validate([
-            'query' => 'required|string|min:2'
+            'query' => 'required|string|min:2',
         ]);
 
         $user = Auth::user();
@@ -418,12 +418,11 @@ class MessageController extends Controller
             ->where(function ($q) use ($request) {
                 $query = $request->query('query');
 
-                $q->where('content', 'LIKE', '%' . $query . '%')
-                    ->orWhere('code_snippet', 'LIKE', '%' . $query . '%')
-                    ->orWhere('file_name', 'LIKE', '%' . $query . '%');
+                $q->where('content', 'LIKE', '%'.$query.'%')
+                    ->orWhere('code_snippet', 'LIKE', '%'.$query.'%')
+                    ->orWhere('file_name', 'LIKE', '%'.$query.'%');
             })
-            ->whereNull('deleted_for_sender_at')
-            ->whereNull('deleted_for_receiver_at')
+            ->visibleTo($user->id)
             ->with(['sender.profile', 'receiver.profile'])
             ->orderBy('created_at', 'desc')
             ->paginate(20);
@@ -440,20 +439,22 @@ class MessageController extends Controller
                 $q->where('sender_id', $user->id)
                     ->orWhere('receiver_id', $user->id);
             })
-            ->whereNull('deleted_for_sender_at')
-            ->whereNull('deleted_for_receiver_at')
+            ->visibleTo($user->id)
             ->groupBy('other_user_id')
             ->orderBy('last_message_at', 'desc')
             ->limit(5)
             ->get()
             ->map(function ($conversation) use ($user) {
                 $otherUser = User::with('profile')->find($conversation->other_user_id);
-                if (!$otherUser) return null;
+                if (! $otherUser) {
+                    return null;
+                }
 
                 $lastMessage = Message::where(function ($query) use ($otherUser, $user) {
                     $query->where('sender_id', $user->id)->where('receiver_id', $otherUser->id)
                         ->orWhere('sender_id', $otherUser->id)->where('receiver_id', $user->id);
                 })
+                    ->visibleTo($user->id)
                     ->latest()
                     ->first();
 
@@ -463,7 +464,7 @@ class MessageController extends Controller
                     'unread_count' => Message::where('sender_id', $otherUser->id)
                         ->where('receiver_id', $user->id)
                         ->whereNull('read_at')
-                        ->count()
+                        ->count(),
                 ];
             })
             ->filter();
