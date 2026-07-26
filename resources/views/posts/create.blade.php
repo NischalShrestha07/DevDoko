@@ -987,8 +987,8 @@
         if (type === 'code' && codeTextarea) {
             html = '<pre><code class="language-' + (document.getElementById('code_language')?.value || 'plaintext') + '">'
                 + escapeHtml(codeTextarea.value) + '</code></pre>';
-        } else if (type === 'image' && imagePreview && imagePreview.src) {
-            html = '<img src="' + imagePreview.src + '" class="img-fluid rounded mb-3" alt="Preview">'
+        } else if (type === 'image' && imagePreview?.querySelector('img')?.src) {
+            html = '<img src="' + imagePreview.querySelector('img').src + '" class="img-fluid rounded mb-3" alt="Preview">'
                 + (contentTextarea?.value ? '<hr>' + marked.parse(contentTextarea.value) : '');
         } else if (type === 'link') {
             html = '<div class="card p-3 mb-3">'
@@ -1071,8 +1071,7 @@
                 if (draft.tags?.length) {
                     draft.tags.forEach(t => addTag(t));
                 }
-                updateCharCounts();
-                updateReadingTime();
+                contentTextarea?.dispatchEvent(new Event('input'));
             }, 100);
 
             if (window.DevDoko?.toast) {
@@ -1129,7 +1128,7 @@
                             const textBefore = contentTextarea.value.substring(0, cursorPos);
                             const textAfter = contentTextarea.value.substring(cursorPos);
                             contentTextarea.value = textBefore + '\n![image](' + data.url + ')\n' + textAfter;
-                            updateCharCounts();
+                            contentTextarea.dispatchEvent(new Event('input'));
                         }
                     } catch (e) {}
                     return;

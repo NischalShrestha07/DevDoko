@@ -372,7 +372,7 @@ document.getElementById('commentForm')?.addEventListener('submit', async functio
         const data = await response.json();
 
         if (response.ok) {
-            const container = document.querySelector('.comments-list');
+            const container = document.querySelector('.comments-scroll');
             const emptyMsg = container?.querySelector('.text-center.py-5');
             if (emptyMsg) emptyMsg.remove();
 

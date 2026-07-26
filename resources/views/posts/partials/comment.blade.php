@@ -29,7 +29,7 @@
                         </div>
 
                         <!-- Comment Actions Dropdown -->
-                        @if(auth()->check() && (auth()->id() === $comment->user_id || auth()->user()->is_admin))
+                        @if(auth()->check() && (auth()->id() === $comment->user_id || auth()->user()->isAdmin()))
                         <div class="dropdown">
                             <button class="btn btn-link text-dark p-0" type="button" data-bs-toggle="dropdown"
                                 style="font-size: 12px;">

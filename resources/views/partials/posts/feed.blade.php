@@ -19,7 +19,7 @@
             </div>
 
             @auth
-            @if(auth()->id() == $post->user_id || auth()->user()->is_admin)
+            @if(auth()->id() == $post->user_id || auth()->user()->isAdmin())
             <div class="dropdown">
                 <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
                     <i class="bi bi-three-dots"></i>
