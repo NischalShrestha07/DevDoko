@@ -37,26 +37,40 @@
             {{-- Results --}}
             @if(!empty($query))
 
-            {{-- Result Count --}}
-            <div class="mb-3 text-muted">
-                @if(isset($users) && method_exists($users, 'total'))
-                Found <strong>{{ $users->total() }}</strong> developers for
-                "<strong>{{ $query }}</strong>"
-                @endif
-            </div>
+            @php
+                $hasUsers = isset($users) && method_exists($users, 'count') && $users->count() > 0;
+                $hasPosts = isset($posts) && method_exists($posts, 'count') && $posts->count() > 0;
+            @endphp
 
-            {{-- Developers List --}}
-            @if(isset($users) && $users->count() > 0)
+            @if($hasUsers)
+            <h6 class="text-muted mb-3">
+                Developers ({{ $users->total() }})
+            </h6>
 
             @foreach($users as $user)
             @include('search.partials.user-card', ['user' => $user])
             @endforeach
 
-            <div class="mt-4">
+            <div class="mt-4 mb-4">
                 {{ $users->appends(request()->query())->links() }}
             </div>
+            @endif
 
-            @else
+            @if($hasPosts)
+            <h6 class="text-muted mb-3">
+                Posts ({{ $posts->total() }})
+            </h6>
+
+            @foreach($posts as $post)
+            @include('posts.partials.card', ['post' => $post, 'fullView' => false])
+            @endforeach
+
+            <div class="mt-4">
+                {{ $posts->appends(request()->query())->links() }}
+            </div>
+            @endif
+
+            @if(!$hasUsers && !$hasPosts)
             <div class="text-center py-5">
                 <i class="bi bi-search display-5 text-muted mb-3"></i>
                 <h5 class="text-muted">No results found</h5>

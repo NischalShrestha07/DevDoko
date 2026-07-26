@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Post;
-use App\Models\Tag;
-use App\Models\Group;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 
 class SearchController extends Controller
 {
@@ -26,7 +23,7 @@ class SearchController extends Controller
         $users = collect();
         $posts = collect();
 
-        if (!$query) {
+        if (! $query) {
             return view('search.index', compact(
                 'users',
                 'posts',
@@ -47,7 +44,10 @@ class SearchController extends Controller
 
         //  Posts Search
         if ($type === 'all' || $type === 'posts') {
-            $posts = Post::where('title', 'LIKE', "%{$query}%")
+            $posts = Post::where(function ($q) use ($query) {
+                $q->where('title', 'LIKE', "%{$query}%")
+                    ->orWhere('content', 'LIKE', "%{$query}%");
+            })
                 ->where(function ($q) {
                     $q->where('visibility', 'public')
                         ->orWhere('user_id', Auth::id());
