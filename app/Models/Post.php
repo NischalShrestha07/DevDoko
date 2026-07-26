@@ -4,13 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class Post extends Model
 {
@@ -46,7 +45,7 @@ class Post extends Model
         'likes_count' => 'integer',
         'comments_count' => 'integer',
         'shares_count' => 'integer',
-        'reading_time' => 'integer'
+        'reading_time' => 'integer',
     ];
 
     protected $appends = [
@@ -55,7 +54,7 @@ class Post extends Model
         'image_url',
         'formatted_reading_time',
         'type_icon',
-        'type_label'
+        'type_label',
     ];
 
     // Relationship with user
@@ -111,24 +110,26 @@ class Post extends Model
     // Check if post is liked by current user
     public function getIsLikedAttribute(): bool
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return false;
         }
         if ($this->relationLoaded('likes')) {
             return $this->likes->contains('user_id', Auth::id());
         }
+
         return $this->likes()->where('user_id', Auth::id())->exists();
     }
 
     // Check if post is saved by current user
     public function getIsSavedAttribute(): bool
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return false;
         }
         if ($this->relationLoaded('saves')) {
             return $this->saves->contains('user_id', Auth::id());
         }
+
         return $this->saves()->where('user_id', Auth::id())->exists();
     }
 
@@ -136,7 +137,8 @@ class Post extends Model
     public function getExcerptAttribute(): string
     {
         $content = strip_tags($this->content ?? '');
-        return strlen($content) > 150 ? substr($content, 0, 150) . '...' : $content;
+
+        return strlen($content) > 150 ? substr($content, 0, 150).'...' : $content;
     }
 
     // Get human readable time
@@ -151,6 +153,7 @@ class Post extends Model
         if ($this->image_path) {
             return Storage::url($this->image_path);
         }
+
         return null;
     }
 
@@ -158,7 +161,8 @@ class Post extends Model
     public function getFormattedReadingTimeAttribute(): string
     {
         $minutes = $this->reading_time ?? 1;
-        return $minutes . ' min read';
+
+        return $minutes.' min read';
     }
 
     // Get post URL
@@ -171,6 +175,7 @@ class Post extends Model
     public function calculateReadingTime(): int
     {
         $wordCount = str_word_count(strip_tags($this->content ?? ''));
+
         return max(1, ceil($wordCount / 200)); // 200 words per minute
     }
 
@@ -183,7 +188,7 @@ class Post extends Model
     // Scope for visible posts (public + followers)
     public function scopeVisibleTo($query, $user)
     {
-        if (!$user) {
+        if (! $user) {
             return $query->public();
         }
 
@@ -233,7 +238,7 @@ class Post extends Model
             return true;
         }
 
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -246,18 +251,6 @@ class Post extends Model
         }
 
         return false;
-    }
-
-    // Check if user can edit post
-    public function canEdit(User $user): bool
-    {
-        return $user->id === $this->user_id || $user->is_admin;
-    }
-
-    // Check if user can delete post
-    public function canDelete(User $user): bool
-    {
-        return $user->id === $this->user_id || $user->is_admin;
     }
 
     // Get post type icon
@@ -310,6 +303,7 @@ class Post extends Model
         if ($this->video_path) {
             return Storage::url($this->video_path);
         }
+
         return null;
     }
 
@@ -342,6 +336,7 @@ class Post extends Model
             // Create a virtual post object from share details
             return (object) $this->share_details;
         }
+
         return null;
     }
 }

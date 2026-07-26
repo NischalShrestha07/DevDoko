@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Comment;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CommentPolicy
@@ -22,13 +22,13 @@ class CommentPolicy
 
     public function update(User $user, Comment $comment): bool
     {
-        return $user->id === $comment->user_id || $user->is_admin;
+        return $user->id === $comment->user_id || $user->isAdmin();
     }
 
     public function delete(User $user, Comment $comment): bool
     {
         return $user->id === $comment->user_id ||
             $user->id === $comment->post->user_id ||
-            $user->is_admin;
+            $user->isAdmin();
     }
 }

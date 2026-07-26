@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
-use App\Models\Notification;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
@@ -25,7 +25,7 @@ class PostController extends Controller
 
     public function index(Request $request)
     {
-        $query = Post::with(['user.profile', 'tags', 'likes', 'saves' => fn($q) => $q->where('user_id', Auth::id()), 'comments.user.profile'])
+        $query = Post::with(['user.profile', 'tags', 'likes', 'saves' => fn ($q) => $q->where('user_id', Auth::id()), 'comments.user.profile'])
             ->visibleTo(Auth::user())
             ->latest();
 
@@ -87,13 +87,13 @@ class PostController extends Controller
                 'type' => $request->type,
                 'has_video' => $request->hasFile('video'),
                 'video_size' => $request->file('video') ? $request->file('video')->getSize() : null,
-                'all_data' => $request->except(['_token', 'video'])
+                'all_data' => $request->except(['_token', 'video']),
             ]);
             $validator = Validator::make($request->all(), [
                 'title' => 'nullable|string|max:200',
-                'content' => 'nullable|string|max:2000000',
+                'content' => 'nullable|string|max:20000',
                 'type' => 'required|in:text,code,image,video,link,question,project,article,status,share',
-                'code_snippet' => 'nullable|string|max:20000000',
+                'code_snippet' => 'nullable|string|max:20000',
                 'code_language' => 'nullable|string|max:50',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,svg|max:20480',
                 'video' => 'nullable|mimes:mp4,avi,mov,wmv|max:51200',
@@ -102,16 +102,15 @@ class PostController extends Controller
                 'link_description' => 'nullable|string|max:500',
                 'link_image' => 'nullable|url|max:500',
                 'tags' => 'nullable|string',
-                'visibility' => 'required|in:public,followers,private'
+                'visibility' => 'required|in:public,followers,private',
             ]);
-
 
             if ($validator->fails()) {
                 Log::warning('Post validation failed', ['errors' => $validator->errors()->all()]);
 
                 // DEBUG: Check what we're returning
                 $response = back()->withErrors($validator)->withInput();
-                Log::debug('Returning response type: ' . get_class($response));
+                Log::debug('Returning response type: '.get_class($response));
 
                 return $response;
             }
@@ -120,8 +119,9 @@ class PostController extends Controller
             Log::info('Post validation passed', ['type' => $validated['type']]);
 
             // Validate content based on type
-            if (!$this->validatePostContent($request, $validated['type'])) {
+            if (! $this->validatePostContent($request, $validated['type'])) {
                 Log::warning('Post content validation failed');
+
                 return back()->withErrors(['content' => 'Please provide content for your post type.'])->withInput();
             }
 
@@ -144,7 +144,7 @@ class PostController extends Controller
                 'link_description' => $validated['link_description'] ?? null,
                 'link_image' => $validated['link_image'] ?? null,
                 'visibility' => $validated['visibility'],
-                'reading_time' => $this->calculateReadingTime($validated['content'] ?? '')
+                'reading_time' => $this->calculateReadingTime($validated['content'] ?? ''),
             ];
 
             Log::info('Creating post', $postData);
@@ -181,10 +181,10 @@ class PostController extends Controller
             return redirect()->route('posts.show', $post)
                 ->with('success', 'Post created successfully!');
         } catch (\Exception $e) {
-            Log::error('Post creation failed: ' . $e->getMessage(), [
+            Log::error('Post creation failed: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'user_id' => Auth::id(),
-                'request' => $request->except(['image', 'video'])
+                'request' => $request->except(['image', 'video']),
             ]);
 
             return back()->withErrors(['error' => 'Failed to create post. Please try again.'])->withInput();
@@ -194,7 +194,7 @@ class PostController extends Controller
     public function show(Post $post)
     {
         // Check if user can view this post
-        if (!$post->canView(Auth::user())) {
+        if (! $post->canView(Auth::user())) {
             abort(403, 'You do not have permission to view this post.');
         }
 
@@ -209,9 +209,9 @@ class PostController extends Controller
                     ->take(10);
             },
             'likes.user.profile',
-            'saves' => fn($q) => $q->where('user_id', Auth::id()),
+            'saves' => fn ($q) => $q->where('user_id', Auth::id()),
             'tags',
-            'media'
+            'media',
         ]);
 
         $post->incrementViews();
@@ -256,7 +256,7 @@ class PostController extends Controller
             'tags' => 'nullable|string', // Changed from array to string
             'remove_image' => 'boolean',
             'remove_video' => 'boolean',
-            'visibility' => 'required|in:public,followers,private'
+            'visibility' => 'required|in:public,followers,private',
         ]);
 
         if ($validator->fails()) {
@@ -309,7 +309,7 @@ class PostController extends Controller
             $tagNames = array_filter(array_map('trim', explode(',', $request->tags)));
 
             foreach ($tagNames as $tagName) {
-                if (!empty($tagName)) {
+                if (! empty($tagName)) {
                     // Check if it's an ID or name
                     if (is_numeric($tagName)) {
                         $tagIds[] = $tagName;
@@ -386,6 +386,11 @@ class PostController extends Controller
 
     public function report(Request $request, Post $post)
     {
+        Log::warning('Post reported', [
+            'post_id' => $post->id,
+            'user_id' => Auth::id(),
+        ]);
+
         return back()->with('success', 'Post reported successfully.');
     }
 
@@ -414,7 +419,7 @@ class PostController extends Controller
     {
         $this->authorize('update', $post);
 
-        $post->update(['is_pinned' => !$post->is_pinned]);
+        $post->update(['is_pinned' => ! $post->is_pinned]);
 
         return back()->with('success', $post->is_pinned ? 'Post pinned!' : 'Post unpinned!');
     }
@@ -422,13 +427,14 @@ class PostController extends Controller
     public function share(Request $request, Post $post)
     {
         $validator = Validator::make($request->all(), [
-            'content' => 'nullable|string|max:1000'
+            'content' => 'nullable|string|max:1000',
         ]);
 
         if ($validator->fails()) {
             if ($request->expectsJson()) {
                 return response()->json(['errors' => $validator->errors()], 422);
             }
+
             return back()->withErrors($validator);
         }
 
@@ -449,7 +455,7 @@ class PostController extends Controller
             'link_description' => $post->excerpt,
             'link_image' => $originalImageUrl,
             'visibility' => 'public',
-            'shared_post_id' => $post->id
+            'shared_post_id' => $post->id,
         ];
 
         // Store original post details for better display
@@ -469,7 +475,7 @@ class PostController extends Controller
             'original_video_path' => $post->video_path, // Store path, not URL
             'original_video_url' => $originalVideoUrl, // Also store URL for direct access
             'original_created_at' => $post->created_at->toISOString(),
-            'tags' => $post->tags->pluck('name')->toArray()
+            'tags' => $post->tags->pluck('name')->toArray(),
         ], JSON_UNESCAPED_SLASHES);
 
         // Create shared post
@@ -487,7 +493,7 @@ class PostController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Post shared successfully!',
-                'post_url' => route('posts.show', $sharedPost)
+                'post_url' => route('posts.show', $sharedPost),
             ]);
         }
 
@@ -499,11 +505,11 @@ class PostController extends Controller
     private function validatePostContent(Request $request, string $type): bool
     {
         return match ($type) {
-            'text', 'article', 'question', 'project', 'status' => !empty($request->content),
-            'code' => !empty($request->code_snippet),
-            'image' => $request->hasFile('image') || !empty($request->content),
-            'video' => $request->hasFile('video') || !empty($request->content),
-            'link' => !empty($request->link_url),
+            'text', 'article', 'question', 'project', 'status' => ! empty($request->content),
+            'code' => ! empty($request->code_snippet),
+            'image' => $request->hasFile('image') || ! empty($request->content),
+            'video' => $request->hasFile('video') || ! empty($request->content),
+            'link' => ! empty($request->link_url),
             default => false
         };
     }
@@ -514,12 +520,15 @@ class PostController extends Controller
             try {
                 $path = $request->file('image')->store('posts/images', 'public');
                 Log::info('Image uploaded successfully', ['path' => $path]);
+
                 return $path;
             } catch (\Exception $e) {
                 Log::error('Image upload failed', ['error' => $e->getMessage()]);
+
                 return null;
             }
         }
+
         return null;
     }
 
@@ -529,12 +538,15 @@ class PostController extends Controller
             try {
                 $path = $request->file('video')->store('posts/videos', 'public');
                 Log::info('Video uploaded successfully', ['path' => $path]);
+
                 return $path;
             } catch (\Exception $e) {
                 Log::error('Video upload failed', ['error' => $e->getMessage()]);
+
                 return null;
             }
         }
+
         return null;
     }
 
@@ -545,17 +557,20 @@ class PostController extends Controller
                 $tagNames = array_filter(array_map('trim', explode(',', $request->tags)));
                 Log::info('Processing tags', ['tags' => $tagNames]);
 
+                $tagIds = [];
                 foreach ($tagNames as $tagName) {
-                    if (!empty($tagName) && strlen($tagName) <= 50) {
+                    if (! empty($tagName) && strlen($tagName) <= 50) {
                         $slug = Str::slug($tagName);
                         $tag = Tag::firstOrCreate(
                             ['slug' => $slug],
                             ['name' => $tagName, 'slug' => $slug]
                         );
-                        Log::info('Attaching tag', ['tag_id' => $tag->id, 'tag_name' => $tag->name]);
-                        $post->tags()->attach($tag->id);
+                        $tagIds[] = $tag->id;
                     }
                 }
+
+                Log::info('Attaching tags', ['tag_ids' => $tagIds]);
+                $post->tags()->sync($tagIds);
             }
         } catch (\Exception $e) {
             Log::error('Tag handling failed', ['error' => $e->getMessage(), 'post_id' => $post->id]);
@@ -565,16 +580,19 @@ class PostController extends Controller
 
     private function calculateReadingTime(?string $content): int
     {
-        if (empty($content)) return 1;
+        if (empty($content)) {
+            return 1;
+        }
 
         $wordCount = str_word_count(strip_tags($content));
+
         return max(1, ceil($wordCount / 200));
     }
 
     private function notifyFollowers(Post $post): void
     {
         try {
-            if (!in_array($post->visibility, ['public', 'followers'])) {
+            if (! in_array($post->visibility, ['public', 'followers'])) {
                 return;
             }
 
@@ -588,7 +606,7 @@ class PostController extends Controller
                         'user_id' => $follower->id,
                         'from_user_id' => Auth::id(),
                         'type' => 'new_post',
-                        'message' => Auth::user()->name . ' created a new post',
+                        'message' => Auth::user()->name.' created a new post',
                         'data' => [
                             'post_id' => $post->id,
                             'post_title' => $post->title ?? 'New Post',
@@ -598,7 +616,7 @@ class PostController extends Controller
                 } catch (\Exception $e) {
                     Log::error('Failed to create notification for follower', [
                         'follower_id' => $follower->id,
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
                 }
             }

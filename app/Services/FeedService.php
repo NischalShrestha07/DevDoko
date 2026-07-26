@@ -2,9 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\Post;
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class FeedService
 {
@@ -27,13 +26,12 @@ class FeedService
                 $q->with('user.profile')->latest()->take(3);
             },
             'media',
-            'codeSnippet'
         ])
-            ->withCount(['likes', 'comments'])
-            ->where(function ($q) use ($followingIds, $user) {
+            ->withCount(['likes', 'comments', 'saves'])
+            ->where(function ($q) use ($followingIds) {
                 // Posts from followed users
                 $q->whereIn('user_id', $followingIds)
-                    ->where(function ($sq) use ($user) {
+                    ->where(function ($sq) {
                         $sq->where('visibility', 'public')
                             ->orWhere('visibility', 'followers');
                     });
@@ -57,6 +55,7 @@ class FeedService
         // Apply scoring algorithm
         $posts = $query->get()->map(function ($post) use ($user, $userInterests) {
             $post->feed_score = $this->calculatePostScore($post, $user, $userInterests);
+
             return $post;
         })
             ->sortByDesc('feed_score')
@@ -103,7 +102,7 @@ class FeedService
             40,
             ($post->likes_count * 0.5) +
                 ($post->comments_count * 1) +
-                ($post->saves_count ?? 0 * 0.3)
+                (($post->saves_count ?? 0) * 0.3)
         );
         $score += $engagementScore;
 

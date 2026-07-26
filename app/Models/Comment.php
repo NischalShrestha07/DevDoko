@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
 class Comment extends Model
@@ -19,7 +19,7 @@ class Comment extends Model
         'parent_id',
         'content',
         'likes_count',
-        'replies_count'
+        'replies_count',
     ];
 
     protected $appends = ['time_ago'];
@@ -57,12 +57,13 @@ class Comment extends Model
     // Check if comment is liked by current user
     public function getIsLikedAttribute(): bool
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return false;
         }
         if ($this->relationLoaded('likes')) {
             return $this->likes->contains('user_id', Auth::id());
         }
+
         return $this->likes()->where('user_id', Auth::id())->exists();
     }
 
@@ -94,17 +95,5 @@ class Comment extends Model
     public function decrementReplies(): void
     {
         $this->decrement('replies_count');
-    }
-
-    // Check if user can edit comment
-    public function canEdit(User $user): bool
-    {
-        return $user->id === $this->user_id || $user->is_admin;
-    }
-
-    // Check if user can delete comment
-    public function canDelete(User $user): bool
-    {
-        return $user->id === $this->user_id || $user->is_admin || $user->id === $this->post->user_id;
     }
 }
