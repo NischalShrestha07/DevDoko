@@ -31,6 +31,19 @@ class MarketplaceInterest extends Model
         'time_ago'
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($interest) {
+            $interest->listing->increment('interested_count');
+        });
+
+        static::deleted(function ($interest) {
+            $interest->listing->decrement('interested_count');
+        });
+    }
+
     public function listing()
     {
         return $this->belongsTo(MarketplaceListing::class, 'listing_id');

@@ -19,8 +19,8 @@
                 <div class="card-body p-3">
                     <!-- Main Image -->
                     <div class="main-image mb-3 text-center">
-                        @if($listing->primary_image)
-                        <img src="{{ Storage::url($listing->primary_image->image_path) }}" class="img-fluid rounded"
+                        @if($listing->primaryImage)
+                        <img src="{{ Storage::url($listing->primaryImage->image_path) }}" class="img-fluid rounded"
                             alt="{{ $listing->title }}" style="max-height: 500px; width: 100%; object-fit: contain;">
                         @elseif($listing->images->count() > 0)
                         <img src="{{ Storage::url($listing->images->first()->image_path) }}" class="img-fluid rounded"
@@ -81,7 +81,7 @@
                     @if($listing->user_id !== auth()->id())
                     <div class="d-grid gap-2 mb-4">
                         <button class="btn btn-primary btn-lg" id="expressInterestBtn"
-                            onclick="showInterestModal({{ $listing->id }}, '{{ $listing->slug }}', '{{ addslashes($listing->title) }}')">
+                            onclick="showInterestModal({{ $listing->id }}, '{{ $listing->slug }}', '{!! addslashes($listing->title) !!}')">
                             <i class="bi bi-chat-dots me-2"></i> Express Interest
                         </button>
                         <button class="btn btn-outline-primary save-listing-btn w-100"
@@ -93,10 +93,10 @@
                     </div>
                     @else
                     <div class="d-grid gap-2 mb-4">
-                        <a href="{{ route('marketplace.edit', $listing) }}" class="btn btn-outline-primary">
+                        <a href="{{ route('marketplace.edit', $listing->slug) }}" class="btn btn-outline-primary">
                             <i class="bi bi-pencil me-2"></i> Edit Listing
                         </a>
-                        <button class="btn btn-outline-danger" onclick="deleteListing({{ $listing->id }})">
+                        <button class="btn btn-outline-danger" onclick="deleteListing('{{ $listing->slug }}')">
                             <i class="bi bi-trash me-2"></i> Delete Listing
                         </button>
                     </div>
@@ -181,7 +181,7 @@
 </div>
 
 <!-- Interest Modal -->
-<div class="modal fade" id="interestModal" tabindex="-1" data-listing-id="">
+<div class="modal fade" id="interestModal" tabindex="-1" data-listing-slug="">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -199,7 +199,7 @@
                     <div class="mb-3">
                         <label class="form-label">Offer Price (optional)</label>
                         <div class="input-group">
-                            <span class="input-group-text">$</span>
+                            <span class="input-group-text">Rs</span>
                             <input type="number" class="form-control" name="offered_price" step="0.01" min="0">
                         </div>
                         <small class="text-muted">Leave blank to accept listed price</small>
@@ -213,91 +213,91 @@
         </div>
     </div>
 </div>
-@endsection
+
+<style>
+    .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1) !important;
+    }
+</style>
 
 <script>
-    // Global save listing functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        // Save/Unsave Listing
-        document.querySelectorAll('.save-listing-btn').forEach(btn => {
-            btn.addEventListener('click', async function(e) {
-                e.preventDefault();
-                e.stopPropagation();
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.save-listing-btn').forEach(function(btn) {
+        if (btn.dataset.bound) return;
+        btn.dataset.bound = '1';
 
-                const listingId = this.dataset.listingId;
-                const wasSaved = this.dataset.saved === 'true';
-                const icon = this.querySelector('i');
-                const textSpan = this.querySelector('.save-text');
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
 
-                try {
-                    const response = await fetch(`/marketplace/${listingId}/save`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        }
-                    });
+            const slug = this.dataset.listingSlug;
+            const icon = this.querySelector('i');
+            const textSpan = this.querySelector('.save-text');
 
-                    const data = await response.json();
-
-                    if (data.success) {
-                        if (data.saved) {
-                            // Saved
-                            this.classList.remove('btn-outline-primary');
-                            this.classList.add('btn-primary');
-                            icon.classList.remove('bi-bookmark');
-                            icon.classList.add('bi-bookmark-fill');
-                            textSpan.textContent = 'Saved';
-                            this.dataset.saved = 'true';
-                        } else {
-                            // Unsaved
-                            this.classList.remove('btn-primary');
-                            this.classList.add('btn-outline-primary');
-                            icon.classList.remove('bi-bookmark-fill');
-                            icon.classList.add('bi-bookmark');
-                            textSpan.textContent = 'Save Listing';
-                            this.dataset.saved = 'false';
-                        }
-
-                        // Show brief animation
-                        this.style.transform = 'scale(0.95)';
-                        setTimeout(() => {
-                            this.style.transform = 'scale(1)';
-                        }, 100);
+            try {
+                const response = await fetch('/marketplace/' + slug + '/save', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
                     }
-                } catch (error) {
-                    console.error('Error toggling save:', error);
-                    alert('Failed to save listing. Please try again.');
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    if (data.saved) {
+                        this.classList.remove('btn-outline-primary');
+                        this.classList.add('btn-primary');
+                        icon.classList.remove('bi-bookmark');
+                        icon.classList.add('bi-bookmark-fill');
+                        if (textSpan) textSpan.textContent = 'Saved';
+                        this.dataset.saved = 'true';
+                    } else {
+                        this.classList.remove('btn-primary');
+                        this.classList.add('btn-outline-primary');
+                        icon.classList.remove('bi-bookmark-fill');
+                        icon.classList.add('bi-bookmark');
+                        if (textSpan) textSpan.textContent = 'Save';
+                        this.dataset.saved = 'false';
+                    }
                 }
-            });
+            } catch (error) {
+                console.error('Error toggling save:', error);
+            }
         });
+    });
+});
+</script>
 
-        // Express Interest Modal
-        window.showInterestModal = function(listingId, listingTitle) {
-            // Store listing ID in modal dataset
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        window.showInterestModal = function(listingId, listingSlug, listingTitle) {
             const modal = document.getElementById('interestModal');
-            modal.dataset.listingId = listingId;
+            modal.dataset.listingSlug = listingSlug;
 
-            // Update modal title if needed
             const modalTitle = document.querySelector('#interestModal .modal-title');
             if (modalTitle) {
                 modalTitle.textContent = `Express Interest in "${listingTitle}"`;
             }
 
-            const bsModal = new bootstrap.Modal(document.getElementById('interestModal'));
+            const bsModal = new bootstrap.Modal(modal);
             bsModal.show();
         };
 
-        // Submit Interest Form
         const submitInterestBtn = document.getElementById('submitInterestBtn');
         if (submitInterestBtn) {
             submitInterestBtn.addEventListener('click', async function() {
                 const modal = document.getElementById('interestModal');
-                const listingId = modal.dataset.listingId;
+                const listingSlug = modal.dataset.listingSlug;
 
-                if (!listingId) {
-                    alert('Error: Listing ID not found');
+                if (!listingSlug) {
+                    alert('Error: Listing not found');
                     return;
                 }
 
@@ -305,7 +305,7 @@
                 const offeredPrice = document.querySelector('#interestModal input[name="offered_price"]').value;
 
                 try {
-                    const response = await fetch(`/marketplace/${listingId}/interest`, {
+                    const response = await fetch(`/marketplace/${listingSlug}/interest`, {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -321,15 +321,12 @@
                     const data = await response.json();
 
                     if (response.ok && data.success) {
-                        // Close modal
                         const bsModal = bootstrap.Modal.getInstance(modal);
                         bsModal.hide();
 
-                        // Clear form
                         document.querySelector('#interestModal textarea[name="message"]').value = '';
                         document.querySelector('#interestModal input[name="offered_price"]').value = '';
 
-                        // Show success message
                         alert('Interest expressed successfully! The seller will contact you soon.');
                     } else {
                         alert(data.error || data.message || 'Failed to express interest');
@@ -341,10 +338,9 @@
             });
         }
 
-        // Delete Listing
-        window.deleteListing = function(listingId) {
+        window.deleteListing = function(listingSlug) {
             if (confirm('Are you sure you want to delete this listing? This action cannot be undone.')) {
-                fetch(`/marketplace/${listingId}`, {
+                fetch(`/marketplace/${listingSlug}`, {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -361,3 +357,4 @@
         };
     });
 </script>
+@endsection

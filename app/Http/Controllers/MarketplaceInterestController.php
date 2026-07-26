@@ -110,10 +110,31 @@ class MarketplaceInterestController extends Controller
             abort(403);
         }
 
-        // You can implement a message system here
-        // For now, return the interest details
         return response()->json([
             'interest' => $interest->load(['user.profile']),
+        ]);
+    }
+
+    /**
+     * Cancel/withdraw an interest (buyer action)
+     */
+    public function destroy(MarketplaceInterest $interest)
+    {
+        if ($interest->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($interest->status !== 'pending') {
+            return response()->json([
+                'error' => 'Can only cancel pending interests'
+            ], 422);
+        }
+
+        $interest->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Interest cancelled successfully'
         ]);
     }
 }

@@ -38,4 +38,65 @@
     </div>
     @endif
 </div>
+
+<style>
+    .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1) !important;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.save-listing-btn').forEach(function(btn) {
+        if (btn.dataset.bound) return;
+        btn.dataset.bound = '1';
+
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const slug = this.dataset.listingSlug;
+            const icon = this.querySelector('i');
+            const textSpan = this.querySelector('.save-text');
+
+            try {
+                const response = await fetch('/marketplace/' + slug + '/save', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    if (data.saved) {
+                        this.classList.remove('btn-outline-primary');
+                        this.classList.add('btn-primary');
+                        icon.classList.remove('bi-bookmark');
+                        icon.classList.add('bi-bookmark-fill');
+                        if (textSpan) textSpan.textContent = 'Saved';
+                        this.dataset.saved = 'true';
+                    } else {
+                        this.classList.remove('btn-primary');
+                        this.classList.add('btn-outline-primary');
+                        icon.classList.remove('bi-bookmark-fill');
+                        icon.classList.add('bi-bookmark');
+                        if (textSpan) textSpan.textContent = 'Save';
+                        this.dataset.saved = 'false';
+                    }
+                }
+            } catch (error) {
+                console.error('Error toggling save:', error);
+            }
+        });
+    });
+});
+</script>
 @endsection

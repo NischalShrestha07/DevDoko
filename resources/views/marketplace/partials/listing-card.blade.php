@@ -55,14 +55,3 @@
     @endif
     @endauth
 </div>
-
-<style>
-    .hover-lift {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .hover-lift:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1) !important;
-    }
-</style>

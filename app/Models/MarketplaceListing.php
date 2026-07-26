@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class MarketplaceListing extends Model
 {
@@ -31,13 +32,8 @@ class MarketplaceListing extends Model
         'is_shippable',
         'is_local_pickup',
         'status',
-        'views_count',
         'interested_count',
         'expires_at',
-        'metadata',
-        'is_featured',
-        'is_boosted',
-        'boosted_until',
     ];
 
     protected $casts = [
@@ -55,9 +51,12 @@ class MarketplaceListing extends Model
     protected $appends = [
         'formatted_price',
         'time_ago',
-        'is_saved',
         'condition_label',
-        'thumbnail_url'
+    ];
+
+    protected $hidden = [
+        'specifications',
+        'metadata',
     ];
 
     protected static function boot()
@@ -65,9 +64,46 @@ class MarketplaceListing extends Model
         parent::boot();
 
         static::creating(function ($listing) {
-            $listing->slug = $listing->slug ?? Str::slug($listing->title);
+            if (empty($listing->slug)) {
+                $listing->slug = self::generateUniqueSlug($listing->title);
+            }
             $listing->expires_at = $listing->expires_at ?? now()->addDays(30);
         });
+
+        static::updating(function ($listing) {
+            if ($listing->isDirty('title') && !$listing->isDirty('slug')) {
+                $listing->slug = self::generateUniqueSlug($listing->title, $listing->id);
+            }
+        });
+
+        static::forceDeleted(function ($listing) {
+            foreach ($listing->images as $image) {
+                Storage::disk('public')->delete($image->image_path);
+            }
+        });
+    }
+
+    public static function generateUniqueSlug($title, $ignoreId = null)
+    {
+        $slug = Str::slug($title);
+        $originalSlug = $slug;
+        $counter = 1;
+
+        $query = self::withTrashed()->where('slug', $slug);
+        if ($ignoreId) {
+            $query->where('id', '!=', $ignoreId);
+        }
+
+        while ($query->exists()) {
+            $slug = $originalSlug . '-' . $counter;
+            $query = self::withTrashed()->where('slug', $slug);
+            if ($ignoreId) {
+                $query->where('id', '!=', $ignoreId);
+            }
+            $counter++;
+        }
+
+        return $slug;
     }
 
     // Relationships
@@ -114,7 +150,7 @@ class MarketplaceListing extends Model
     public function getIsSavedAttribute()
     {
         if (!Auth::check()) return false;
-        return $this->savedBy()->where('user_id', Auth::id())->exists();
+        return $this->savedBy->contains('id', Auth::id());
     }
 
     public function getConditionLabelAttribute()
@@ -129,12 +165,6 @@ class MarketplaceListing extends Model
         };
     }
 
-    public function getThumbnailUrlAttribute()
-    {
-        $image = $this->images()->first();
-        return $image ? asset('storage/' . $image->image_path) : null;
-    }
-
     // Scopes
     public function scopeActive($query)
     {
@@ -144,6 +174,8 @@ class MarketplaceListing extends Model
 
     public function scopeSearch($query, $term)
     {
+        $term = str_replace(['%', '_'], ['\\%', '\\_'], $term);
+
         return $query->where(function ($q) use ($term) {
             $q->where('title', 'LIKE', "%{$term}%")
                 ->orWhere('description', 'LIKE', "%{$term}%")

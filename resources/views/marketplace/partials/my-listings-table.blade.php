@@ -72,7 +72,7 @@
                             <i class="bi bi-pencil"></i>
                         </a>
                         <button type="button" class="btn btn-outline-danger" title="Delete"
-                            onclick="deleteListing({{ $listing->id }})">
+                            onclick="deleteListing('{{ $listing->slug }}')">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
@@ -84,9 +84,9 @@
 </div>
 
 <script>
-    function deleteListing(id) {
+    function deleteListing(slug) {
     if (confirm('Are you sure you want to delete this listing?')) {
-        fetch(`/marketplace/${id}`, {
+        fetch(`/marketplace/${slug}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,

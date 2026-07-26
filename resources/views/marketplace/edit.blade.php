@@ -60,11 +60,11 @@
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Price Type</label>
                                 <select name="price_type" id="priceType" class="form-select" required>
-                                    <option value="fixed" {{ $listing->price_type == 'fixed' ? 'selected' : '' }}>Fixed
+                                    <option value="fixed" {{ old('price_type', $listing->price_type) == 'fixed' ? 'selected' : '' }}>Fixed
                                         Price</option>
-                                    <option value="negotiable" {{ $listing->price_type == 'negotiable' ? 'selected' : ''
+                                    <option value="negotiable" {{ old('price_type', $listing->price_type) == 'negotiable' ? 'selected' : ''
                                         }}>Negotiable</option>
-                                    <option value="free" {{ $listing->price_type == 'free' ? 'selected' : '' }}>Free
+                                    <option value="free" {{ old('price_type', $listing->price_type) == 'free' ? 'selected' : '' }}>Free
                                     </option>
                                 </select>
                             </div>
@@ -90,8 +90,7 @@
                                     <select name="condition" class="form-select">
                                         <option value="">Select condition</option>
                                         @foreach($conditions as $value => $label)
-                                        <option value="{{ $value }}" {{ $listing->condition == $value ? 'selected' : ''
-                                            }}>
+                                        <option value="{{ $value }}" {{ old('condition', $listing->condition) == $value ? 'selected' : '' }}>
                                             {{ $label }}
                                         </option>
                                         @endforeach

@@ -7,7 +7,7 @@
     <!-- Back Button -->
     <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
         <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('home') }}"
-            class="text-decoration-none text-dark d-flex align-items-center gap-2">
+            class="text-decoration-none app-text-primary d-flex align-items-center gap-2">
             <i class="bi bi-arrow-left"></i>
             <span>Back</span>
         </a>
@@ -41,13 +41,12 @@
         <!-- Left Column - Post -->
         <div class="col-lg-8">
             <!-- Post Card -->
-            <div class="card border-0">
+            <div class="card border-0 mb-4">
                 @include('posts.partials.card', [
                 'post' => $post,
                 'fullView' => true,
                 'showActions' => true
                 ])
-
             </div>
 
             <!-- Author Card -->
@@ -64,7 +63,7 @@
                             <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
                                 <div>
                                     <a href="{{ route('profile.show', $post->user->profile?->username) }}"
-                                        class="text-decoration-none text-dark fw-semibold fs-5">
+                                        class="text-decoration-none app-text-primary fw-semibold fs-5">
                                         {{ $post->user->profile?->username }}
                                     </a>
                                     <div class="d-flex gap-3 mt-1">
@@ -95,7 +94,7 @@
         <div class="col-lg-4">
             <!-- Comments Section -->
             <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white border-0 py-3">
+                <div class="card-header border-0 py-3">
                     <div class="d-flex align-items-center justify-content-between">
                         <h5 class="fw-semibold mb-0">
                             <i class="bi bi-chat-text me-2"></i>
@@ -109,7 +108,7 @@
 
                 <!-- Comments List -->
                 <div class="card-body p-0">
-                    <div style="max-height: 500px; overflow-y: auto;">
+                    <div class="comments-scroll">
                         @forelse($post->comments as $comment)
                         <div class="p-3 border-bottom">
                             <div class="d-flex gap-2">
@@ -122,7 +121,7 @@
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div>
                                             <a href="{{ route('profile.show', $comment->user->profile?->username) }}"
-                                                class="text-decoration-none text-dark fw-semibold small">
+                                                class="text-decoration-none app-text-primary fw-semibold small">
                                                 {{ $comment->user->profile?->username }}
                                             </a>
                                             <span class="text-secondary small ms-2">
@@ -159,7 +158,7 @@
 
                 <!-- Add Comment Form -->
                 @auth
-                <div class="card-footer bg-white border-0 pt-0 pb-3 px-3">
+                <div class="card-footer border-0 pt-0 pb-3 px-3">
                     <form action="{{ route('comments.store', $post) }}" method="POST" id="commentForm">
                         @csrf
                         <div class="d-flex gap-2 align-items-start">
@@ -169,11 +168,10 @@
                             <div class="flex-grow-1">
                                 <div class="input-group">
                                     <input type="text" name="content"
-                                        class="form-control form-control-sm bg-light border-0"
-                                        placeholder="Write a comment..." id="commentInput" maxlength="500"
-                                        style="border-radius: 20px; padding: 10px 16px;">
-                                    <button type="submit" class="btn btn-primary btn-sm ms-2" id="commentSubmit"
-                                        disabled style="border-radius: 20px; padding: 8px 20px;">
+                                        class="form-control form-control-sm comment-input border-0"
+                                        placeholder="Write a comment..." id="commentInput" maxlength="500">
+                                    <button type="submit" class="btn btn-primary btn-sm ms-2 rounded-pill px-3" id="commentSubmit"
+                                        disabled>
                                         Post
                                     </button>
                                 </div>
@@ -183,9 +181,8 @@
                     </form>
                 </div>
                 @else
-                <div class="card-footer bg-white border-0 text-center py-3">
-                    <a href="{{ route('login') }}" class="btn btn-outline-primary btn-sm px-4"
-                        style="border-radius: 20px;">
+                <div class="card-footer border-0 text-center py-3">
+                    <a href="{{ route('login') }}" class="btn btn-outline-primary btn-sm px-4 rounded-pill">
                         Log in to comment
                     </a>
                 </div>
@@ -195,7 +192,7 @@
             <!-- Related Posts -->
             @if(!empty($relatedPosts) && $relatedPosts->count() > 0)
             <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white border-0 py-3">
+                <div class="card-header border-0 py-3">
                     <h5 class="fw-semibold mb-0">
                         <i class="bi bi-grid-3x3-gap-fill me-2"></i>
                         More from {{ $post->user->profile?->username }}
@@ -218,7 +215,7 @@
                                     </div>
                                     @else
                                     <div
-                                        class="w-100 h-100 d-flex align-items-center justify-content-center bg-light text-secondary">
+                                        class="w-100 h-100 d-flex align-items-center justify-content-center bg-body-secondary text-secondary">
                                         <i class="bi bi-file-text" style="font-size: 24px;"></i>
                                     </div>
                                     @endif
@@ -250,7 +247,7 @@
             <!-- Tags Section -->
             @if($post->tags->count() > 0)
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-0 py-3">
+                <div class="card-header border-0 py-3">
                     <h5 class="fw-semibold mb-0">
                         <i class="bi bi-tags me-2"></i>
                         Tags
@@ -260,7 +257,7 @@
                     <div class="d-flex flex-wrap gap-2">
                         @foreach($post->tags as $tag)
                         <a href="{{ route('tags.show', $tag->slug) }}"
-                            class="text-decoration-none px-3 py-2 bg-light rounded-pill text-dark small">
+                            class="text-decoration-none tag-badge">
                             #{{ $tag->name }}
                         </a>
                         @endforeach
@@ -285,7 +282,7 @@
             </div>
             <div class="modal-body pt-0">
                 <div class="input-group">
-                    <input type="text" class="form-control bg-light border-0" value="{{ url()->current() }}" readonly
+                    <input type="text" class="form-control comment-input border-0" value="{{ url()->current() }}" readonly
                         id="shareLink">
                     <button class="btn btn-primary" type="button" onclick="copyShareLink()">
                         <i class="bi bi-clipboard me-1"></i>
@@ -299,7 +296,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-    // Comment form validation
     const commentInput = document.getElementById('commentInput');
     const commentSubmit = document.getElementById('commentSubmit');
     const charCount = document.getElementById('charCount');
@@ -309,12 +305,12 @@
             const length = this.value.trim().length;
             charCount.textContent = `${length}/500`;
             commentSubmit.disabled = length === 0 || length > 500;
-            charCount.style.color = length > 450 ? '#dc3545' : '#6c757d';
+            charCount.classList.toggle('text-danger', length > 450);
+            charCount.classList.toggle('text-muted', length <= 450);
         });
     }
 });
 
-// Share functionality
 function sharePost() {
     const shareData = {
         title: document.title,
@@ -336,11 +332,9 @@ function copyShareLink() {
     shareLink.setSelectionRange(0, 99999);
 
     navigator.clipboard.writeText(shareLink.value).then(() => {
-        const toast = new bootstrap.Toast(document.createElement('div'));
-        toast.show();
-        alert('Link copied to clipboard!');
+        DevDoko.toast('Link copied!', 'success');
     }).catch(() => {
-        alert('Failed to copy link');
+        DevDoko.toast('Failed to copy', 'danger');
     });
 }
 
@@ -350,7 +344,6 @@ function confirmDelete(button) {
     }
 }
 
-// Handle comment form submission (AJAX)
 document.getElementById('commentForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     const input = document.getElementById('commentInput');
@@ -394,18 +387,17 @@ document.getElementById('commentForm')?.addEventListener('submit', async functio
                 countBadge.textContent = parseInt(countBadge.textContent) + 1;
             }
         } else if (data.errors) {
-            alert(Object.values(data.errors).flat().join('\n'));
+            DevDoko.toast(Object.values(data.errors).flat().join(', '), 'danger');
         }
     } catch (error) {
         console.error('Comment failed:', error);
-        alert('Failed to post comment. Please try again.');
+        DevDoko.toast('Failed to post comment', 'danger');
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Post';
     }
 });
 
-// Keyboard shortcuts
 document.addEventListener('keydown', function(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         const commentForm = document.getElementById('commentForm');

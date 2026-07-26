@@ -115,7 +115,7 @@
                             <div class="mb-3" id="priceField">
                                 <label class="form-label fw-semibold">Price <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+                                    <span class="input-group-text">Rs</span>
                                     <input type="number" name="price" id="price"
                                         class="form-control @error('price') is-invalid @enderror"
                                         value="{{ old('price') }}" step="0.01" min="0" placeholder="0.00">
@@ -228,7 +228,7 @@
                                 </div>
 
                                 <input type="file" name="images[]" id="imageInput" class="d-none" multiple
-                                    accept="image/jpeg,image/png,image/jpg,image/gif">
+                                    accept="image/jpeg,image/png,image/jpg,image/gif,image/webp">
                             </div>
                             @error('images')
                             <div class="text-danger small mt-1">{{ $message }}</div>

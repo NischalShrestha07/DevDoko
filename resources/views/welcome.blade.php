@@ -227,6 +227,7 @@
             overflow: hidden;
             box-shadow: 0 25px 50px rgba(0,0,0,0.3);
             transition: transform 0.4s ease;
+            padding: 16px;
         }
 
         .lp-hero-image-card:hover {
@@ -235,9 +236,11 @@
 
         .lp-hero-image-card img {
             width: 100%;
-            height: 350px;
-            object-fit: cover;
+            height: auto;
+            max-height: 400px;
+            object-fit: contain;
             display: block;
+            border-radius: 12px;
         }
 
         /* ===== SECTIONS ===== */
@@ -322,11 +325,12 @@
             border-radius: 14px;
             padding: 1.25rem;
             border: 1px solid var(--light-border);
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.2s;
         }
 
         .lp-feature-mini:hover {
             background: #eef2ff;
+            transform: translateY(-2px);
         }
 
         .lp-feature-mini h5 {
@@ -340,6 +344,64 @@
             font-size: 0.8rem;
             color: var(--light-muted);
             margin: 0;
+        }
+
+        /* ===== SOCIAL INTERACTION CARD ===== */
+        .lp-social-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.25rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            border: 1px solid var(--light-border);
+            height: 100%;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .lp-social-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+        }
+
+        .lp-social-action {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--light-border);
+        }
+
+        .lp-social-action:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .lp-social-action:first-child {
+            padding-top: 0;
+        }
+
+        .lp-social-action-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            flex-shrink: 0;
+        }
+
+        .lp-social-action h5 {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--light-text);
+            margin-bottom: 0.15rem;
+        }
+
+        .lp-social-action p {
+            font-size: 0.85rem;
+            color: var(--light-muted);
+            margin: 0;
+            line-height: 1.5;
         }
 
         /* ===== DARK BANNER ===== */
@@ -465,6 +527,34 @@
             margin: 0 auto 2.5rem;
         }
 
+        .lp-stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1.5rem;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+        }
+
+        .lp-stat-item {
+            text-align: center;
+        }
+
+        .lp-stat-num {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--brand), var(--brand-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .lp-stat-label {
+            font-size: 0.85rem;
+            color: var(--dark-muted);
+            margin-top: 0.25rem;
+        }
+
         /* ===== FOOTER ===== */
         .lp-footer {
             background: var(--dark-bg);
@@ -509,6 +599,7 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.08);
             border: 1px solid var(--light-border);
             transition: transform 0.3s;
+            padding: 16px;
         }
 
         .lp-img-card:hover {
@@ -517,9 +608,11 @@
 
         .lp-img-card img {
             width: 100%;
-            height: 350px;
-            object-fit: cover;
+            height: auto;
+            max-height: 450px;
+            object-fit: contain;
             display: block;
+            border-radius: 12px;
         }
 
         /* ===== RESPONSIVE ===== */
@@ -531,9 +624,10 @@
 
         @media (max-width: 767.98px) {
             .lp-hero-actions { flex-direction: column; }
-            .lp-hero-actions .btn { width: 100%; text-align: center; justify-content: center; }
-            .lp-hero-image-card img { height: 250px; }
-            .lp-img-card img { height: 250px; }
+            .lp-hero-actions a { width: 100%; text-align: center; justify-content: center; }
+            .lp-hero-image-card img { max-height: 280px; }
+            .lp-img-card img { max-height: 280px; }
+            .lp-stat-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
@@ -594,25 +688,31 @@
                     </h1>
 
                     <p class="lp-hero-desc">
-                        The first complete social platform built exclusively for developers.
-                        Share code, join tech groups, chat in real-time, collaborate on projects,
-                        and build your professional network.
+                        Stop juggling between GitHub, LinkedIn, and Discord. DevDoko brings
+                        code sharing, developer communities, real-time messaging, and career
+                        growth into one platform built the way you actually work.
                     </p>
 
                     <div class="lp-hero-actions">
                         <a href="{{ route('register') }}" class="lp-btn-primary lp-hero-btn-lg">
-                            <i class="bi bi-rocket-takeoff"></i> Register Free
+                            <i class="bi bi-rocket-takeoff"></i> Get Started Free
                         </a>
                         <a href="#features" class="lp-btn-outline lp-hero-btn-lg">
-                            <i class="bi bi-play-circle"></i> Explore Features
+                            <i class="bi bi-play-circle"></i> See How It Works
                         </a>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-4" style="color: var(--dark-muted); font-size: 0.85rem;">
+                        <span><i class="bi bi-check-circle-fill me-1" style="color: #10b981;"></i> Free forever</span>
+                        <span><i class="bi bi-check-circle-fill me-1" style="color: #10b981;"></i> No ads</span>
+                        <span><i class="bi bi-check-circle-fill me-1" style="color: #10b981;"></i> Open community</span>
                     </div>
                 </div>
 
                 <div class="col-lg-6" data-aos="fade-left" data-aos-duration="1000">
                     <div class="lp-hero-image-wrapper">
                         <div class="lp-hero-image-card">
-                            <img src="{{ asset('/assets/home.png') }}" alt="DevDoko Platform Preview">
+                            <img src="{{ asset('/assets/home.png') }}" alt="DevDoko Home Feed showing posts, code snippets, and developer interactions">
                         </div>
                     </div>
                 </div>
@@ -625,54 +725,56 @@
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-up">
                 <span class="lp-badge">Everything You Need</span>
-                <h2 class="lp-section-title">Complete Social Platform for Developers</h2>
+                <h2 class="lp-section-title">A Social Network That Speaks Your Language</h2>
                 <p class="lp-section-subtitle">
-                    From posting code to group chats, DevDoko has all the features you expect from a modern social
-                    platform, plus developer-specific tools you won't find anywhere else.
+                    DevDoko combines the social features you love with developer-first tools —
+                    so you can share code, discuss architecture, and grow your career without leaving the platform.
                 </p>
             </div>
 
-            <!-- Main Feature Cards -->
+            <!-- Post Management Card -->
             <div class="row g-4">
-                <!-- Post Management -->
                 <div class="col-lg-6" data-aos="fade-right">
                     <div class="lp-feature-card">
                         <div class="d-flex align-items-center mb-4">
                             <div class="lp-feature-icon" style="background: rgba(102,126,234,0.1); color: var(--brand);">
                                 <i class="bi bi-file-text-fill"></i>
                             </div>
-                            <h3 class="ms-3 mb-0">Post Management</h3>
+                            <div class="ms-3">
+                                <h3 class="mb-0">Rich Post Creation</h3>
+                                <p class="mt-1 mb-0">Express ideas in any format</p>
+                            </div>
                         </div>
                         <div class="row g-3">
                             <div class="col-sm-6">
                                 <div class="lp-feature-mini">
-                                    <h5><i class="bi bi-pencil-square me-2" style="color: var(--brand);"></i>Create Posts</h5>
-                                    <p>Share text, code, images, videos, links, and questions</p>
+                                    <h5><i class="bi bi-pencil-square me-2" style="color: var(--brand);"></i>Multi-Format Posts</h5>
+                                    <p>Write text, share code with syntax highlighting, upload images, embed videos, post links, ask questions, or publish articles</p>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="lp-feature-mini">
-                                    <h5><i class="bi bi-trash me-2" style="color: #ef4444;"></i>Delete & Edit</h5>
-                                    <p>Full control over your content</p>
+                                    <h5><i class="bi bi-code-slash me-2" style="color: #06b6d4;"></i>Code Snippets</h5>
+                                    <p>Share code with syntax highlighting for 50+ languages, copy-to-clipboard, and inline rendering in the feed</p>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="lp-feature-mini">
-                                    <h5><i class="bi bi-pin-angle-fill me-2" style="color: #f59e0b;"></i>Pin Posts</h5>
-                                    <p>Highlight important content</p>
+                                    <h5><i class="bi bi-pin-angle-fill me-2" style="color: #f59e0b;"></i>Pin & Organize</h5>
+                                    <p>Pin important posts to your profile, add tags for discoverability, and control who sees each post</p>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="lp-feature-mini">
-                                    <h5><i class="bi bi-send me-2" style="color: #10b981;"></i>Share & Repost</h5>
-                                    <p>Spread content to your network</p>
+                                    <h5><i class="bi bi-pencil me-2" style="color: #10b981;"></i>Full Edit Control</h5>
+                                    <p>Edit, delete, or repost any of your content. Your posts, your rules</p>
                                 </div>
                             </div>
                         </div>
                         <div class="mt-3 p-2 rounded-3" style="background: rgba(102,126,234,0.05);">
                             <small class="text-muted">
                                 <i class="bi bi-info-circle me-1" style="color: var(--brand);"></i>
-                                Post Types:
+                                Post types:
                                 <span class="badge bg-light text-dark ms-1">Text</span>
                                 <span class="badge bg-light text-dark">Code</span>
                                 <span class="badge bg-light text-dark">Images</span>
@@ -686,97 +788,134 @@
                     </div>
                 </div>
 
-                <!-- Social Interactions -->
+                <!-- Social Interactions Card — matches actual app behavior -->
                 <div class="col-lg-6" data-aos="fade-left">
-                    <div class="lp-feature-card">
+                    <div class="lp-social-card">
                         <div class="d-flex align-items-center mb-4">
-                            <div class="lp-feature-icon" style="background: rgba(245,158,11,0.1); color: #f59e0b;">
+                            <div class="lp-feature-icon" style="background: rgba(239,68,68,0.1); color: #ef4444;">
                                 <i class="bi bi-heart-fill"></i>
                             </div>
-                            <h3 class="ms-3 mb-0">Social Interactions</h3>
-                        </div>
-                        <div class="row g-3">
-                            @php
-                            $socialFeatures = [
-                                ['icon' => 'bi-heart-fill', 'color' => '#ef4444', 'name' => 'Likes', 'desc' => 'Show appreciation'],
-                                ['icon' => 'bi-chat-fill', 'color' => '#3b82f6', 'name' => 'Comments', 'desc' => 'Engage in discussions'],
-                                ['icon' => 'bi-bookmark-fill', 'color' => '#10b981', 'name' => 'Saves', 'desc' => 'Bookmark for later'],
-                                ['icon' => 'bi-share-fill', 'color' => '#8b5cf6', 'name' => 'Shares', 'desc' => 'Spread the word'],
-                                ['icon' => 'bi-flag-fill', 'color' => '#ef4444', 'name' => 'Report', 'desc' => 'Keep community safe'],
-                                ['icon' => 'bi-reply-fill', 'color' => '#06b6d4', 'name' => 'Replies', 'desc' => 'Threaded comments'],
-                            ];
-                            @endphp
-                            @foreach($socialFeatures as $feat)
-                            <div class="col-md-4">
-                                <div class="lp-feature-mini text-center">
-                                    <i class="bi {{ $feat['icon'] }}" style="font-size: 1.5rem; color: {{ $feat['color'] }};"></i>
-                                    <h5 class="mt-2">{{ $feat['name'] }}</h5>
-                                    <p>{{ $feat['desc'] }}</p>
-                                </div>
+                            <div class="ms-3">
+                                <h3 class="mb-0">Social Interactions</h3>
+                                <p class="mt-1 mb-0">Engage with the developer community</p>
                             </div>
-                            @endforeach
+                        </div>
+
+                        <div class="lp-social-action">
+                            <div class="lp-social-action-icon" style="background: rgba(239,68,68,0.1); color: #ef4444;">
+                                <i class="bi bi-heart-fill"></i>
+                            </div>
+                            <div>
+                                <h5>Like with Heart Animation</h5>
+                                <p>Tap to like with a satisfying animation. Unlike just as easily. See real-time like counts on every post.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-social-action">
+                            <div class="lp-social-action-icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;">
+                                <i class="bi bi-chat-fill"></i>
+                            </div>
+                            <div>
+                                <h5>Threaded Comments & Replies</h5>
+                                <p>Start discussions with inline comments. Reply to specific comments to build threaded conversations. Expand to view full threads.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-social-action">
+                            <div class="lp-social-action-icon" style="background: rgba(139,92,246,0.1); color: #8b5cf6;">
+                                <i class="bi bi-send-fill"></i>
+                            </div>
+                            <div>
+                                <h5>Share with a Message</h5>
+                                <p>Share posts to your feed with an optional commentary. Copy link or send directly to connections.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-social-action">
+                            <div class="lp-social-action-icon" style="background: rgba(16,185,129,0.1); color: #10b981;">
+                                <i class="bi bi-bookmark-fill"></i>
+                            </div>
+                            <div>
+                                <h5>Save & Organize</h5>
+                                <p>Bookmark posts to read later or build curated collections. Toggle save with one click — your reading list, always accessible.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-social-action">
+                            <div class="lp-social-action-icon" style="background: rgba(245,158,11,0.1); color: #f59e0b;">
+                                <i class="bi bi-flag-fill"></i>
+                            </div>
+                            <div>
+                                <h5>Report & Moderate</h5>
+                                <p>Help keep the community safe. Report posts with a reason and details. Admins review every report.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Groups & Communities -->
+            <!-- Groups & Chat Row -->
+            <div class="row g-4 mt-2">
                 <div class="col-lg-6" data-aos="fade-right">
                     <div class="lp-feature-card">
                         <div class="d-flex align-items-center mb-4">
                             <div class="lp-feature-icon" style="background: rgba(16,185,129,0.1); color: #10b981;">
                                 <i class="bi bi-people-fill"></i>
                             </div>
-                            <h3 class="ms-3 mb-0">Groups & Communities</h3>
+                            <div class="ms-3">
+                                <h3 class="mb-0">Groups & Communities</h3>
+                                <p class="mt-1 mb-0">Find your tribe</p>
+                            </div>
                         </div>
                         <ul class="list-unstyled mb-3" style="color: #475569;">
-                            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #10b981;"></i>Create groups by tech stack</li>
-                            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #10b981;"></i>Location-based communities</li>
-                            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #10b981;"></i>Project collaboration teams</li>
-                            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #10b981;"></i>Learning circles</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #10b981;"></i>Create groups by tech stack, location, or interest</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #10b981;"></i>Share posts, resources, and events within groups</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #10b981;"></i>Admin roles, member directories, and invitation system</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #10b981;"></i>Learning circles and project collaboration teams</li>
                         </ul>
                         <div>
                             <span class="badge me-1 mb-1" style="background: #10b981; color: white;">Group Posts</span>
                             <span class="badge me-1 mb-1 bg-light text-dark">Resources Library</span>
-                            <span class="badge me-1 mb-1 bg-light text-dark">Group Events</span>
+                            <span class="badge me-1 mb-1 bg-light text-dark">Events</span>
                             <span class="badge me-1 mb-1 bg-light text-dark">Member Directory</span>
                             <span class="badge me-1 mb-1 bg-light text-dark">Admin Roles</span>
-                            <span class="badge me-1 mb-1 bg-light text-dark">Invitations</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Chat & Messaging -->
                 <div class="col-lg-6" data-aos="fade-left">
                     <div class="lp-feature-card">
                         <div class="d-flex align-items-center mb-4">
                             <div class="lp-feature-icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;">
                                 <i class="bi bi-chat-dots-fill"></i>
                             </div>
-                            <h3 class="ms-3 mb-0">Real-time Chat & Messaging</h3>
+                            <div class="ms-3">
+                                <h3 class="mb-0">Real-time Messaging</h3>
+                                <p class="mt-1 mb-0">Talk directly, anytime</p>
+                            </div>
                         </div>
                         <ul class="list-unstyled" style="color: #475569;">
-                            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #3b82f6;"></i>One-on-one private messages</li>
-                            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #3b82f6;"></i>Group chats with up to 500 members</li>
-                            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #3b82f6;"></i>Code sharing in messages</li>
-                            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #3b82f6;"></i>File attachments</li>
-                            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #3b82f6;"></i>Read receipts</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #3b82f6;"></i>One-on-one private messages with any developer</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #3b82f6;"></i>Group chats with up to 500 members for team coordination</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #3b82f6;"></i>Share code snippets and file attachments directly in chat</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #3b82f6;"></i>Read receipts so you know when messages are seen</li>
                         </ul>
                     </div>
                 </div>
             </div>
 
-            <!-- Small Feature Cards -->
+            <!-- Follow, Notifications, Saves Row -->
             <div class="row g-4 mt-2">
                 <div class="col-lg-4" data-aos="fade-up">
                     <div class="lp-feature-card">
                         <i class="bi bi-person-plus-fill" style="font-size: 2rem; color: #8b5cf6; margin-bottom: 1rem;"></i>
                         <h4 style="font-weight: 700; color: var(--light-text);">Follow System</h4>
-                        <p style="color: var(--light-muted);">Build your network by following developers who inspire you.</p>
+                        <p style="color: var(--light-muted);">Build a feed that matters. Follow developers whose work inspires you and see their posts in your personalized timeline.</p>
                         <ul class="list-unstyled mt-3">
-                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #8b5cf6;"></i>Follow/unfollow developers</li>
-                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #8b5cf6;"></i>Followers & following lists</li>
-                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #8b5cf6;"></i>Suggested developers</li>
-                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #8b5cf6;"></i>Activity feed from followed users</li>
+                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #8b5cf6;"></i>Follow/unfollow with one tap</li>
+                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #8b5cf6;"></i>See follower and following counts on profiles</li>
+                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #8b5cf6;"></i>Discover suggested developers to follow</li>
+                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #8b5cf6;"></i>Personalized "Following" feed tab</li>
                         </ul>
                     </div>
                 </div>
@@ -784,14 +923,13 @@
                 <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
                     <div class="lp-feature-card">
                         <i class="bi bi-bell-fill" style="font-size: 2rem; color: #f59e0b; margin-bottom: 1rem;"></i>
-                        <h4 style="font-weight: 700; color: var(--light-text);">Smart Notifications</h4>
-                        <p style="color: var(--light-muted);">Stay updated with what matters most.</p>
+                        <h4 style="font-weight: 700; color: var(--light-text);">Live Notifications</h4>
+                        <p style="color: var(--light-muted);">Never miss what matters. Real-time alerts for every interaction on your posts and profile.</p>
                         <ul class="list-unstyled mt-3">
-                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #f59e0b;"></i>Like notifications</li>
-                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #f59e0b;"></i>Comment alerts</li>
-                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #f59e0b;"></i>Follow notifications</li>
-                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #f59e0b;"></i>Message notifications</li>
-                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #f59e0b;"></i>Group activity alerts</li>
+                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #f59e0b;"></i>Like and comment notifications</li>
+                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #f59e0b;"></i>New follower alerts</li>
+                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #f59e0b;"></i>Direct message notifications</li>
+                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #f59e0b;"></i>Group activity and mention alerts</li>
                         </ul>
                     </div>
                 </div>
@@ -799,13 +937,13 @@
                 <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
                     <div class="lp-feature-card">
                         <i class="bi bi-bookmark-star-fill" style="font-size: 2rem; color: #10b981; margin-bottom: 1rem;"></i>
-                        <h4 style="font-weight: 700; color: var(--light-text);">Collections & Saves</h4>
-                        <p style="color: var(--light-muted);">Organize content you love.</p>
+                        <h4 style="font-weight: 700; color: var(--light-text);">Saves & Collections</h4>
+                        <p style="color: var(--light-muted);">Build your personal knowledge base. Save posts, organize by topic, and revisit anytime.</p>
                         <ul class="list-unstyled mt-3">
-                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #10b981;"></i>Create custom collections</li>
-                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #10b981;"></i>Save posts for later</li>
-                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #10b981;"></i>Organize by topic/project</li>
-                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #10b981;"></i>Share collections</li>
+                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #10b981;"></i>One-click save on any post</li>
+                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #10b981;"></i>Toggle between saved/unsaved states</li>
+                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #10b981;"></i>View save counts on posts</li>
+                            <li class="mb-2"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #10b981;"></i>Access your saved posts anytime</li>
                         </ul>
                     </div>
                 </div>
@@ -817,24 +955,24 @@
                     <div class="lp-dark-banner">
                         <div class="row align-items-center gy-4">
                             <div class="col-lg-6">
-                                <h3>Developer-Specific Features</h3>
-                                <p class="mb-4">Tools you won't find on other social platforms</p>
+                                <h3>Built for How You Actually Code</h3>
+                                <p class="mb-4">Tools that other social platforms don't have — because they weren't built by developers</p>
                                 <div class="row g-3">
                                     <div class="col-sm-6">
                                         <div class="lp-dark-feature">
                                             <i class="bi bi-code-slash" style="color: var(--brand);"></i>
                                             <div>
-                                                <h5>Code Snippets</h5>
-                                                <p>Syntax highlighting for 50+ languages</p>
+                                                <h5>Syntax-Highlighted Snippets</h5>
+                                                <p>50+ languages with dark theme code blocks</p>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="lp-dark-feature">
-                                            <i class="bi bi-connection" style="color: var(--dark-muted);"></i>
+                                            <i class="bi bi-person-workspace" style="color: var(--dark-muted);"></i>
                                             <div>
-                                                <h5>Connections</h5>
-                                                <p>Grow your professional network</p>
+                                                <h5>Developer Profiles</h5>
+                                                <p>Showcase your tech stack, bio, and portfolio</p>
                                             </div>
                                         </div>
                                     </div>
@@ -842,17 +980,17 @@
                                         <div class="lp-dark-feature">
                                             <i class="bi bi-briefcase" style="color: #10b981;"></i>
                                             <div>
-                                                <h5>Portfolio Builder</h5>
-                                                <p>Showcase your best work</p>
+                                                <h5>Job Board</h5>
+                                                <p>Find roles posted by the community</p>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="lp-dark-feature">
-                                            <i class="bi bi-code-square" style="color: #f59e0b;"></i>
+                                            <i class="bi bi-diagram-3" style="color: #f59e0b;"></i>
                                             <div>
-                                                <h5>Code Reviews</h5>
-                                                <p>Get feedback from senior devs</p>
+                                                <h5>Project Showcase</h5>
+                                                <p>Display your work with links and screenshots</p>
                                             </div>
                                         </div>
                                     </div>
@@ -860,7 +998,7 @@
                             </div>
                             <div class="col-lg-6" data-aos="fade-left">
                                 <div class="lp-hero-image-card">
-                                    <img src="{{ asset('/assets/explore.png') }}" alt="Developer Feed UI" style="height: 400px;">
+                                    <img src="{{ asset('/assets/explore.png') }}" alt="DevDoko Explore page showing trending developers and posts">
                                 </div>
                             </div>
                         </div>
@@ -874,18 +1012,18 @@
     <section id="how-it-works" class="lp-section" style="background: white;">
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-up">
-                <h2 class="lp-section-title">Start Your Developer Journey</h2>
-                <p class="lp-section-subtitle">From signup to your first connection in less than 2 minutes</p>
+                <h2 class="lp-section-title">Up and Running in 2 Minutes</h2>
+                <p class="lp-section-subtitle">From sign-up to your first post — no friction, no paywalls</p>
             </div>
 
             <div class="row g-4">
                 <div class="col-md-4" data-aos="fade-right">
                     <div class="lp-step-card text-center">
                         <span class="lp-step-num" style="background: rgba(102,126,234,0.1); color: var(--brand); border-color: var(--brand);">1</span>
-                        <h4>Create Profile</h4>
-                        <p>Sign up in 30 seconds. Connect GitHub, add your tech stack, and customize your developer profile.</p>
+                        <h4>Create Your Profile</h4>
+                        <p>Sign up with your email, pick a username, and add your tech stack. Optionally link your GitHub to import repositories.</p>
                         <div class="lp-step-hint">
-                            <i class="bi bi-github me-2"></i> Sync your repositories
+                            <i class="bi bi-github me-2"></i> Optional GitHub integration
                         </div>
                     </div>
                 </div>
@@ -893,10 +1031,10 @@
                 <div class="col-md-4" data-aos="fade-up">
                     <div class="lp-step-card text-center">
                         <span class="lp-step-num" style="background: rgba(16,185,129,0.1); color: #10b981; border-color: #10b981;">2</span>
-                        <h4>Connect & Share</h4>
-                        <p>Post your first code snippet, join groups matching your interests, and follow inspiring developers.</p>
+                        <h4>Join & Connect</h4>
+                        <p>Follow developers you admire, join groups that match your stack — whether it's Laravel, React, Python, or anything else.</p>
                         <div class="lp-step-hint">
-                            <i class="bi bi-people-fill me-2" style="color: #10b981;"></i> Join Laravel, React, Python groups
+                            <i class="bi bi-people-fill me-2" style="color: #10b981;"></i> 50+ active tech communities
                         </div>
                     </div>
                 </div>
@@ -904,10 +1042,10 @@
                 <div class="col-md-4" data-aos="fade-left">
                     <div class="lp-step-card text-center">
                         <span class="lp-step-num" style="background: rgba(245,158,11,0.1); color: #f59e0b; border-color: #f59e0b;">3</span>
-                        <h4>Grow & Collaborate</h4>
-                        <p>Participate in discussions, get code reviews, collaborate on projects, and build your reputation.</p>
+                        <h4>Share & Grow</h4>
+                        <p>Post your first code snippet, answer questions, get feedback from seniors, and watch your developer reputation grow.</p>
                         <div class="lp-step-hint">
-                            <i class="bi bi-trophy-fill me-2" style="color: #f59e0b;"></i> Earn badges & grow your network
+                            <i class="bi bi-trophy-fill me-2" style="color: #f59e0b;"></i> Earn visibility through contributions
                         </div>
                     </div>
                 </div>
@@ -921,38 +1059,38 @@
             <div class="row align-items-center gy-5">
                 <div class="col-lg-6" data-aos="fade-right">
                     <span class="lp-badge">See It In Action</span>
-                    <h2 class="lp-section-title" style="text-align: left;">A Familiar Interface, Built for Developers</h2>
+                    <h2 class="lp-section-title" style="text-align: left;">Familiar Social Features, Developer-First Execution</h2>
                     <p style="color: var(--light-muted); font-size: 1.05rem; line-height: 1.8; margin-bottom: 2rem;">
-                        DevDoko combines the best of social media platforms like Facebook, Instagram, and LinkedIn,
-                        but adds developer-specific features you won't find anywhere else.
+                        DevDoko takes the best interaction patterns from the platforms you already use
+                        and reimagines them for how developers actually communicate and collaborate.
                     </p>
 
                     <div class="lp-compare-item">
                         <i class="bi bi-facebook" style="color: #1877f2;"></i>
                         <div>
-                            <h5>Like Facebook</h5>
-                            <p>News feed, groups, events, and social interactions</p>
+                            <h5>Like Facebook, But Better</h5>
+                            <p>News feed with "For You", "Following", "Popular", and "Latest" tabs. Groups with posts, events, and member directories.</p>
                         </div>
                     </div>
                     <div class="lp-compare-item">
                         <i class="bi bi-instagram" style="color: #e4405f;"></i>
                         <div>
-                            <h5>Like Instagram</h5>
-                            <p>Visual posts, stories, and creative showcases</p>
+                            <h5>Visual Sharing Like Instagram</h5>
+                            <p>Share images, screenshots, and project demos. Profile grids to showcase your visual work.</p>
                         </div>
                     </div>
                     <div class="lp-compare-item">
                         <i class="bi bi-linkedin" style="color: #0a66c2;"></i>
                         <div>
-                            <h5>Like LinkedIn</h5>
-                            <p>Professional networking, portfolio building</p>
+                            <h5>Professional Growth Like LinkedIn</h5>
+                            <p>Developer profiles with tech stacks, follower counts, verified badges, and a dedicated job board.</p>
                         </div>
                     </div>
                     <div class="lp-compare-item">
                         <i class="bi bi-github" style="color: #24292e;"></i>
                         <div>
-                            <h5>+ Developer Tools</h5>
-                            <p>Code snippets, reviews, GitHub sync</p>
+                            <h5>Code-First Like GitHub</h5>
+                            <p>Syntax-highlighted snippets with 50+ language support, copy-to-clipboard, and inline rendering in the feed.</p>
                         </div>
                     </div>
 
@@ -965,7 +1103,7 @@
 
                 <div class="col-lg-6" data-aos="fade-left">
                     <div class="lp-img-card">
-                        <img src="{{ asset('/assets/groups.png') }}" alt="Groups Interface Preview">
+                        <img src="{{ asset('/assets/groups.png') }}" alt="DevDoko Groups showing developer communities and discussions">
                     </div>
                 </div>
             </div>
@@ -975,8 +1113,28 @@
     <!-- CTA -->
     <section class="lp-cta">
         <div class="container text-center" data-aos="zoom-in">
-            <h2>Join Developers on DevDoko</h2>
-            <p>Stop coding alone. Join the community, share your knowledge, and accelerate your developer career.</p>
+            <h2>Join the Developer Community<br>That Gets You</h2>
+            <p>Whether you're shipping your first Hello World or leading a team of 50 — DevDoko is where developers come to connect, learn, and build together.</p>
+
+            <div class="lp-stat-grid">
+                <div class="lp-stat-item">
+                    <div class="lp-stat-num">9+</div>
+                    <div class="lp-stat-label">Post Types</div>
+                </div>
+                <div class="lp-stat-item">
+                    <div class="lp-stat-num">50+</div>
+                    <div class="lp-stat-label">Languages</div>
+                </div>
+                <div class="lp-stat-item">
+                    <div class="lp-stat-num">Real-time</div>
+                    <div class="lp-stat-label">Messaging</div>
+                </div>
+                <div class="lp-stat-item">
+                    <div class="lp-stat-num">100%</div>
+                    <div class="lp-stat-label">Free Forever</div>
+                </div>
+            </div>
+
             <div class="d-flex flex-wrap gap-3 justify-content-center">
                 <a href="{{ route('register') }}" class="lp-btn-primary lp-hero-btn-lg">
                     <i class="bi bi-rocket-takeoff"></i> Create Your Free Account
@@ -996,8 +1154,8 @@
                 <span>DevDoko</span>
             </div>
             <p class="lp-footer-desc">
-                The complete social platform for developers. Connect, share code, collaborate,
-                and grow your professional network all in one place.
+                The complete social platform for developers. Share code, join communities,
+                message in real-time, find jobs, and grow your career — all in one place.
             </p>
             <p class="lp-footer-copy">
                 <i class="bi bi-c-circle me-1"></i> {{ date('Y') }} DevDoko. All rights reserved. Made with <i class="bi bi-heart-fill" style="color: #ef4444;"></i> for developers worldwide.

@@ -18,7 +18,7 @@ class MarketplaceController extends Controller
      */
     public function index(Request $request)
     {
-        $query = MarketplaceListing::with(['user.profile', 'images'])
+        $query = MarketplaceListing::with(['user.profile', 'images', 'savedBy'])
             ->where('status', 'active')
             ->where('expires_at', '>', now());
 
@@ -46,7 +46,8 @@ class MarketplaceController extends Controller
 
         // Condition filter
         if ($request->filled('condition')) {
-            $query->where('condition', $request->condition);
+            $conditions = (array) $request->condition;
+            $query->whereIn('condition', $conditions);
         }
 
         // Sort
@@ -72,7 +73,7 @@ class MarketplaceController extends Controller
         $categories = MarketplaceListing::getUniqueCategories();
 
         // Get featured listings
-        $featuredListings = MarketplaceListing::with(['user.profile', 'images'])
+        $featuredListings = MarketplaceListing::with(['user.profile', 'images', 'savedBy'])
             ->where('status', 'active')
             ->where('expires_at', '>', now())
             ->where(function ($q) {
@@ -117,7 +118,7 @@ class MarketplaceController extends Controller
             'title' => 'required|string|max:200',
             'category' => 'required|string|max:100',
             'description' => 'required|string',
-            'price' => 'required_if:price_type,fixed,negotiable|nullable|numeric|min:0',
+            'price' => 'required_unless:price_type,free|nullable|numeric|min:0',
             'price_type' => 'required|in:fixed,negotiable,free',
             'condition' => 'nullable|in:new,like_new,good,fair,poor',
             'brand' => 'nullable|string|max:100',
@@ -126,7 +127,7 @@ class MarketplaceController extends Controller
             'is_shippable' => 'nullable|boolean',
             'is_local_pickup' => 'nullable|boolean',
             'images' => 'required|array|min:1|max:10',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
 
         if ($validator->fails()) {
@@ -168,7 +169,8 @@ class MarketplaceController extends Controller
     {
         $listing = MarketplaceListing::with([
             'user.profile',
-            'images'
+            'images',
+            'savedBy'
         ])
             ->where('slug', $slug)
             ->firstOrFail();
@@ -177,7 +179,7 @@ class MarketplaceController extends Controller
         $listing->incrementViews();
 
         // Get similar listings based on category
-        $similarListings = MarketplaceListing::with(['user.profile', 'images'])
+        $similarListings = MarketplaceListing::with(['user.profile', 'images', 'savedBy'])
             ->where('status', 'active')
             ->where('category', $listing->category)
             ->where('id', '!=', $listing->id)
@@ -187,7 +189,7 @@ class MarketplaceController extends Controller
             ->get();
 
         // Get seller's other listings
-        $sellerListings = MarketplaceListing::with('images')
+        $sellerListings = MarketplaceListing::with(['images', 'savedBy'])
             ->where('status', 'active')
             ->where('user_id', $listing->user_id)
             ->where('id', '!=', $listing->id)
@@ -238,7 +240,7 @@ class MarketplaceController extends Controller
             'title' => 'required|string|max:200',
             'category' => 'required|string|max:100',
             'description' => 'required|string',
-            'price' => 'required_if:price_type,fixed,negotiable|nullable|numeric|min:0',
+            'price' => 'required_unless:price_type,free|nullable|numeric|min:0',
             'price_type' => 'required|in:fixed,negotiable,free',
             'condition' => 'nullable|in:new,like_new,good,fair,poor',
             'brand' => 'nullable|string|max:100',
@@ -272,11 +274,6 @@ class MarketplaceController extends Controller
             abort(403);
         }
 
-        // Delete images from storage
-        foreach ($listing->images as $image) {
-            Storage::disk('public')->delete($image->image_path);
-        }
-
         $listing->delete();
 
         return redirect()->route('marketplace.index')
@@ -303,6 +300,16 @@ class MarketplaceController extends Controller
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $existingInterest = MarketplaceInterest::where('listing_id', $listing->id)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if ($existingInterest && !in_array($existingInterest->status, ['pending'])) {
+            return response()->json([
+                'error' => 'You have already expressed interest in this listing. Status: ' . $existingInterest->status,
+            ], 400);
         }
 
         $interest = MarketplaceInterest::updateOrCreate(
@@ -339,6 +346,12 @@ class MarketplaceController extends Controller
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        if ($interest->status !== 'pending') {
+            return response()->json([
+                'error' => 'This interest has already been ' . $interest->status,
+            ], 400);
         }
 
         if ($request->action === 'accept') {
@@ -380,12 +393,20 @@ class MarketplaceController extends Controller
      */
     public function myListings()
     {
-        $listings = MarketplaceListing::with(['images', 'interests'])
-            ->where('user_id', Auth::id())
-            ->orderBy('created_at', 'desc')
+        $query = MarketplaceListing::with(['images', 'interests'])
+            ->where('user_id', Auth::id());
+
+        $stats = [
+            'active' => (clone $query)->where('status', 'active')->count(),
+            'pending' => (clone $query)->where('status', 'pending')->count(),
+            'sold' => (clone $query)->where('status', 'sold')->count(),
+            'total_views' => (clone $query)->sum('views_count'),
+        ];
+
+        $listings = $query->orderBy('created_at', 'desc')
             ->paginate(12);
 
-        return view('marketplace.my-listings', compact('listings'));
+        return view('marketplace.my-listings', compact('listings', 'stats'));
     }
 
     /**
@@ -407,7 +428,7 @@ class MarketplaceController extends Controller
     public function savedListings()
     {
         $listings = Auth::user()->savedMarketplaceListings()
-            ->with(['user.profile', 'images'])
+            ->with(['user.profile', 'images', 'savedBy'])
             ->paginate(12);
 
         return view('marketplace.saved', compact('listings'));
@@ -418,7 +439,7 @@ class MarketplaceController extends Controller
      */
     public function category($category)
     {
-        $listings = MarketplaceListing::with(['user.profile', 'images'])
+        $listings = MarketplaceListing::with(['user.profile', 'images', 'savedBy'])
             ->where('status', 'active')
             ->where('category', $category)
             ->where('expires_at', '>', now())
@@ -436,8 +457,18 @@ class MarketplaceController extends Controller
             abort(403);
         }
 
+        $existingCount = $listing->images()->count();
         $validator = Validator::make($request->all(), [
-            'images' => 'required|array|max:10',
+            'images' => [
+                'required',
+                'array',
+                'max:10',
+                function ($attribute, $value, $fail) use ($existingCount) {
+                    if ($existingCount + count($value) > 10) {
+                        $fail("Maximum 10 images per listing. You already have {$existingCount}.");
+                    }
+                },
+            ],
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
 
@@ -512,9 +543,10 @@ class MarketplaceController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $search = Auth::user()->savedMarketplaceSearches()->create(
-            $validator->validated()
-        );
+        $search = Auth::user()->savedMarketplaceSearches()->create([
+            'filters' => $validator->validated(),
+            'user_id' => Auth::id(),
+        ]);
 
         return response()->json([
             'success' => true,

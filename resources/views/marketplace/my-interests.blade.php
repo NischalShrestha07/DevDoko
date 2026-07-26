@@ -106,8 +106,23 @@
 <script>
     function cancelInterest(id) {
     if (confirm('Cancel your interest in this item?')) {
-        // Implement cancel interest functionality
-        alert('Cancel functionality - to be implemented');
+        fetch(`/marketplace/interests/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                response.json().then(data => {
+                    alert(data.error || 'Failed to cancel interest');
+                });
+            }
+        }).catch(() => {
+            alert('Failed to cancel interest. Please try again.');
+        });
     }
 }
 </script>

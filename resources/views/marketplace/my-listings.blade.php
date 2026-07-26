@@ -31,7 +31,7 @@
                         </div>
                         <div>
                             <h6 class="fw-semibold mb-1">Active</h6>
-                            <h4 class="mb-0">{{ $listings->where('status', 'active')->count() }}</h4>
+                            <h4 class="mb-0">{{ $stats['active'] }}</h4>
                         </div>
                     </div>
                 </div>
@@ -46,7 +46,7 @@
                         </div>
                         <div>
                             <h6 class="fw-semibold mb-1">Pending</h6>
-                            <h4 class="mb-0">{{ $listings->where('status', 'pending')->count() }}</h4>
+                            <h4 class="mb-0">{{ $stats['pending'] }}</h4>
                         </div>
                     </div>
                 </div>
@@ -61,7 +61,7 @@
                         </div>
                         <div>
                             <h6 class="fw-semibold mb-1">Sold</h6>
-                            <h4 class="mb-0">{{ $listings->where('status', 'sold')->count() }}</h4>
+                            <h4 class="mb-0">{{ $stats['sold'] }}</h4>
                         </div>
                     </div>
                 </div>
@@ -76,7 +76,7 @@
                         </div>
                         <div>
                             <h6 class="fw-semibold mb-1">Total Views</h6>
-                            <h4 class="mb-0">{{ $listings->sum('views_count') }}</h4>
+                            <h4 class="mb-0">{{ $stats['total_views'] }}</h4>
                         </div>
                     </div>
                 </div>
