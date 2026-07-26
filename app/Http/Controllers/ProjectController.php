@@ -283,7 +283,9 @@ class ProjectController extends Controller
 
         // Notify project owner
         $project->user->notifications()->create([
+            'from_user_id' => Auth::id(),
             'type' => 'collaboration_request',
+            'message' => Auth::user()->name.' wants to collaborate on your project',
             'data' => [
                 'user_id' => Auth::id(),
                 'user_name' => Auth::user()->name,

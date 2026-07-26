@@ -2,11 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -23,7 +21,7 @@ class User extends Authenticatable
         'last_login_at',
         'github_id',
         'github_token',
-        'github_refresh_token'
+        'github_refresh_token',
     ];
 
     protected $hidden = [
@@ -45,7 +43,7 @@ class User extends Authenticatable
         return $this->hasOne(Profile::class)->withDefault(function ($profile, $user) {
             $profile->forceFill([
                 'user_id' => $user->id,
-                'username' => $user->username ?? 'user_' . $user->id,
+                'username' => $user->username ?? 'user_'.$user->id,
                 'bio' => 'Hello! I\'m new to DevDoko.',
                 'avatar' => null,
                 'github_link' => null,
@@ -111,7 +109,6 @@ class User extends Authenticatable
     public function scopeDevelopers($query)
     {
         return $query->whereHas('profile')
-            ->where('is_active', true)
             ->orderBy('created_at', 'desc');
     }
 
@@ -129,7 +126,8 @@ class User extends Authenticatable
 
         // Return default avatar if no profile
         $name = $this->name ?? $this->username ?? 'User';
-        return 'https://ui-avatars.com/api/?name=' . urlencode($name) . '&background=random&color=fff';
+
+        return 'https://ui-avatars.com/api/?name='.urlencode($name).'&background=random&color=fff';
     }
 
     public function getPostsCountAttribute()
@@ -183,7 +181,7 @@ class User extends Authenticatable
 
         static::created(function ($user) {
             $user->profile()->create([
-                'username' => strtolower(str_replace(' ', '', $user->name)) . rand(100, 999),
+                'username' => strtolower(str_replace(' ', '', $user->name)).rand(100, 999),
                 'bio' => 'Hello! I\'m new to DevDoko.',
                 'avatar' => null,
                 'github_link' => null,
@@ -229,8 +227,6 @@ class User extends Authenticatable
     {
         return $this->hasMany(MarketplaceSavedSearch::class);
     }
-
-
 
     public function savedMarketplaceListings()
     {

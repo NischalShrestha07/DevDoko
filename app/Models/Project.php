@@ -31,7 +31,7 @@ class Project extends Model
         'views_count',
         'forks_count',
         'likes_count',
-        'screenshots'
+        'screenshots',
     ];
 
     protected $casts = [
@@ -41,7 +41,7 @@ class Project extends Model
         'is_featured' => 'boolean',
         'views_count' => 'integer',
         'forks_count' => 'integer',
-        'likes_count' => 'integer'
+        'likes_count' => 'integer',
     ];
 
     // Relationships
@@ -65,6 +65,16 @@ class Project extends Model
         return $this->belongsToMany(User::class, 'project_contributors')
             ->withPivot('role', 'joined_at')
             ->withTimestamps();
+    }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(ProjectLike::class);
+    }
+
+    public function collaborations(): HasMany
+    {
+        return $this->hasMany(ProjectCollaboration::class);
     }
 
     // Scopes
@@ -112,11 +122,12 @@ class Project extends Model
             'nodejs' => '#339933',
             'php' => '#777bb4',
             'laravel' => '#ff2d20',
-            'code' => '#0095f6'
+            'code' => '#0095f6',
         ];
 
         $color = $colors[strtolower($tech)] ?? '#0095f6';
-        return "https://ui-avatars.com/api/?name=" . urlencode($this->title) . "&background=" . substr($color, 1) . "&color=fff&size=256";
+
+        return 'https://ui-avatars.com/api/?name='.urlencode($this->title).'&background='.substr($color, 1).'&color=fff&size=256';
     }
 
     public function getExcerptAttribute(): string
