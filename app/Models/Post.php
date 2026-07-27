@@ -185,6 +185,22 @@ class Post extends Model
         return $query->where('visibility', 'public');
     }
 
+    /**
+     * Newest first, with a deterministic tie-break.
+     *
+     * Plain latest() orders only by created_at. Posts sharing a timestamp then
+     * come back in arbitrary order, so LIMIT/OFFSET pagination repeats some
+     * rows across pages and skips others. Always use this for paginated feeds.
+     */
+    public function scopeLatestStable($query)
+    {
+        // Qualify the columns: these feeds include belongsToMany joins (saved
+        // posts, tags) whose pivot tables also carry created_at/id.
+        $table = $query->getModel()->getTable();
+
+        return $query->orderByDesc("{$table}.created_at")->orderByDesc("{$table}.id");
+    }
+
     // Scope for visible posts (public + followers)
     public function scopeVisibleTo($query, $user)
     {

@@ -27,7 +27,7 @@ class ProfileController extends Controller
         $posts = $profile->user->posts()
             ->with(['likes', 'comments', 'tags', 'media', 'user.profile'])
             ->withCount(['likes', 'comments', 'saves'])
-            ->latest()
+            ->latestStable()
             ->paginate(12);
 
         // Get saved posts if authenticated and viewing own profile
@@ -36,7 +36,7 @@ class ProfileController extends Controller
             $savedPosts = Auth::user()->savedPosts()
                 ->with(['likes', 'comments', 'tags', 'media', 'user.profile'])
                 ->withCount(['likes', 'comments', 'saves'])
-                ->latest()
+                ->latestStable()
                 ->paginate(12, ['*'], 'saved_page');
         }
 

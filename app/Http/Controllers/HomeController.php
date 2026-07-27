@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Like;
 use App\Models\Post;
-use App\Models\User;
 use App\Models\Tag;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 
 class HomeController extends Controller
 {
@@ -43,10 +43,18 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
-        $posts = Post::with(['user.profile', 'likes', 'saves' => fn($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
+        $posts = Post::with(['user.profile', 'likes', 'saves' => fn ($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
             ->visibleTo($user)
-            ->latest()
+            ->latestStable()
             ->paginate(10);
+
+        // Infinite scroll: return just the next batch of rendered cards.
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => $posts->map(fn ($post) => view('posts.partials.card', compact('post'))->render())->implode(''),
+                'next_page' => $posts->hasMorePages() ? $posts->currentPage() + 1 : null,
+            ]);
+        }
 
         $unreadNotifications = $user->unreadNotificationsCount();
 
@@ -77,20 +85,20 @@ class HomeController extends Controller
         $user = Auth::user();
         $type = $request->get('type', 'all');
 
-        $posts = Post::with(['user.profile', 'likes', 'saves' => fn($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
+        $posts = Post::with(['user.profile', 'likes', 'saves' => fn ($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
             ->visibleTo($user);
 
         if ($type && $type !== 'all') {
             $posts->where('type', $type);
         }
 
-        $posts = $posts->latest()
+        $posts = $posts->latestStable()
             ->paginate(10);
 
         if ($request->ajax()) {
             return response()->json([
                 'posts' => $posts->items(),
-                'next_page_url' => $posts->nextPageUrl()
+                'next_page_url' => $posts->nextPageUrl(),
             ]);
         }
 
@@ -103,10 +111,10 @@ class HomeController extends Controller
 
         $followingIds = $user->following()->pluck('following_id');
 
-        $posts = Post::with(['user.profile', 'likes', 'saves' => fn($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
+        $posts = Post::with(['user.profile', 'likes', 'saves' => fn ($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
             ->whereIn('user_id', $followingIds)
             ->visibleTo($user)
-            ->latest()
+            ->latestStable()
             ->paginate(10);
 
         return view('home', array_merge(
@@ -120,7 +128,7 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
-        $posts = Post::with(['user.profile', 'likes', 'saves' => fn($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
+        $posts = Post::with(['user.profile', 'likes', 'saves' => fn ($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
             ->visibleTo($user)
             ->where('created_at', '>=', Carbon::now()->subDays(7))
             ->withCount(['likes', 'comments', 'saves'])
@@ -138,9 +146,9 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
-        $posts = Post::with(['user.profile', 'likes', 'saves' => fn($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
+        $posts = Post::with(['user.profile', 'likes', 'saves' => fn ($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
             ->visibleTo($user)
-            ->latest()
+            ->latestStable()
             ->paginate(10);
 
         return view('home', array_merge(

@@ -17,7 +17,7 @@ class TagController extends Controller
                 $query->where('tags.id', $tag->id);
             })
             ->where('visibility', 'public')
-            ->latest()
+            ->latestStable()
             ->paginate(12);
 
         return view('tags.show', compact('tag', 'posts'));

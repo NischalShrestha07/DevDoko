@@ -18,7 +18,7 @@ class SaveController extends Controller
         $savedPosts = Auth::user()->savedPosts()
             ->with(['likes', 'comments', 'tags', 'media', 'user.profile'])
             ->withCount(['likes', 'comments', 'saves'])
-            ->latest()
+            ->latestStable()
             ->paginate(12);
 
         return view('saved.index', compact('savedPosts'));

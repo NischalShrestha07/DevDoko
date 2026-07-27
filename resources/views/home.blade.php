@@ -78,9 +78,10 @@
             </div>
 
             <!-- Posts Feed -->
-            @forelse($posts as $post)
-                @include('posts.partials.card', ['post' => $post])
-            @empty
+            <div id="feedItems">
+                @forelse($posts as $post)
+                    @include('posts.partials.card', ['post' => $post])
+                @empty
             <div class="card border-0 shadow-sm text-center py-5 mb-4 home-empty-card">
                 <div class="card-body px-4">
                     <div class="empty-feed-icon mx-auto mb-4">
@@ -100,7 +101,24 @@
                     </div>
                 </div>
             </div>
-            @endforelse
+                @endforelse
+            </div>
+
+            {{-- Infinite scroll sentinel. Falls back to a plain link if JS is off. --}}
+            @if($posts->hasMorePages())
+                <div id="feedSentinel" data-next-page="2" class="py-4 text-center">
+                    <div class="spinner-border spinner-border-sm text-muted d-none" id="feedSpinner" role="status">
+                        <span class="visually-hidden">Loading more posts…</span>
+                    </div>
+                    <noscript>
+                        <a href="{{ $posts->nextPageUrl() }}" class="btn btn-outline-primary rounded-pill px-4">Load more posts</a>
+                    </noscript>
+                </div>
+            @endif
+
+            <div id="feedEnd" class="text-center text-muted small py-4 d-none">
+                <i class="bi bi-check2-circle me-1"></i>You're all caught up
+            </div>
         </div>
 
         <!-- Right Column - Sidebar -->
@@ -214,4 +232,58 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const sentinel = document.getElementById('feedSentinel');
+    if (!sentinel) return;
+
+    const items = document.getElementById('feedItems');
+    const spinner = document.getElementById('feedSpinner');
+    const endMarker = document.getElementById('feedEnd');
+    let loading = false;
+
+    async function loadMore() {
+        const nextPage = sentinel.dataset.nextPage;
+        if (loading || !nextPage) return;
+        loading = true;
+        spinner.classList.remove('d-none');
+
+        try {
+            const res = await fetch(`{{ route('home') }}?page=${nextPage}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+            });
+            if (!res.ok) throw new Error('Request failed');
+            const data = await res.json();
+
+            // Card partials each carry their own <script>; the handlers are
+            // delegated on document and already registered, so strip the
+            // duplicates instead of bloating the DOM with them.
+            const frag = document.createElement('div');
+            frag.innerHTML = data.html;
+            frag.querySelectorAll('script').forEach(s => s.remove());
+            while (frag.firstChild) items.appendChild(frag.firstChild);
+
+            if (data.next_page) {
+                sentinel.dataset.nextPage = data.next_page;
+            } else {
+                observer.disconnect();
+                sentinel.remove();
+                endMarker.classList.remove('d-none');
+            }
+        } catch (e) {
+            window.DevDoko?.toast('Could not load more posts.', 'error');
+        } finally {
+            loading = false;
+            spinner.classList.add('d-none');
+        }
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) loadMore();
+    }, { rootMargin: '400px' });
+
+    observer.observe(sentinel);
+});
+</script>
 @endsection
