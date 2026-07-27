@@ -82,9 +82,9 @@ class JobController extends Controller
         $data['is_active'] = true;
         $data['is_featured'] = $request->boolean('is_featured') && Auth::user()->isAdmin();
 
-        if (isset($data['required_skills'])) {
-            $data['required_skills'] = array_map('trim', explode(',', $data['required_skills']));
-        }
+        $data['required_skills'] = ! empty($data['required_skills'])
+            ? array_values(array_filter(array_map('trim', explode(',', $data['required_skills']))))
+            : [];
 
         Job::create($data);
 
@@ -136,9 +136,9 @@ class JobController extends Controller
         $data['salary_currency'] = $data['salary_currency'] ?? 'NPR';
         $data['is_featured'] = $request->boolean('is_featured') && Auth::user()->isAdmin();
 
-        if (isset($data['required_skills'])) {
-            $data['required_skills'] = array_map('trim', explode(',', $data['required_skills']));
-        }
+        $data['required_skills'] = ! empty($data['required_skills'])
+            ? array_values(array_filter(array_map('trim', explode(',', $data['required_skills']))))
+            : [];
 
         $job->update($data);
 

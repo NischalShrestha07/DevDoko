@@ -34,7 +34,7 @@ use Illuminate\Support\Facades\Route;
 // Public Routes
 Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
 Route::get('/jobs', [JobController::class, 'index'])->name('jobs.index');
-Route::get('/jobs/{job}', [JobController::class, 'show'])->name('jobs.show');
+Route::get('/jobs/{job}', [JobController::class, 'show'])->name('jobs.show')->whereNumber('job');
 Route::get('/explore', [ExploreController::class, 'index'])->name('explore');
 Route::get('/@{username}', [ProfileController::class, 'show'])->name('profile.show');
 Route::get('/tags/{tag}', [TagController::class, 'show'])->name('tags.show');
