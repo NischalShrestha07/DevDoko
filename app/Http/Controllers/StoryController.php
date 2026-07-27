@@ -45,6 +45,7 @@ class StoryController extends Controller
                     'media_type' => $story->media_type,
                     'caption' => $story->caption,
                     'time_ago' => $story->created_at->diffForHumans(),
+                    'views_count' => $story->views_count,
                     'viewed' => in_array($story->id, $viewedIds),
                 ])->values(),
             ];
