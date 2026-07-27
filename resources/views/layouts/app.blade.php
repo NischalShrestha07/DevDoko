@@ -87,7 +87,7 @@
                         <span class="badge bg-danger rounded-pill ms-auto">{{ $unreadCount }}</span>
                     </a>
                     @endauth
-                    <a href="{{ route('posts.create') }}"
+                    <a href="{{ route('posts.create') }}" data-composer-open="image"
                         class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('posts.create') ? 'active' : '' }}">
                         @if(request()->routeIs('posts.create'))<span class="nav-active-indicator"></span>@endif
                         <i class="bi bi-plus-square{{ request()->routeIs('posts.create') ? '-fill' : '' }} fs-5 me-3"></i>
@@ -316,7 +316,7 @@
                     <span class="badge bg-danger rounded-pill ms-auto" id="notifBadge">{{ $unreadCount }}</span>
                 </a>
                 @endauth
-                <a href="{{ route('posts.create') }}"
+                <a href="{{ route('posts.create') }}" data-composer-open="image"
                     class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('posts.create') ? 'active' : '' }}">
                     @if(request()->routeIs('posts.create'))<span class="nav-active-indicator"></span>@endif
                     <i class="bi bi-plus-square{{ request()->routeIs('posts.create') ? '-fill' : '' }} fs-5 me-3"></i>
@@ -434,7 +434,7 @@
                 <i class="bi bi-search fs-5"></i>
                 <small>Search</small>
             </a>
-            <a href="{{ route('posts.create') }}" class="app-bottom-nav-item text-center app-accent-text">
+            <a href="{{ route('posts.create') }}" data-composer-open="image" class="app-bottom-nav-item text-center app-accent-text">
                 <div class="app-create-btn-mobile mx-auto">
                     <i class="bi bi-plus-lg fs-5"></i>
                 </div>
@@ -462,6 +462,10 @@
             @endauth
         </div>
     </nav>
+
+    @auth
+    @include('posts.partials.composer')
+    @endauth
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
     @auth

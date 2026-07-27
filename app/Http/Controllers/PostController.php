@@ -108,11 +108,14 @@ class PostController extends Controller
             if ($validator->fails()) {
                 Log::warning('Post validation failed', ['errors' => $validator->errors()->all()]);
 
-                // DEBUG: Check what we're returning
-                $response = back()->withErrors($validator)->withInput();
-                Log::debug('Returning response type: '.get_class($response));
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'message' => $validator->errors()->first(),
+                        'errors' => $validator->errors(),
+                    ], 422);
+                }
 
-                return $response;
+                return back()->withErrors($validator)->withInput();
             }
 
             $validated = $validator->validated();
@@ -122,7 +125,16 @@ class PostController extends Controller
             if (! $this->validatePostContent($request, $validated['type'])) {
                 Log::warning('Post content validation failed');
 
-                return back()->withErrors(['content' => 'Please provide content for your post type.'])->withInput();
+                $message = 'Please provide content for your post type.';
+
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'message' => $message,
+                        'errors' => ['content' => [$message]],
+                    ], 422);
+                }
+
+                return back()->withErrors(['content' => $message])->withInput();
             }
 
             // Handle file uploads
@@ -178,6 +190,15 @@ class PostController extends Controller
                 Log::warning('Activity log failed', ['error' => $e->getMessage()]);
             }
 
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'post_id' => $post->id,
+                    'redirect_url' => route('posts.show', $post),
+                    'message' => 'Post created successfully!',
+                ]);
+            }
+
             return redirect()->route('posts.show', $post)
                 ->with('success', 'Post created successfully!');
         } catch (\Exception $e) {
@@ -187,7 +208,13 @@ class PostController extends Controller
                 'request' => $request->except(['image', 'video']),
             ]);
 
-            return back()->withErrors(['error' => 'Failed to create post. Please try again.'])->withInput();
+            $message = 'Failed to create post. Please try again.';
+
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $message], 500);
+            }
+
+            return back()->withErrors(['error' => $message])->withInput();
         }
     }
 

@@ -15,28 +15,28 @@
                     <div class="d-flex align-items-center gap-3">
                         <img src="{{ auth()->user()->profile->avatar_url }}" alt="{{ auth()->user()->name }}"
                             class="rounded-circle flex-shrink-0" style="width: 44px; height: 44px; object-fit: cover;">
-                        <a href="{{ route('posts.create') }}"
+                        <a href="{{ route('posts.create') }}" data-composer-open="text"
                             class="flex-grow-1 text-decoration-none home-post-input rounded-pill px-4 py-2">
                             What's on your mind, {{ auth()->user()->profile->username ?? auth()->user()->name }}?
                         </a>
                     </div>
                     <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                        <a href="{{ route('posts.create') }}?type=image"
+                        <a href="{{ route('posts.create') }}?type=image" data-composer-open="image"
                             class="btn btn-sm flex-fill d-flex align-items-center justify-content-center gap-2 home-action-btn text-decoration-none">
                             <i class="bi bi-image-fill" style="color: #22c55e;"></i>
                             <span class="d-none d-sm-inline">Photo</span>
                         </a>
-                        <a href="{{ route('posts.create') }}?type=video"
+                        <a href="{{ route('posts.create') }}?type=video" data-composer-open="video"
                             class="btn btn-sm flex-fill d-flex align-items-center justify-content-center gap-2 home-action-btn text-decoration-none">
                             <i class="bi bi-camera-reels-fill" style="color: #ef4444;"></i>
                             <span class="d-none d-sm-inline">Video</span>
                         </a>
-                        <a href="{{ route('posts.create') }}?type=code"
+                        <a href="{{ route('posts.create') }}?type=code" data-composer-open="code"
                             class="btn btn-sm flex-fill d-flex align-items-center justify-content-center gap-2 home-action-btn text-decoration-none">
                             <i class="bi bi-code-slash" style="color: #06b6d4;"></i>
                             <span class="d-none d-sm-inline">Code</span>
                         </a>
-                        <a href="{{ route('posts.create') }}?type=article"
+                        <a href="{{ route('posts.create') }}?type=article" data-composer-open="article"
                             class="btn btn-sm flex-fill d-flex align-items-center justify-content-center gap-2 home-action-btn text-decoration-none">
                             <i class="bi bi-file-text-fill" style="color: #f59e0b;"></i>
                             <span class="d-none d-sm-inline">Article</span>
