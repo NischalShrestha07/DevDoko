@@ -103,11 +103,15 @@ class Notification extends Model
 
     private function getMentionUrl(): ?string
     {
+        // comment_id first: a comment mention also carries post_id, and
+        // checking post_id first made this branch unreachable, so mentions in
+        // comments never linked to the comment anchor.
+        if (isset($this->data['comment_id'], $this->data['post_id'])) {
+            return route('posts.show', $this->data['post_id']).'#comment-'.$this->data['comment_id'];
+        }
+
         if (isset($this->data['post_id'])) {
             return route('posts.show', $this->data['post_id']);
-        }
-        if (isset($this->data['comment_id'])) {
-            return route('posts.show', $this->data['post_id']).'#comment-'.$this->data['comment_id'];
         }
 
         return null;

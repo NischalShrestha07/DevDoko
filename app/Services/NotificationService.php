@@ -150,6 +150,32 @@ class NotificationService
     }
 
     /**
+     * Notify everyone @mentioned in a post or comment.
+     *
+     * $context is ['post_id' => int] and optionally ['comment_id' => int];
+     * Notification::getActionUrlAttribute() uses those to build the link.
+     */
+    public function mentionNotification(User $author, iterable $mentionedUsers, array $context = []): void
+    {
+        foreach ($mentionedUsers as $mentioned) {
+            if ($mentioned->id === $author->id) {
+                continue;
+            }
+
+            $this->create([
+                'user_id' => $mentioned->id,
+                'from_user_id' => $author->id,
+                'type' => 'mention',
+                'message' => $author->name.' mentioned you in a '.(isset($context['comment_id']) ? 'comment' : 'post'),
+                'data' => $context + [
+                    'author_id' => $author->id,
+                    'author_name' => $author->name,
+                ],
+            ]);
+        }
+    }
+
+    /**
      * Send a message notification
      */
     public function messageNotification(User $sender, User $receiver, $messageContent, $messageType = 'text'): void

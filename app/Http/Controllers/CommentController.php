@@ -6,6 +6,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\NotificationService;
+use App\Support\ContentParser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -30,6 +31,7 @@ class CommentController extends Controller
             if ($request->expectsJson()) {
                 return response()->json(['errors' => $validator->errors()], 422);
             }
+
             return back()->withErrors($validator)->withInput();
         }
 
@@ -44,6 +46,15 @@ class CommentController extends Controller
 
         // Send notification
         $this->notificationService->commentNotification(Auth::user(), $comment, $post);
+
+        // Notify anyone @mentioned in the comment
+        $mentioned = ContentParser::mentionedUsers($comment->content, Auth::id());
+        if ($mentioned->isNotEmpty()) {
+            $this->notificationService->mentionNotification(Auth::user(), $mentioned, [
+                'post_id' => $post->id,
+                'comment_id' => $comment->id,
+            ]);
+        }
 
         // Load user relationship for response
         $comment->load('user.profile');

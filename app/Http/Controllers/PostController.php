@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
 use App\Services\NotificationService;
+use App\Support\ContentParser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -167,6 +168,17 @@ class PostController extends Controller
             // Handle tags
             $this->handleTags($request, $post);
             Log::info('Tags handled for post', ['post_id' => $post->id]);
+
+            // Notify anyone @mentioned in the body
+            try {
+                $mentioned = ContentParser::mentionedUsers($post->content, Auth::id());
+                if ($mentioned->isNotEmpty()) {
+                    app(NotificationService::class)
+                        ->mentionNotification(Auth::user(), $mentioned, ['post_id' => $post->id]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Mention notifications failed', ['error' => $e->getMessage()]);
+            }
 
             // Create notification for followers
             try {
@@ -580,8 +592,18 @@ class PostController extends Controller
     private function handleTags(Request $request, Post $post): void
     {
         try {
-            if ($request->filled('tags')) {
-                $tagNames = array_filter(array_map('trim', explode(',', $request->tags)));
+            // Tags come from the explicit field plus any #hashtags written
+            // inline in the post body.
+            $tagNames = $request->filled('tags')
+                ? array_filter(array_map('trim', explode(',', $request->tags)))
+                : [];
+
+            $tagNames = array_values(array_unique(array_merge(
+                $tagNames,
+                ContentParser::extractHashtags($post->content),
+            )));
+
+            if ($tagNames) {
                 Log::info('Processing tags', ['tags' => $tagNames]);
 
                 $tagIds = [];

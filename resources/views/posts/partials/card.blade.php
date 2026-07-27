@@ -153,7 +153,7 @@
         @if($post->content)
         <div class="px-4 mb-3">
             <div class="post-content">
-                {!! Str::markdown(e($post->content)) !!}
+                @rich($post->content)
             </div>
         </div>
         @endif

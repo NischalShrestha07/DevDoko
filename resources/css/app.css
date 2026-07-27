@@ -1265,6 +1265,24 @@ code {
     z-index: 20;
 }
 
+/* Inline @mention / #hashtag links inside post and comment bodies */
+.mention-link,
+.hashtag-link {
+    color: var(--brand-purple);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.mention-link:hover,
+.hashtag-link:hover {
+    text-decoration: underline;
+}
+
+[data-bs-theme="dark"] .mention-link,
+[data-bs-theme="dark"] .hashtag-link {
+    color: #58a6ff;
+}
+
 /* ===============================
    POST COMPOSER
    =============================== */

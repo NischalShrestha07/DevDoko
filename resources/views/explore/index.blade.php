@@ -113,7 +113,7 @@
                                 @endif
                                 @if($post->content)
                                 <div class="post-content text-muted" style="font-size: 14px;">
-                                    {!! Str::markdown(e(Str::limit($post->content, 120))) !!}
+                                    @rich(Str::limit($post->content, 120))
                                 </div>
                                 @endif
                             </div>
