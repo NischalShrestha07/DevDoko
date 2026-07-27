@@ -221,6 +221,12 @@ class MessageController extends Controller
      */
     public function store(Request $request, User $user)
     {
+        if (Auth::user()->isBlockedEitherWay($user)) {
+            return $request->expectsJson() || $request->ajax()
+                ? response()->json(['error' => 'You cannot message this user.'], 403)
+                : back()->with('error', 'You cannot message this user.');
+        }
+
         $validator = Validator::make($request->all(), [
             'content' => 'nullable|string|max:5000',
             'type' => 'required|in:text,code,file',

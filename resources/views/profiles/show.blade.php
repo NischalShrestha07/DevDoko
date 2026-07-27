@@ -90,9 +90,23 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item text-danger" href="#">
-                                            <i class="bi bi-block me-2"></i> Block
-                                        </a>
+                                        @if(auth()->user()->hasBlocked($profile->user))
+                                        <form action="{{ route('users.unblock', $profile->user) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-check-circle me-2"></i> Unblock
+                                            </button>
+                                        </form>
+                                        @else
+                                        <form action="{{ route('users.block', $profile->user) }}" method="POST"
+                                            onsubmit="return confirm('Block {{ $profile->username }}? They will not be able to see your posts, message you, or follow you.');">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="bi bi-slash-circle me-2"></i> Block
+                                            </button>
+                                        </form>
+                                        @endif
                                     </li>
                                 </ul>
                             </div>

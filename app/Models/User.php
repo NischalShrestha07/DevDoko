@@ -98,6 +98,52 @@ class User extends Authenticatable
         return $this->hasMany(Story::class);
     }
 
+    /** Users this user has blocked. */
+    public function blockedUsers()
+    {
+        return $this->belongsToMany(User::class, 'blocks', 'blocker_id', 'blocked_id')->withTimestamps();
+    }
+
+    /** Users who have blocked this user. */
+    public function blockedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'blocks', 'blocked_id', 'blocker_id')->withTimestamps();
+    }
+
+    public function hasBlocked(User $user): bool
+    {
+        return $this->blockedUsers()->where('blocked_id', $user->id)->exists();
+    }
+
+    public function isBlockedBy(User $user): bool
+    {
+        return $this->blockedByUsers()->where('blocker_id', $user->id)->exists();
+    }
+
+    /** True if either side has blocked the other. */
+    public function isBlockedEitherWay(User $user): bool
+    {
+        return Block::where(function ($q) use ($user) {
+            $q->where('blocker_id', $this->id)->where('blocked_id', $user->id);
+        })->orWhere(function ($q) use ($user) {
+            $q->where('blocker_id', $user->id)->where('blocked_id', $this->id);
+        })->exists();
+    }
+
+    /**
+     * IDs of everyone this user cannot see content from, in either direction.
+     * Cached per request since the feed and sidebars all need it.
+     */
+    public function hiddenUserIds(): array
+    {
+        return once(fn () => Block::where('blocker_id', $this->id)
+            ->pluck('blocked_id')
+            ->merge(Block::where('blocked_id', $this->id)->pluck('blocker_id'))
+            ->unique()
+            ->values()
+            ->all());
+    }
+
     public function activeStories()
     {
         return $this->stories()->active()->oldest();

@@ -375,6 +375,11 @@
         <!-- Bottom -->
         <div class="p-3 border-top">
             @auth
+            <a href="{{ route('blocks.index') }}"
+                class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 mb-1 app-nav-item {{ request()->routeIs('blocks.*') ? 'active' : '' }}">
+                <i class="bi bi-slash-circle fs-5 me-3"></i>
+                <span>Blocked</span>
+            </a>
             @if(auth()->user()->isAdmin())
             <a href="{{ route('admin.dashboard') }}"
                 class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 mb-1 app-nav-item">

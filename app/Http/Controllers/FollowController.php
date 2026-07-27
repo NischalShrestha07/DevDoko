@@ -32,6 +32,12 @@ class FollowController extends Controller
                 : back()->with('info', 'Already following this user');
         }
 
+        if ($currentUser->isBlockedEitherWay($user)) {
+            return $request->expectsJson()
+                ? response()->json(['error' => 'You cannot follow this user'], 403)
+                : back()->with('error', 'You cannot follow this user.');
+        }
+
         $currentUser->following()->attach($user->id);
         $this->notificationService->followNotification($currentUser, $user);
 

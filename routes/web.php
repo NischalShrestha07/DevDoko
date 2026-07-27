@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\BlockController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DeveloperController;
 use App\Http\Controllers\ExploreController;
@@ -117,6 +118,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/users/{user}/follow', [FollowController::class, 'unfollow'])->name('users.unfollow');
     Route::get('/users/{user}/followers', [FollowController::class, 'followers'])->name('users.followers');
     Route::get('/users/{user}/following', [FollowController::class, 'following'])->name('users.following');
+
+    // Blocking
+    Route::get('/settings/blocked', [BlockController::class, 'index'])->name('blocks.index');
+    Route::post('/users/{user}/block', [BlockController::class, 'store'])->name('users.block');
+    Route::delete('/users/{user}/block', [BlockController::class, 'destroy'])->name('users.unblock');
     // Route::post('/users/{user}/follow', [FollowController::class, 'toggle'])->name('follow.toggle');
 
     // Profile Management

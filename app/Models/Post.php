@@ -208,13 +208,21 @@ class Post extends Model
             return $query->public();
         }
 
-        return $query->where(function ($q) use ($user) {
+        $table = $query->getModel()->getTable();
+
+        // Hide anything from users on either side of a block.
+        $hidden = $user->hiddenUserIds();
+        if ($hidden) {
+            $query->whereNotIn("{$table}.user_id", $hidden);
+        }
+
+        return $query->where(function ($q) use ($user, $table) {
             $q->where('visibility', 'public')
                 ->orWhere(function ($q2) use ($user) {
                     $q2->where('visibility', 'followers')
                         ->whereIn('user_id', $user->following()->pluck('following_id'));
                 })
-                ->orWhere('user_id', $user->id);
+                ->orWhere("{$table}.user_id", $user->id);
         });
     }
 
