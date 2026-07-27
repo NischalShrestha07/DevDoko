@@ -625,10 +625,18 @@ code {
     display: none;
 }
 
-/* Post card image */
-.post-image img {
+/* Post card image.
+   The markup is <img class="post-image">, so a descendant selector
+   (.post-image img) matches nothing — target the element itself. */
+.post-image {
     max-height: 600px;
     object-fit: contain;
+}
+
+/* Letterboxing behind a contained image should follow the theme,
+   otherwise portrait images sit on a bright band in dark mode. */
+[data-bs-theme="dark"] .post-image-container {
+    background: #0d1117 !important;
 }
 
 /* Developer card */
