@@ -175,7 +175,6 @@ Route::middleware('auth')->group(function () {
         // Public routes (no auth required)
         Route::get('/', [MarketplaceController::class, 'index'])->name('index');
         Route::get('/category/{category}', [MarketplaceController::class, 'category'])->name('category');
-        Route::get('/{listing:slug}', [MarketplaceController::class, 'show'])->name('show');
 
         // Authenticated routes
         Route::middleware('auth')->group(function () {
@@ -213,6 +212,10 @@ Route::middleware('auth')->group(function () {
             // Saved searches
             Route::post('/saved-searches', [MarketplaceController::class, 'saveSearch'])->name('saved-searches.store');
         });
+
+        // Public — registered last so literal segments above (create, my-listings,
+        // my-interests, saved, save/{id}, interest/{id}) match before this wildcard.
+        Route::get('/{listing:slug}', [MarketplaceController::class, 'show'])->name('show');
     });
 
     // Marketplace Interests Routes
