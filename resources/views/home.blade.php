@@ -7,6 +7,8 @@
     <div class="row justify-content-center">
         <!-- Left Column - Main Feed -->
         <div class="col-lg-8">
+            @include('stories.partials.bar')
+
             <!-- Create Post Card -->
             <div class="card border-0 shadow-sm mb-4 home-create-card">
                 <div class="card-body p-3">

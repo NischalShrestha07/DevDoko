@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('marketplace:expire-listings')->daily();
+Schedule::command('stories:expire')->hourly();

@@ -24,6 +24,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SaveController;
 use App\Http\Controllers\SavedJobController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\StoryController;
 use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 
@@ -67,6 +68,13 @@ Route::middleware('auth')->group(function () {
 
     // Home feed
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+    // Stories
+    Route::get('/stories', [StoryController::class, 'index'])->name('stories.index');
+    Route::post('/stories', [StoryController::class, 'store'])->name('stories.store');
+    Route::delete('/stories/{story}', [StoryController::class, 'destroy'])->name('stories.destroy');
+    Route::post('/stories/{story}/view', [StoryController::class, 'markViewed'])->name('stories.view');
+    Route::get('/stories/{story}/viewers', [StoryController::class, 'viewers'])->name('stories.viewers');
 
     // Posts Routes
     Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
