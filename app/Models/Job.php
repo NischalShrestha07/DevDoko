@@ -43,4 +43,24 @@ class Job extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function applications()
+    {
+        return $this->hasMany(JobApplication::class);
+    }
+
+    public function savedBy()
+    {
+        return $this->hasMany(SavedJob::class);
+    }
+
+    public function hasApplied(User $user): bool
+    {
+        return $this->applications()->where('user_id', $user->id)->exists();
+    }
+
+    public function isSavedBy(User $user): bool
+    {
+        return $this->savedBy()->where('user_id', $user->id)->exists();
+    }
 }

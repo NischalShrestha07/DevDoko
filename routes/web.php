@@ -11,6 +11,7 @@ use App\Http\Controllers\ExploreController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\MarketplaceController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SaveController;
+use App\Http\Controllers\SavedJobController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
@@ -78,6 +80,13 @@ Route::middleware('auth')->group(function () {
 
     // Job Routes (index/show are public — see public section)
     Route::resource('jobs', JobController::class)->except(['index', 'show']);
+    Route::post('/jobs/{job}/save', [SavedJobController::class, 'store'])->name('jobs.save');
+    Route::delete('/jobs/{job}/save', [SavedJobController::class, 'destroy'])->name('jobs.unsave');
+    Route::get('/jobs/{job}/apply', [JobApplicationController::class, 'create'])->name('jobs.apply.create');
+    Route::post('/jobs/{job}/apply', [JobApplicationController::class, 'store'])->name('jobs.apply.store');
+    Route::get('/jobs/{job}/applicants', [JobApplicationController::class, 'applicants'])->name('jobs.applicants');
+    Route::get('/my-applications', [JobApplicationController::class, 'index'])->name('jobs.my-applications');
+    Route::patch('/job-applications/{application}/status', [JobApplicationController::class, 'updateStatus'])->name('job-applications.update-status');
 
     // Post Interactions
     Route::post('/posts/{post}/like/toggle', [LikeController::class, 'toggle'])->name('posts.like.toggle');

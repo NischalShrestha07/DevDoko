@@ -60,8 +60,18 @@ class Notification extends Model
             'group_invite' => $this->getGroupUrl(),
             'event_reminder' => $this->getEventUrl(),
             'collaboration_request' => $this->getCollaborationUrl(),
+            'job_application', 'job_application_status' => $this->getJobUrl(),
             default => null,
         };
+    }
+
+    private function getJobUrl(): ?string
+    {
+        if (isset($this->data['job_id'])) {
+            return route('jobs.show', $this->data['job_id']);
+        }
+
+        return null;
     }
 
     private function getPostUrl(): ?string

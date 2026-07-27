@@ -113,21 +113,47 @@
                     <h6 class="fw-semibold mb-3">
                         <i class="bi bi-send me-2"></i>Interested in this position?
                     </h6>
-                    @if($job->company_website)
-                        <p class="text-muted small mb-3">Apply directly on the company's website or send your application.</p>
-                        <div class="d-flex flex-wrap gap-2">
-                            <a href="{{ $job->company_website }}" target="_blank" rel="noopener noreferrer"
-                                class="btn btn-primary rounded-pill px-4">
-                                <i class="bi bi-box-arrow-up-right me-2"></i>Apply on Website
+
+                    @auth
+                        @if(auth()->id() === $job->user_id)
+                            <p class="text-muted small mb-3">This is your job listing.</p>
+                            <a href="{{ route('jobs.applicants', $job) }}" class="btn btn-primary rounded-pill px-4">
+                                <i class="bi bi-people me-2"></i>View Applicants ({{ $job->applications_count }})
                             </a>
-                            <button class="btn btn-outline-secondary rounded-pill px-4"
-                                onclick="alert('Save this job and apply later!')">
-                                <i class="bi bi-bookmark me-2"></i>Save Job
-                            </button>
-                        </div>
+                        @else
+                            <div class="d-flex flex-wrap gap-2">
+                                @if($userApplication)
+                                    <span class="btn btn-success rounded-pill px-4 disabled">
+                                        <i class="bi bi-check-circle me-2"></i>Applied &middot; {{ ucfirst($userApplication->status) }}
+                                    </span>
+                                @else
+                                    <a href="{{ route('jobs.apply.create', $job) }}" class="btn btn-primary rounded-pill px-4">
+                                        <i class="bi bi-send me-2"></i>Apply Now
+                                    </a>
+                                @endif
+
+                                @if($job->company_website)
+                                    <a href="{{ $job->company_website }}" target="_blank" rel="noopener noreferrer"
+                                        class="btn btn-outline-secondary rounded-pill px-4">
+                                        <i class="bi bi-box-arrow-up-right me-2"></i>Company Site
+                                    </a>
+                                @endif
+
+                                <form action="{{ $isSaved ? route('jobs.unsave', $job) : route('jobs.save', $job) }}" method="POST" class="job-save-form d-inline">
+                                    @csrf
+                                    @if($isSaved) @method('DELETE') @endif
+                                    <button type="submit" class="btn btn-outline-secondary rounded-pill px-4">
+                                        <i class="bi {{ $isSaved ? 'bi-bookmark-fill' : 'bi-bookmark' }} me-2"></i><span>{{ $isSaved ? 'Saved' : 'Save Job' }}</span>
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
                     @else
-                        <p class="text-muted small mb-0">No application link provided. Check the company's career page for more details.</p>
-                    @endif
+                        <p class="text-muted small mb-3">Log in to apply for this position.</p>
+                        <a href="{{ route('login') }}" class="btn btn-primary rounded-pill px-4">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Login to Apply
+                        </a>
+                    @endauth
                 </div>
             </div>
         </div>
@@ -228,4 +254,35 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('submit', async function(e) {
+    const form = e.target.closest('.job-save-form');
+    if (!form) return;
+    e.preventDefault();
+
+    const button = form.querySelector('button');
+    const icon = button.querySelector('i');
+    const text = button.querySelector('span');
+
+    try {
+        const response = await window.DevDoko.fetch(form.action, {
+            method: form.querySelector('[name="_method"]') ? 'DELETE' : 'POST',
+        });
+
+        icon.classList.toggle('bi-bookmark-fill', response.saved);
+        icon.classList.toggle('bi-bookmark', !response.saved);
+        text.textContent = response.saved ? 'Saved' : 'Save Job';
+
+        const methodInput = form.querySelector('[name="_method"]');
+        if (response.saved && !methodInput) {
+            form.insertAdjacentHTML('beforeend', '<input type="hidden" name="_method" value="DELETE">');
+        } else if (!response.saved && methodInput) {
+            methodInput.remove();
+        }
+    } catch (error) {
+        window.DevDoko.toast('Something went wrong. Please try again.', 'error');
+    }
+});
+</script>
 @endsection

@@ -95,7 +95,15 @@ class JobController extends Controller
     {
         $job->increment('views_count');
 
-        return view('jobs.show', compact('job'));
+        $userApplication = null;
+        $isSaved = false;
+
+        if (Auth::check()) {
+            $userApplication = $job->applications()->where('user_id', Auth::id())->first();
+            $isSaved = $job->isSavedBy(Auth::user());
+        }
+
+        return view('jobs.show', compact('job', 'userApplication', 'isSaved'));
     }
 
     public function edit(Job $job)
