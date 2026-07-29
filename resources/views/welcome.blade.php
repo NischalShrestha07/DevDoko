@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DevDoko — Where Developers Connect, Code & Grow</title>
     <meta name="description" content="The social platform built by developers, for developers. Share code snippets, join communities, collaborate on projects, find jobs, and grow your career — all in one place.">
-    <link rel="icon" href="{{ asset('assets/devdeko.png') }}">
+    <link rel="icon" href="{{ asset('assets/devdokoIcon.png') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
