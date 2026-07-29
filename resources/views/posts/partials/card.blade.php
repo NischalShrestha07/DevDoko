@@ -152,9 +152,14 @@
         <!-- Content -->
         @if($post->content)
         <div class="px-4 mb-3">
-            <div class="post-content">
+            <div class="post-content post-content-truncate" id="post-content-{{ $post->id }}">
                 @rich($post->content)
             </div>
+            @if(strlen($post->content) > 300)
+            <button class="btn btn-link text-primary p-0 mt-1 post-read-more" data-post-id="{{ $post->id }}" onclick="toggleReadMore({{ $post->id }})">
+                Read more <i class="bi bi-chevron-down small"></i>
+            </button>
+            @endif
         </div>
         @endif
 
@@ -178,7 +183,7 @@
                         </button>
                     </div>
                 </div>
-                <pre class="mb-0 p-3" style="max-height: 400px; overflow: auto;">
+                <pre class="mb-0 p-3 code-block-feed">
                         <code id="code-{{ $post->id }}" class="language-{{ $post->code_language ?? 'plaintext' }}">{{ $post->code_snippet }}</code>
                     </pre>
             </div>
@@ -188,9 +193,10 @@
         <!-- Image -->
         @if($post->type === 'image' && $post->image_url)
         <div class="mb-3">
-            <img src="{{ $post->image_url }}" alt="Post image" class="img-fluid w-100"
-                style="max-height: 600px; object-fit: contain; cursor: pointer;"
-                onclick="openImageModal({{ json_encode($post->image_url) }}, {{ json_encode($post->title) }})">
+            <div class="post-image-container">
+                <img src="{{ $post->image_url }}" alt="Post image" class="post-image"
+                    onclick="openImageModal({{ json_encode($post->image_url) }}, {{ json_encode($post->title) }})">
+            </div>
         </div>
         @endif
 
@@ -250,26 +256,36 @@
     <!-- Post Stats -->
     <div class="card-footer bg-white border-0 pt-0">
         <!-- Stats Row -->
+        @if($post->views_count > 0 || $post->comments_count > 0 || $post->shares_count > 0 || ($post->saves_count ?? 0) > 0)
         <div class="px-4 pb-2 border-bottom">
             <div class="d-flex justify-content-between text-muted small">
+                @if($post->views_count > 0)
                 <div class="d-flex align-items-center">
                     <i class="bi bi-eye me-1"></i>
                     <span>{{ $post->views_count }} views</span>
                 </div>
+                @endif
+                @if($post->comments_count > 0)
                 <div class="d-flex align-items-center">
                     <i class="bi bi-chat me-1"></i>
                     <span>{{ $post->comments_count }} comments</span>
                 </div>
+                @endif
+                @if($post->shares_count > 0)
                 <div class="d-flex align-items-center">
                     <i class="bi bi-share me-1"></i>
                     <span>{{ $post->shares_count }} shares</span>
                 </div>
+                @endif
+                @if(($post->saves_count ?? 0) > 0)
                 <div class="d-flex align-items-center">
                     <i class="bi bi-bookmark me-1"></i>
-                    <span>{{ $post->saves_count ?? 0 }} saves</span>
+                    <span>{{ $post->saves_count }} saves</span>
                 </div>
+                @endif
             </div>
         </div>
+        @endif
 
         <!-- Action Buttons -->
         <div class="px-4 py-2">
@@ -340,10 +356,13 @@
                         @csrf
                         <div class="input-group">
                             <input type="text" class="form-control border-0" placeholder="Write a comment..."
-                                name="content" id="comment-input-{{ $post->id }}">
+                                name="content" id="comment-input-{{ $post->id }}" maxlength="500">
                             <button class="btn btn-link text-primary text-decoration-none" type="submit">
                                 <i class="bi bi-send"></i>
                             </button>
+                        </div>
+                        <div class="d-flex justify-content-end mt-1">
+                            <small class="text-muted card-comment-count" id="comment-count-{{ $post->id }}">0/500</small>
                         </div>
                     </form>
                 </div>
@@ -540,6 +559,18 @@ if (!window._cardInit) {
         }, { once: true });
     });
 
+    // Card comment character counter (event delegation)
+    document.addEventListener('input', function(e) {
+        if (!e.target.id || !e.target.id.startsWith('comment-input-')) return;
+        const postId = e.target.id.split('-').pop();
+        const countEl = document.getElementById(`comment-count-${postId}`);
+        if (!countEl) return;
+        const len = e.target.value.trim().length;
+        countEl.textContent = `${len}/500`;
+        countEl.classList.toggle('text-danger', len > 450);
+        countEl.classList.toggle('text-muted', len <= 450);
+    });
+
     // Handle comment form submission (event delegation)
     document.addEventListener('submit', async function(e) {
         const form = e.target.closest('.comment-form');
@@ -685,6 +716,20 @@ if (!window._cardInit) {
         }
     });
 
+    // Toggle read more/less for long content
+    window.toggleReadMore = function(postId) {
+        const content = document.getElementById(`post-content-${postId}`);
+        const btn = document.querySelector(`.post-read-more[data-post-id="${postId}"]`);
+        if (!content) return;
+        content.classList.toggle('expanded');
+        if (btn) {
+            const isExpanded = content.classList.contains('expanded');
+            btn.innerHTML = isExpanded
+                ? 'Show less <i class="bi bi-chevron-up small"></i>'
+                : 'Read more <i class="bi bi-chevron-down small"></i>';
+        }
+    };
+
     // Copy code to clipboard
     function copyCode(postId, button) {
         const codeElement = document.getElementById(`code-${postId}`);
@@ -794,6 +839,73 @@ if (!window._cardInit) {
 
     .post-content {
         line-height: 1.6;
+    }
+
+    .post-content-truncate {
+        max-height: 150px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .post-content-truncate.expanded {
+        max-height: none;
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
+
+    /* Fade with a mask, not a coloured overlay — the old
+       linear-gradient(transparent, white) showed as a white smear in dark mode
+       and over code blocks. A mask fades to transparent in any theme. */
+    .post-content-truncate:not(.expanded) {
+        -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 40px), transparent);
+        mask-image: linear-gradient(to bottom, #000 calc(100% - 40px), transparent);
+    }
+
+    /* Size to the image instead of forcing a 16:9 box. The old
+       padding-top + object-fit:cover combination cropped the top and
+       bottom off any portrait image. */
+    .post-image-container {
+        position: relative;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: #f8f9fa;
+    }
+
+    .post-image {
+        width: auto;
+        height: auto;
+        max-width: 100%;
+        max-height: 600px;
+        object-fit: contain;
+        cursor: pointer;
+        transition: transform 0.3s;
+    }
+
+    .post-image:hover {
+        transform: scale(1.02);
+    }
+
+    .code-block-feed {
+        max-height: 200px;
+        overflow: auto;
+        position: relative;
+    }
+
+    .code-block-feed::after {
+        content: '';
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 30px;
+        background: linear-gradient(transparent, #1a1a2e);
+        display: block;
+        pointer-events: none;
+        margin: 0 -1rem -1rem;
+        padding: 0 1rem;
     }
 
     .post-content h1,
