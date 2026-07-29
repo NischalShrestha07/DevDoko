@@ -83,7 +83,7 @@
             display: flex;
             align-items: center;
             gap: 0.6rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
         }
 
         .brand-row img {
@@ -113,7 +113,7 @@
             font-weight: 600;
             letter-spacing: 0.09em;
             text-transform: uppercase;
-            margin-bottom: 0.85rem;
+            margin-bottom: 0.7rem;
         }
 
         h1 {
@@ -136,7 +136,7 @@
             color: var(--muted);
             font-size: clamp(0.82rem, 1.2vw, 0.95rem);
             line-height: 1.55;
-            margin: 0 0 1.1rem;
+            margin: 0 0 0.85rem;
             max-width: 46ch;
         }
 
@@ -145,7 +145,7 @@
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 0.5rem;
-            margin-bottom: 1.1rem;
+            margin-bottom: 0.85rem;
         }
 
         .feature {
@@ -170,7 +170,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 0.4rem;
-            margin-bottom: 1.15rem;
+            margin-bottom: 0.9rem;
         }
 
         .stack span {
@@ -185,53 +185,131 @@
         }
 
         /* ---------- team table ---------- */
+        .team-card {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            background: var(--card);
+            margin-bottom: 0.85rem;
+        }
+
+        .team-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 1.05rem;
+            background: rgba(255, 255, 255, 0.06);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .team-head h2 {
+            margin: 0;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            color: #fff;
+        }
+
+        .team-head .count {
+            font-size: 0.76rem;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
         table.team {
             width: 100%;
             border-collapse: collapse;
-            background: var(--card);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 0.7rem;
         }
 
-        table.team th,
         table.team td {
-            border: 1px solid var(--border);
-            padding: 0.42rem 0.8rem;
-            text-align: left;
-            font-size: clamp(0.74rem, 1.05vw, 0.85rem);
+            padding: 0.6rem 1.05rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            vertical-align: middle;
         }
 
-        table.team th {
-            background: rgba(255, 255, 255, 0.07);
-            color: #fff;
-            font-weight: 700;
-            font-size: 0.7rem;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
+        table.team tr:last-child td { border-bottom: none; }
+        table.team tbody tr:hover td { background: rgba(255, 255, 255, 0.035); }
 
-        table.team td { color: var(--text); }
-
-        table.team td:last-child {
-            color: var(--muted);
-            font-variant-numeric: tabular-nums;
-            text-align: right;
-            width: 34%;
-        }
-
-        table.team tbody tr:hover td { background: rgba(255, 255, 255, 0.03); }
-
-        .supervisor {
-            color: var(--muted);
-            font-size: 0.78rem;
-            margin: 0 0 1.15rem;
+        .member {
             display: flex;
             align-items: center;
-            gap: 0.4rem;
+            gap: 0.7rem;
         }
 
-        .supervisor strong { color: var(--text); font-weight: 600; }
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+            letter-spacing: 0.02em;
+        }
+
+        .member-name {
+            font-size: clamp(0.95rem, 1.3vw, 1.08rem);
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -0.01em;
+        }
+
+        td.symbol-cell { text-align: right; white-space: nowrap; width: 1%; }
+
+        .symbol {
+            display: inline-block;
+            padding: 0.25rem 0.7rem;
+            border-radius: 8px;
+            background: rgba(102, 126, 234, 0.15);
+            border: 1px solid rgba(102, 126, 234, 0.34);
+            color: #c3cdf8;
+            font-size: clamp(0.92rem, 1.25vw, 1.05rem);
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.03em;
+        }
+
+        /* ---------- supervisor ---------- */
+        .sup-card {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.68rem 1.05rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--card);
+            margin-bottom: 1rem;
+        }
+
+        .sup-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+            color: #fff;
+            font-size: 1.05rem;
+            flex-shrink: 0;
+        }
+
+        .sup-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .sup-name {
+            font-size: clamp(0.98rem, 1.35vw, 1.12rem);
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.01em;
+        }
 
         .cta {
             display: inline-flex;
@@ -348,7 +426,7 @@
         }
 
         /* short desktop screens: let it scroll rather than clip the content */
-        @media (min-width: 992px) and (max-height: 700px) {
+        @media (min-width: 992px) and (max-height: 800px) {
             html, body { overflow: auto; height: auto; }
             body { min-height: 100%; }
         }
@@ -365,7 +443,6 @@
                 <span>DevDoko</span>
             </div>
 
-            <div class="badge-pill anim d1"><i class="bi bi-mortarboard-fill"></i> Project No. 11</div>
 
             <h1 class="anim d1">Social Media Platform <span class="accent">(DevDoko)</span></h1>
 
@@ -394,32 +471,47 @@
                 @endforeach
             </div>
 
-            <table class="team anim d3">
-                <thead>
-                    <tr>
-                        <th>Student Name</th>
-                        <th style="text-align: right;">Symbol No.</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ([
-                        ['Narayan Shrestha', '780627'],
-                        ['Priyanka Karki',   '780637'],
-                        ['Simran Baral',     '780646'],
-                        ['Prekshya Rai',     '780635'],
-                    ] as [$name, $symbolNo])
-                        <tr>
-                            <td>{{ $name }}</td>
-                            <td>{{ $symbolNo }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+            @php
+                // initials precomputed here rather than inline in the markup
+                $members = [
+                    ['name' => 'Narayan Shrestha', 'symbol' => '780627', 'initials' => 'NS', 'grad' => 'linear-gradient(135deg,#667eea,#764ba2)'],
+                    ['name' => 'Priyanka Karki',   'symbol' => '780637', 'initials' => 'PK', 'grad' => 'linear-gradient(135deg,#06b6d4,#3b82f6)'],
+                    ['name' => 'Simran Baral',     'symbol' => '780646', 'initials' => 'SB', 'grad' => 'linear-gradient(135deg,#10b981,#059669)'],
+                    ['name' => 'Prekshya Rai',     'symbol' => '780635', 'initials' => 'PR', 'grad' => 'linear-gradient(135deg,#f472b6,#a78bfa)'],
+                ];
+            @endphp
 
-            <p class="supervisor anim d3">
-                <i class="bi bi-person-badge"></i>
-                Supervisor: <strong>Er. Hemant Kumar Goit</strong>
-            </p>
+            <div class="team-card anim d3">
+                <div class="team-head">
+                    <h2>Submitted By</h2>
+                    <span class="count">{{ count($members) }} members</span>
+                </div>
+                <table class="team">
+                    <tbody>
+                        @foreach ($members as $member)
+                            <tr>
+                                <td>
+                                    <div class="member">
+                                        <span class="avatar" style="background: {{ $member['grad'] }}">{{ $member['initials'] }}</span>
+                                        <span class="member-name">{{ $member['name'] }}</span>
+                                    </div>
+                                </td>
+                                <td class="symbol-cell">
+                                    <span class="symbol">{{ $member['symbol'] }}</span>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="sup-card anim d3">
+                <span class="sup-icon"><i class="bi bi-person-badge-fill"></i></span>
+                <div>
+                    <div class="sup-label">Project Supervisor</div>
+                    <div class="sup-name">Er. Hemant Kumar Goit</div>
+                </div>
+            </div>
 
             <a href="{{ auth()->check() ? route('home') : route('welcome') }}" class="cta anim d4">
                 Continue to DevDoko <i class="bi bi-arrow-right"></i>
