@@ -36,7 +36,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Public Routes
-Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
+// Project cover page is the entry point; it links on to the landing page.
+// The landing page keeps the 'welcome' route name so existing links still work.
+Route::get('/', [HomeController::class, 'cover'])->name('cover');
+Route::get('/landing', [HomeController::class, 'welcome'])->name('welcome');
 Route::get('/jobs', [JobController::class, 'index'])->name('jobs.index');
 Route::get('/jobs/{job}', [JobController::class, 'show'])->name('jobs.show')->whereNumber('job');
 Route::get('/explore', [ExploreController::class, 'index'])->name('explore');

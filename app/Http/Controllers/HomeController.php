@@ -12,6 +12,16 @@ use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
+    /**
+     * Project cover page shown at the site root. Deliberately visible to
+     * everyone, including signed-in users, since it is the project's title
+     * page; the CTA sends them on to the feed or the landing page.
+     */
+    public function cover()
+    {
+        return view('cover');
+    }
+
     public function welcome()
     {
         if (Auth::check()) {
