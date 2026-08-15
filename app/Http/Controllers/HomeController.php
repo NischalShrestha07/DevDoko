@@ -53,7 +53,7 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
-        $posts = Post::with(['user.profile', 'likes', 'saves' => fn ($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
+        $posts = Post::with(['user.profile', 'likes', 'media', 'saves' => fn ($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
             ->visibleTo($user)
             ->latestStable()
             ->paginate(10);
@@ -95,7 +95,7 @@ class HomeController extends Controller
         $user = Auth::user();
         $type = $request->get('type', 'all');
 
-        $posts = Post::with(['user.profile', 'likes', 'saves' => fn ($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
+        $posts = Post::with(['user.profile', 'likes', 'media', 'saves' => fn ($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
             ->visibleTo($user);
 
         if ($type && $type !== 'all') {
@@ -121,7 +121,7 @@ class HomeController extends Controller
 
         $followingIds = $user->following()->pluck('following_id');
 
-        $posts = Post::with(['user.profile', 'likes', 'saves' => fn ($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
+        $posts = Post::with(['user.profile', 'likes', 'media', 'saves' => fn ($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
             ->whereIn('user_id', $followingIds)
             ->visibleTo($user)
             ->latestStable()
@@ -138,7 +138,7 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
-        $posts = Post::with(['user.profile', 'likes', 'saves' => fn ($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
+        $posts = Post::with(['user.profile', 'likes', 'media', 'saves' => fn ($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
             ->visibleTo($user)
             ->where('created_at', '>=', Carbon::now()->subDays(7))
             ->withCount(['likes', 'comments', 'saves'])
@@ -156,7 +156,7 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
-        $posts = Post::with(['user.profile', 'likes', 'saves' => fn ($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
+        $posts = Post::with(['user.profile', 'likes', 'media', 'saves' => fn ($q) => $q->where('user_id', $user->id), 'comments.user.profile', 'tags'])
             ->visibleTo($user)
             ->latestStable()
             ->paginate(10);

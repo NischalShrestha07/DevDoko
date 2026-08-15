@@ -15,11 +15,11 @@
                 <div class="ms-3">
                     <div class="d-flex align-items-center">
                         <a href="{{ route('profile.show', $post->user->profile->username ?? '') }}"
-                            class="text-decoration-none text-dark fw-bold">
+                            class="text-decoration-none app-text-primary fw-bold">
                             {{ $post->user->profile->username ?? '' }}
                         </a>
 
-                        @if($post->user->is_verified)
+                        @if($post->user->profile->is_verified ?? false)
                         <span class="badge bg-primary ms-2" style="font-size: 10px; padding: 2px 6px;">
                             <i class="bi bi-check-circle-fill"></i>
                         </span>
@@ -42,7 +42,7 @@
                         @endif
                     </div>
 
-                    <div class="d-flex align-items-center text-muted" style="font-size: 12px;">
+                    <div class="d-flex align-items-center app-text-muted" style="font-size: 12px;">
                         <span class="me-2">{{ $post->created_at->diffForHumans() }}</span>
                         <i class="bi bi-dot"></i>
                         <span class="ms-2">
@@ -82,8 +82,7 @@
                         <hr class="dropdown-divider">
                     </li>
                     <li>
-                        <form action="{{ route('posts.destroy', $post) }}" method="POST"
-                            onsubmit="return confirm('Are you sure you want to delete this post?');">
+                        <form action="{{ route('posts.destroy', $post) }}" method="POST" class="delete-post-form">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="dropdown-item text-danger">
@@ -124,6 +123,14 @@
                             data-bs-target="#shareModal-{{ $post->id }}">
                             <i class="bi bi-send me-2"></i> Share Post
                         </button>
+                    </li>
+                    <li>
+                        <form action="{{ route('posts.hide', $post) }}" method="POST" class="hide-post-form">
+                            @csrf
+                            <button type="submit" class="dropdown-item">
+                                <i class="bi bi-eye-slash me-2"></i> Not Interested
+                            </button>
+                        </form>
                     </li>
                     <li>
                         <hr class="dropdown-divider">
@@ -190,13 +197,41 @@
         </div>
         @endif
 
-        <!-- Image -->
-        @if($post->type === 'image' && $post->image_url)
+        <!-- Image / Gallery -->
+        @if($post->type === 'image' && ($post->image_url || $post->media->count()))
+        @php
+            $galleryImages = collect([$post->image_url])->merge($post->media->pluck('url'))->filter()->unique()->values();
+        @endphp
         <div class="mb-3">
-            <div class="post-image-container">
-                <img src="{{ $post->image_url }}" alt="Post image" class="post-image"
-                    onclick="openImageModal({{ json_encode($post->image_url) }}, {{ json_encode($post->title) }})">
+            @if($galleryImages->count() > 1)
+            <div id="carousel-{{ $post->id }}" class="carousel slide post-image-container position-relative" data-bs-ride="false">
+                <div class="carousel-inner">
+                    @foreach($galleryImages as $i => $img)
+                    <div class="carousel-item {{ $i === 0 ? 'active' : '' }}">
+                        <img src="{{ $img }}" alt="Post image" class="post-image d-block mx-auto"
+                            data-image-url="{{ $img }}" data-image-title="{{ $post->title }}">
+                    </div>
+                    @endforeach
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ $post->id }}" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ $post->id }}" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                </button>
+                <div class="carousel-indicators position-relative gallery-dots" style="height: auto;">
+                    @foreach($galleryImages as $i => $img)
+                    <button type="button" data-bs-target="#carousel-{{ $post->id }}" data-bs-slide-to="{{ $i }}" class="{{ $i === 0 ? 'active' : '' }}"></button>
+                    @endforeach
+                </div>
+                <span class="badge bg-dark bg-opacity-75 position-absolute top-0 end-0 m-2 gallery-counter">1/{{ $galleryImages->count() }}</span>
             </div>
+            @else
+            <div class="post-image-container">
+                <img src="{{ $galleryImages->first() }}" alt="Post image" class="post-image"
+                    data-image-url="{{ $galleryImages->first() }}" data-image-title="{{ $post->title }}">
+            </div>
+            @endif
         </div>
         @endif
 
@@ -255,81 +290,89 @@
 
     <!-- Post Stats -->
     <div class="card-footer bg-white border-0 pt-0">
-        <!-- Stats Row -->
-        @if($post->views_count > 0 || $post->comments_count > 0 || $post->shares_count > 0 || ($post->saves_count ?? 0) > 0)
-        <div class="px-4 pb-2 border-bottom">
-            <div class="d-flex justify-content-between text-muted small">
-                @if($post->views_count > 0)
-                <div class="d-flex align-items-center">
-                    <i class="bi bi-eye me-1"></i>
-                    <span>{{ $post->views_count }} views</span>
-                </div>
-                @endif
-                @if($post->comments_count > 0)
-                <div class="d-flex align-items-center">
-                    <i class="bi bi-chat me-1"></i>
-                    <span>{{ $post->comments_count }} comments</span>
-                </div>
-                @endif
-                @if($post->shares_count > 0)
-                <div class="d-flex align-items-center">
-                    <i class="bi bi-share me-1"></i>
-                    <span>{{ $post->shares_count }} shares</span>
-                </div>
-                @endif
-                @if(($post->saves_count ?? 0) > 0)
-                <div class="d-flex align-items-center">
-                    <i class="bi bi-bookmark me-1"></i>
-                    <span>{{ $post->saves_count }} saves</span>
-                </div>
-                @endif
-            </div>
-        </div>
-        @endif
-
         <!-- Action Buttons -->
-        <div class="px-4 py-2">
-            <div class="d-flex justify-content-between">
-                <!-- Like Button -->
-                <form action="{{ route('posts.like.toggle', $post) }}" method="POST" class="like-form">
-                    @csrf
-                    <button type="submit" class="btn btn-link text-dark p-0 action-btn">
-                        <i class="bi bi-heart{{ $post->is_liked ? '-fill text-danger' : '' }} fs-5"></i>
-                        <span class="ms-1">{{ $post->likes_count }}</span>
-                    </button>
-                </form>
+        <div class="px-4 pt-2">
+            <div class="d-flex align-items-center gap-1">
+                <!-- Like / Reaction Button -->
+                @php $reactionEmoji = ['like' => '<i class="bi bi-heart-fill text-danger"></i>', 'love' => '❤️', 'haha' => '😂', 'wow' => '😮', 'sad' => '😢', 'angry' => '😡']; @endphp
+                <div class="position-relative reaction-wrap" data-reacted="{{ $post->reaction_type ? '1' : '0' }}">
+                    <form action="{{ route('posts.like.toggle', $post) }}" method="POST" class="like-form">
+                        @csrf
+                        <input type="hidden" name="type" value="{{ $post->reaction_type ?? 'like' }}" class="reaction-type-input">
+                        <button type="submit" class="btn btn-link text-dark p-0 action-btn action-btn-icon">
+                            <span class="reaction-icon fs-4">
+                                @if($post->reaction_type)
+                                    {!! $reactionEmoji[$post->reaction_type] ?? $reactionEmoji['like'] !!}
+                                @else
+                                    <i class="bi bi-heart"></i>
+                                @endif
+                            </span>
+                        </button>
+                    </form>
+                    <div class="reaction-picker">
+                        @foreach($reactionEmoji as $key => $emoji)
+                        <button type="button" class="reaction-option" data-type="{{ $key }}" title="{{ ucfirst($key) }}">{!! $emoji !!}</button>
+                        @endforeach
+                    </div>
+                </div>
 
                 <!-- Comment Button -->
-                <button class="btn btn-link text-dark p-0 action-btn comment-toggle" data-post-id="{{ $post->id }}">
-                    <i class="bi bi-chat fs-5"></i>
-                    <span class="ms-1">Comment</span>
+                <button class="btn btn-link text-dark p-0 action-btn action-btn-icon comment-toggle" data-post-id="{{ $post->id }}">
+                    <i class="bi bi-chat fs-4"></i>
                 </button>
 
                 <!-- Share Button -->
-                <button class="btn btn-link text-dark p-0 action-btn" data-bs-toggle="modal"
+                <button class="btn btn-link text-dark p-0 action-btn action-btn-icon" data-bs-toggle="modal"
                     data-bs-target="#shareModal-{{ $post->id }}">
-                    <i class="bi bi-send fs-5"></i>
-                    <span class="ms-1">Share</span>
+                    <i class="bi bi-send fs-4"></i>
                 </button>
 
                 <!-- Save Button -->
-                <form action="{{ route('posts.save', $post) }}" method="POST" class="save-form">
+                <form action="{{ route('posts.save', $post) }}" method="POST" class="save-form ms-auto">
                     @csrf
                     @if($post->is_saved)
                     @method('DELETE')
-                    <button type="submit" class="btn btn-link text-dark p-0 action-btn">
-                        <i class="bi bi-bookmark-fill fs-5"></i>
-                        <span class="ms-1">Saved</span>
+                    <button type="submit" class="btn btn-link text-dark p-0 action-btn action-btn-icon">
+                        <i class="bi bi-bookmark-fill fs-4"></i>
                     </button>
                     @else
-                    <button type="submit" class="btn btn-link text-dark p-0 action-btn">
-                        <i class="bi bi-bookmark fs-5"></i>
-                        <span class="ms-1">Save</span>
+                    <button type="submit" class="btn btn-link text-dark p-0 action-btn action-btn-icon">
+                        <i class="bi bi-bookmark fs-4"></i>
                     </button>
                     @endif
                 </form>
             </div>
         </div>
+
+        <!-- Likes count -->
+        <div class="px-4 pt-1 likes-count-wrap {{ $post->likes_count > 0 ? '' : 'd-none' }}">
+            <span class="fw-semibold small likes-count-text">{{ number_format($post->likes_count) }} {{ Str::plural('like', $post->likes_count) }}</span>
+        </div>
+
+        <!-- Secondary stats -->
+        @if($post->views_count > 0 || $post->shares_count > 0 || ($post->saves_count ?? 0) > 0)
+        <div class="px-4 pt-1">
+            <div class="d-flex gap-3 text-muted small">
+                @if($post->views_count > 0)
+                <span><i class="bi bi-eye me-1"></i>{{ $post->views_count }}</span>
+                @endif
+                @if($post->shares_count > 0)
+                <span><i class="bi bi-send me-1"></i>{{ $post->shares_count }}</span>
+                @endif
+                @if(($post->saves_count ?? 0) > 0)
+                <span><i class="bi bi-bookmark me-1"></i>{{ $post->saves_count }}</span>
+                @endif
+            </div>
+        </div>
+        @endif
+
+        @if($post->comments_count > 0)
+        <div class="px-4 pt-2">
+            <button class="btn btn-link text-muted p-0 small text-decoration-none comment-toggle" data-post-id="{{ $post->id }}">
+                View all {{ $post->comments_count }} {{ Str::plural('comment', $post->comments_count) }}
+            </button>
+        </div>
+        @endif
 
         <!-- Comments Section (Collapsible) -->
         <div id="comments-{{ $post->id }}" class="collapse">
@@ -351,19 +394,18 @@
 
                 <!-- Add Comment Form -->
                 <div class="mt-3">
-                    <form action="{{ route('comments.store', $post) }}" method="POST" class="comment-form"
+                    <form action="{{ route('comments.store', $post) }}" method="POST" class="comment-form d-flex align-items-center gap-2"
                         id="comment-form-{{ $post->id }}">
                         @csrf
-                        <div class="input-group">
-                            <input type="text" class="form-control border-0" placeholder="Write a comment..."
-                                name="content" id="comment-input-{{ $post->id }}" maxlength="500">
-                            <button class="btn btn-link text-primary text-decoration-none" type="submit">
-                                <i class="bi bi-send"></i>
-                            </button>
-                        </div>
-                        <div class="d-flex justify-content-end mt-1">
-                            <small class="text-muted card-comment-count" id="comment-count-{{ $post->id }}">0/500</small>
-                        </div>
+                        @auth
+                        <img src="{{ auth()->user()->profile->avatar_url }}" alt="{{ auth()->user()->name }}"
+                            class="rounded-circle" style="width: 28px; height: 28px; object-fit: cover;">
+                        @endauth
+                        <input type="text" class="form-control border-0 bg-transparent flex-grow-1" placeholder="Add a comment..."
+                            name="content" id="comment-input-{{ $post->id }}" maxlength="500">
+                        <button class="btn btn-link p-0 fw-semibold text-decoration-none comment-post-btn" type="submit" disabled>
+                            Post
+                        </button>
                     </form>
                 </div>
             </div>
@@ -463,16 +505,19 @@
 if (!window._cardInit) {
     window._cardInit = true;
 
-    // Handle like form submission (event delegation)
+    // Handle like/reaction form submission (event delegation)
+    const REACTION_EMOJI = { like: '<i class="bi bi-heart-fill text-danger"></i>', love: '❤️', haha: '😂', wow: '😮', sad: '😢', angry: '😡' };
+
     document.addEventListener('submit', async function(e) {
         const form = e.target.closest('.like-form');
         if (!form) return;
         e.preventDefault();
 
-        const postId = form.closest('.post-card').dataset.postId;
-        const likeButton = form.querySelector('button');
-        const likeIcon = likeButton.querySelector('i');
-        const likeCount = likeButton.querySelector('span');
+        const wrap = form.closest('.reaction-wrap');
+        const reactionIcon = wrap.querySelector('.reaction-icon');
+        const card = form.closest('.post-card');
+        const likesWrap = card.querySelector('.likes-count-wrap');
+        const likesText = card.querySelector('.likes-count-text');
 
         try {
             const response = await fetch(form.action, {
@@ -486,21 +531,47 @@ if (!window._cardInit) {
 
             if (response.ok) {
                 const data = await response.json();
-                if (data.liked) {
-                    likeIcon.classList.remove('bi-heart');
-                    likeIcon.classList.add('bi-heart-fill', 'text-danger');
-                } else {
-                    likeIcon.classList.remove('bi-heart-fill', 'text-danger');
-                    likeIcon.classList.add('bi-heart');
+                reactionIcon.innerHTML = data.type ? REACTION_EMOJI[data.type] : '<i class="bi bi-heart"></i>';
+                form.querySelector('.reaction-type-input').value = data.type || 'like';
+                wrap.dataset.reacted = data.type ? '1' : '0';
+                if (likesWrap && likesText) {
+                    likesText.textContent = `${data.likes_count} ${data.likes_count === 1 ? 'like' : 'likes'}`;
+                    likesWrap.classList.toggle('d-none', data.likes_count === 0);
                 }
-                likeCount.textContent = data.likes_count;
-                likeIcon.style.transform = 'scale(1.2)';
-                setTimeout(() => {
-                    likeIcon.style.transform = 'scale(1)';
-                }, 200);
+                reactionIcon.style.transform = 'scale(1.25)';
+                setTimeout(() => { reactionIcon.style.transform = 'scale(1)'; }, 200);
             }
         } catch (error) {
             console.error('Error:', error);
+        }
+    });
+
+    // Reaction picker: pick a specific reaction, then submit the like-form
+    document.addEventListener('click', function(e) {
+        const option = e.target.closest('.reaction-option');
+        if (!option) return;
+        const wrap = option.closest('.reaction-wrap');
+        const form = wrap.querySelector('.like-form');
+        form.querySelector('.reaction-type-input').value = option.dataset.type;
+        form.requestSubmit();
+        wrap.classList.remove('picker-open');
+    });
+
+    // Long-press (touch) reveals the picker without submitting the default reaction
+    document.querySelectorAll('.reaction-wrap').forEach(function(wrap) {
+        let holdTimer = null;
+        const trigger = wrap.querySelector('.like-form button');
+        trigger.addEventListener('touchstart', function() {
+            holdTimer = setTimeout(() => wrap.classList.add('picker-open'), 350);
+        }, { passive: true });
+        trigger.addEventListener('touchend', function(e) {
+            if (wrap.classList.contains('picker-open')) e.preventDefault();
+            clearTimeout(holdTimer);
+        });
+    });
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.reaction-wrap')) {
+            document.querySelectorAll('.reaction-wrap.picker-open').forEach(w => w.classList.remove('picker-open'));
         }
     });
 
@@ -559,16 +630,11 @@ if (!window._cardInit) {
         }, { once: true });
     });
 
-    // Card comment character counter (event delegation)
+    // Enable the "Post" button only once the comment box has text (event delegation)
     document.addEventListener('input', function(e) {
         if (!e.target.id || !e.target.id.startsWith('comment-input-')) return;
-        const postId = e.target.id.split('-').pop();
-        const countEl = document.getElementById(`comment-count-${postId}`);
-        if (!countEl) return;
-        const len = e.target.value.trim().length;
-        countEl.textContent = `${len}/500`;
-        countEl.classList.toggle('text-danger', len > 450);
-        countEl.classList.toggle('text-muted', len <= 450);
+        const postBtn = e.target.closest('.comment-form')?.querySelector('.comment-post-btn');
+        if (postBtn) postBtn.disabled = e.target.value.trim().length === 0;
     });
 
     // Handle comment form submission (event delegation)
@@ -597,6 +663,8 @@ if (!window._cardInit) {
                     commentsList.insertAdjacentHTML('afterbegin', data.html);
                 }
                 if (commentInput) commentInput.value = '';
+                const postBtn = form.querySelector('.comment-post-btn');
+                if (postBtn) postBtn.disabled = true;
                 const commentCount = document.querySelector(`#post-${postId} .bi-chat-text + span`);
                 if (commentCount) {
                     const current = parseInt(commentCount.textContent) || 0;
@@ -755,11 +823,53 @@ if (!window._cardInit) {
     // Copy URL to clipboard
     function copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(() => {
-            alert('Link copied to clipboard!');
+            window.DevDoko?.toast('Link copied to clipboard!', 'success');
         }).catch(err => {
             console.error('Failed to copy: ', err);
+            window.DevDoko?.toast('Failed to copy link', 'error');
         });
     }
+
+    // "Not interested" — hide the post and remove its card from the DOM (event delegation)
+    document.addEventListener('submit', async function(e) {
+        const form = e.target.closest('.hide-post-form');
+        if (!form) return;
+        e.preventDefault();
+
+        const card = form.closest('.post-card');
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                window.DevDoko?.toast("You won't see this post again.", 'success');
+                card?.remove();
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+
+    // Delete-post confirmation (event delegation)
+    document.addEventListener('submit', async function(e) {
+        const form = e.target.closest('.delete-post-form');
+        if (!form || form.dataset.confirmed) return;
+        e.preventDefault();
+        const confirmed = window.DevDoko?.confirm
+            ? await window.DevDoko.confirm('Are you sure you want to delete this post?')
+            : confirm('Are you sure you want to delete this post?');
+        if (confirmed) {
+            form.dataset.confirmed = '1';
+            form.submit();
+        }
+    });
 
     // Open image in modal
     function openImageModal(imageUrl, title) {
@@ -770,6 +880,43 @@ if (!window._cardInit) {
         const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
         imageModal.show();
     }
+
+    // Single click opens the image modal; a double-click (within 250ms) instead
+    // likes the post with a heart-burst, Instagram-style — the delay is what lets
+    // us tell the two apart before the first click's action fires.
+    let postImageClickTimer = null;
+    document.addEventListener('click', function(e) {
+        const img = e.target.closest('.post-image');
+        if (!img) return;
+        if (postImageClickTimer) {
+            clearTimeout(postImageClickTimer);
+            postImageClickTimer = null;
+            return;
+        }
+        postImageClickTimer = setTimeout(() => {
+            postImageClickTimer = null;
+            openImageModal(img.dataset.imageUrl, img.dataset.imageTitle);
+        }, 250);
+    });
+
+    document.addEventListener('dblclick', function(e) {
+        const img = e.target.closest('.post-image');
+        if (!img) return;
+        e.preventDefault();
+
+        const container = img.closest('.post-image-container');
+        if (container) {
+            const burst = document.createElement('i');
+            burst.className = 'bi bi-heart-fill heart-burst';
+            container.appendChild(burst);
+            burst.addEventListener('animationend', () => burst.remove());
+        }
+
+        const wrap = img.closest('.post-card')?.querySelector('.reaction-wrap');
+        if (wrap && wrap.dataset.reacted !== '1') {
+            wrap.querySelector('.like-form').requestSubmit();
+        }
+    });
 
     // Load more comments
     async function loadMoreComments(postId) {
@@ -783,6 +930,14 @@ if (!window._cardInit) {
             console.error('Error:', error);
         }
     }
+
+    // Keep the "N/total" gallery badge in sync with the active carousel slide
+    document.addEventListener('slide.bs.carousel', function(e) {
+        const counter = e.target.querySelector('.gallery-counter');
+        if (!counter) return;
+        const total = e.target.querySelectorAll('.carousel-item').length;
+        counter.textContent = `${e.to + 1}/${total}`;
+    });
 
     // Lazy load images
     document.addEventListener('DOMContentLoaded', function() {
@@ -830,6 +985,36 @@ if (!window._cardInit) {
         transition: all 0.2s;
         border-radius: 8px;
         padding: 8px 12px;
+    }
+
+    .action-btn-icon {
+        padding: 6px 10px;
+        line-height: 1;
+    }
+
+    .comment-post-btn:disabled {
+        color: #a3d2ff !important;
+        opacity: 1;
+    }
+
+    .heart-burst {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        font-size: 80px;
+        color: #fff;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+        transform: translate(-50%, -50%) scale(0);
+        pointer-events: none;
+        z-index: 5;
+        animation: heartBurst 0.7s ease-out forwards;
+    }
+
+    @keyframes heartBurst {
+        0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+        15% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+        30% { transform: translate(-50%, -50%) scale(0.95); }
+        100% { transform: translate(-50%, -50%) scale(1.05); opacity: 0; }
     }
 
     .action-btn:hover {
@@ -963,5 +1148,73 @@ if (!window._cardInit) {
 
     #imageModal .btn-close-white {
         filter: invert(1) grayscale(100%) brightness(200%);
+    }
+
+    .reaction-picker {
+        position: absolute;
+        bottom: 100%;
+        left: -8px;
+        z-index: 20;
+        display: flex;
+        gap: 2px;
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 24px;
+        padding: 4px;
+        margin-bottom: 6px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(4px) scale(0.9);
+        transform-origin: bottom left;
+        transition: opacity 0.12s ease, transform 0.12s ease;
+    }
+
+    [data-bs-theme="dark"] .reaction-picker {
+        background: #161b22;
+        border-color: #30363d;
+    }
+
+    .reaction-wrap:hover .reaction-picker,
+    .reaction-wrap.picker-open .reaction-picker {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0) scale(1);
+    }
+
+    .reaction-option {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        font-size: 19px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.12s ease;
+    }
+
+    .reaction-option:hover {
+        transform: scale(1.3) translateY(-3px);
+    }
+
+    .gallery-dots {
+        margin: 0 !important;
+        padding-top: 8px;
+        bottom: -4px;
+    }
+
+    .gallery-dots [data-bs-target] {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: #adb5bd;
+        opacity: 1;
+    }
+
+    .gallery-dots [data-bs-target].active {
+        background-color: #0d6efd;
     }
 </style>

@@ -5,7 +5,7 @@
 @section('content')
 <div class="container py-4">
     <div class="d-flex align-items-center gap-2 mb-4">
-        <a href="{{ route('jobs.index') }}" class="text-decoration-none text-dark d-flex align-items-center gap-1">
+        <a href="{{ route('jobs.index') }}" class="text-decoration-none app-text-primary d-flex align-items-center gap-1">
             <i class="bi bi-arrow-left"></i>
             <span>Back to Jobs</span>
         </a>
@@ -19,7 +19,7 @@
                         <i class="bi bi-plus-circle text-primary me-2"></i>
                         Post a Job
                     </h4>
-                    <p class="text-muted mb-4">Fill in the details to attract the best talent</p>
+                    <p class="app-text-muted mb-4">Fill in the details to attract the best talent</p>
 
                     @include('jobs.partials.form', [
                         'job' => null,

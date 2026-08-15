@@ -215,9 +215,9 @@
 
                             <div class="border rounded p-4 text-center" id="uploadArea">
                                 <div id="uploadPrompt">
-                                    <i class="bi bi-cloud-arrow-up fs-1 text-muted d-block mb-3"></i>
-                                    <p class="text-muted mb-3">Drag & drop images or click to browse</p>
-                                    <p class="text-muted small mb-3">Upload up to 10 images (max 5MB each)</p>
+                                    <i class="bi bi-cloud-arrow-up fs-1 app-text-muted d-block mb-3"></i>
+                                    <p class="app-text-muted mb-3">Drag & drop images or click to browse</p>
+                                    <p class="app-text-muted small mb-3">Upload up to 10 images (max 5MB each)</p>
                                     <button type="button" class="btn btn-primary" id="browseBtn">
                                         <i class="bi bi-upload"></i> Select Images
                                     </button>

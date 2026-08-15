@@ -56,6 +56,16 @@
     </button>
 </form>
 
+<div style="display: flex; align-items: center; gap: 0.75rem; margin: 1.25rem 0; color: #8b949e; font-size: 0.8125rem;">
+    <div style="flex: 1; height: 1px; background: #dee2e6;"></div>
+    <span>or</span>
+    <div style="flex: 1; height: 1px; background: #dee2e6;"></div>
+</div>
+
+<a href="{{ route('auth.github.redirect') }}" class="auth-submit-btn" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #24292f; text-decoration: none;">
+    <i class="bi bi-github"></i> Continue with GitHub
+</a>
+
 <p class="auth-footer-text">
     Don't have an account?
     <a href="{{ route('register') }}">Create one free</a>

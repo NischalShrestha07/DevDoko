@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\GithubAuthController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\JobController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\MarketplaceInterestController;
+use App\Http\Controllers\MarketplaceReviewController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
@@ -51,6 +53,10 @@ Route::get('/tech-trending', [TagController::class, 'trending'])->name('tech.tre
 Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
 Route::get('/groups/categories/{category}', [GroupController::class, 'category'])->name('groups.category');
 Route::get('/groups/invitation/{token}', [GroupController::class, 'acceptInvitation'])->name('groups.accept-invitation');
+Route::post('/groups/{group:slug}/report', [GroupController::class, 'report'])->name('groups.report')->middleware('auth');
+
+Route::get('/auth/github/redirect', [GithubAuthController::class, 'redirect'])->name('auth.github.redirect');
+Route::get('/auth/github/callback', [GithubAuthController::class, 'callback'])->name('auth.github.callback');
 
 // Auth routes
 Route::middleware('guest')->group(function () {
@@ -83,7 +89,7 @@ Route::middleware('auth')->group(function () {
     // Posts Routes
     Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
-    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+    Route::post('/posts', [PostController::class, 'store'])->name('posts.store')->middleware('throttle:10,1');
     Route::post('/posts/upload-image', [PostController::class, 'uploadImage'])->name('posts.upload-image');
     Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
@@ -107,9 +113,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/posts/{post}/pin', [PostController::class, 'pin'])->name('posts.pin');
     Route::post('/posts/{post}/share', [PostController::class, 'share'])->name('posts.share');
     Route::post('/posts/{post}/report', [PostController::class, 'report'])->name('posts.report');
+    Route::post('/posts/{post}/hide', [PostController::class, 'hide'])->name('posts.hide');
 
     // Comments
-    Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store')->middleware('throttle:10,1');
     Route::get('/posts/{post}/comments', [CommentController::class, 'index'])->name('comments.index');
     Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
@@ -126,7 +133,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings/blocked', [BlockController::class, 'index'])->name('blocks.index');
     Route::post('/users/{user}/block', [BlockController::class, 'store'])->name('users.block');
     Route::delete('/users/{user}/block', [BlockController::class, 'destroy'])->name('users.unblock');
-    // Route::post('/users/{user}/follow', [FollowController::class, 'toggle'])->name('follow.toggle');
 
     // Profile Management
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -164,6 +170,7 @@ Route::middleware('auth')->group(function () {
 
     // Search
     Route::get('/search', [SearchController::class, 'index'])->name('search');
+    Route::get('/search/quick', [SearchController::class, 'quick'])->name('search.quick');
 
     // Saved Posts
     Route::get('/saved', [SaveController::class, 'index'])->name('saved.index');
@@ -172,6 +179,10 @@ Route::middleware('auth')->group(function () {
 
     // Admin
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::post('/admin/users/{user}/toggle-verified', [AdminController::class, 'toggleVerified'])->name('admin.users.toggle-verified');
+    Route::get('/admin/reports', [AdminController::class, 'reports'])->name('admin.reports');
+    Route::post('/admin/reports/{report}/resolve', [AdminController::class, 'resolveReport'])->name('admin.reports.resolve');
+    Route::post('/admin/reports/{report}/dismiss', [AdminController::class, 'dismissReport'])->name('admin.reports.dismiss');
 
     // Developers
     Route::get('/developers', [DeveloperController::class, 'index'])->name('developers.index');
@@ -186,6 +197,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
     Route::post('/projects/{project}/fork', [ProjectController::class, 'fork'])->name('projects.fork');
     Route::post('/projects/{project}/collaboration', [ProjectController::class, 'requestCollaboration'])->name('projects.request.collaboration');
+    Route::post('/projects/collaborations/{collaboration}/approve', [ProjectController::class, 'approveCollaboration'])->name('projects.collaboration.approve');
+    Route::post('/projects/collaborations/{collaboration}/reject', [ProjectController::class, 'rejectCollaboration'])->name('projects.collaboration.reject');
 
     // Marketplace Routes
     Route::prefix('marketplace')->name('marketplace.')->group(function () {
@@ -221,6 +234,9 @@ Route::middleware('auth')->group(function () {
                 // Interests
                 Route::post('/interest', [MarketplaceController::class, 'expressInterest'])->name('interest');
                 Route::post('/save', [MarketplaceController::class, 'toggleSave'])->name('save');
+
+                // Reviews
+                Route::post('/reviews', [MarketplaceReviewController::class, 'store'])->name('reviews.store');
             });
 
             // Interest responses
@@ -280,7 +296,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/invite', [GroupController::class, 'invite'])->name('groups.invite');
 
         // Posts
-        Route::post('/posts', [GroupController::class, 'storePost'])->name('groups.posts.store');
+        Route::post('/posts', [GroupController::class, 'storePost'])->name('groups.posts.store')->middleware('throttle:10,1');
         Route::get('/posts/{post}', [GroupController::class, 'showPost'])->name('groups.post');
         Route::post('/posts/{post}/like', [GroupController::class, 'likePost'])->name('groups.posts.like');
         Route::post('/posts/{post}/pin', [GroupController::class, 'pinPost'])->name('groups.posts.pin');
@@ -299,7 +315,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/comments/{comment}', [GroupController::class, 'updateComment'])->name('groups.comments.update');
 
         // Post Comments
-        Route::post('/posts/{post}/comments', [GroupController::class, 'storeComment'])->name('groups.posts.comments.store');
+        Route::post('/posts/{post}/comments', [GroupController::class, 'storeComment'])->name('groups.posts.comments.store')->middleware('throttle:10,1');
         Route::delete('/comments/{comment}', [GroupController::class, 'deleteComment'])->name('groups.comments.destroy');
         Route::post('/comments/{comment}/like', [GroupController::class, 'likeComment'])->name('groups.comments.like');
 

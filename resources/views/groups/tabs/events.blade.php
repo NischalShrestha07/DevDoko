@@ -21,14 +21,14 @@
                 <div class="card border h-100">
                     <div class="card-body">
                         <div class="d-flex align-items-start">
-                            <div class="bg-light rounded p-3 text-center me-3" style="min-width: 70px;">
-                                <div class="small text-muted">{{ $event->starts_at->format('M') }}</div>
+                            <div class="app-bg-secondary rounded p-3 text-center me-3" style="min-width: 70px;">
+                                <div class="small app-text-muted">{{ $event->starts_at->format('M') }}</div>
                                 <div class="fs-3 fw-bold">{{ $event->starts_at->format('d') }}</div>
                             </div>
                             <div class="flex-grow-1">
                                 <h6 class="fw-semibold mb-1">{{ $event->title }}</h6>
                                 <div class="d-flex flex-wrap gap-2 mb-2">
-                                    <span class="badge bg-light text-dark">
+                                    <span class="badge app-bg-secondary app-text-primary">
                                         {{ match($event->type) {
                                         'meetup' => '🤝 Meetup',
                                         'hackathon' => '⚡ Hackathon',
@@ -38,7 +38,7 @@
                                         default => '📅 Event',
                                         } }}
                                     </span>
-                                    <span class="badge bg-light text-dark">
+                                    <span class="badge app-bg-secondary app-text-primary">
                                         {{ match($event->format) {
                                         'online' => '🌐 Online',
                                         'in_person' => '📍 In Person',
@@ -47,7 +47,7 @@
                                         } }}
                                     </span>
                                 </div>
-                                <p class="small text-muted mb-2">{{ Str::limit($event->description, 100) }}</p>
+                                <p class="small app-text-muted mb-2">{{ Str::limit($event->description, 100) }}</p>
                                 <div class="d-flex align-items-center gap-2 small mb-2">
                                     <i class="bi bi-clock"></i>
                                     <span>
@@ -72,7 +72,7 @@
                                 @endif
                                 <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
                                     <div>
-                                        <span class="small text-muted">
+                                        <span class="small app-text-muted">
                                             <i class="bi bi-people"></i> {{ $event->attendees_count ?? 0 }}/{{
                                             $event->max_attendees ?? '∞' }} attending
                                         </span>
@@ -115,10 +115,10 @@
         </div>
         @else
         <div class="text-center py-5">
-            <i class="bi bi-calendar-x fs-1 text-muted"></i>
-            <p class="text-muted mt-3 mb-0">No upcoming events.</p>
+            <i class="bi bi-calendar-x fs-1 app-text-muted"></i>
+            <p class="app-text-muted mt-3 mb-0">No upcoming events.</p>
             @if($group->is_member)
-            <p class="text-muted small">Organize your first event!</p>
+            <p class="app-text-muted small">Organize your first event!</p>
             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#createEventModal">
                 <i class="bi bi-plus-lg"></i> Create Event

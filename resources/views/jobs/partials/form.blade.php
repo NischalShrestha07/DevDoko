@@ -87,7 +87,7 @@
         </div>
 
         <div class="col-md-6">
-            <label for="location" class="form-label fw-semibold">Location <span class="text-muted fw-normal">(optional)</span></label>
+            <label for="location" class="form-label fw-semibold">Location <span class="app-text-muted fw-normal">(optional)</span></label>
             <input type="text" name="location" id="location"
                 class="form-control @error('location') is-invalid @enderror"
                 value="{{ old('location', $job->location ?? '') }}" placeholder="e.g. Kathmandu, Nepal">
@@ -98,7 +98,7 @@
 
         <div class="col-12">
             <label for="required_skills" class="form-label fw-semibold">
-                Required Skills <span class="text-muted fw-normal">(comma separated)</span>
+                Required Skills <span class="app-text-muted fw-normal">(comma separated)</span>
             </label>
             <input type="text" name="required_skills" id="required_skills"
                 class="form-control @error('required_skills') is-invalid @enderror"
@@ -111,7 +111,7 @@
         </div>
 
         <div class="col-md-6">
-            <label for="company_website" class="form-label fw-semibold">Company Website <span class="text-muted fw-normal">(optional)</span></label>
+            <label for="company_website" class="form-label fw-semibold">Company Website <span class="app-text-muted fw-normal">(optional)</span></label>
             <input type="url" name="company_website" id="company_website"
                 class="form-control @error('company_website') is-invalid @enderror"
                 value="{{ old('company_website', $job->company_website ?? '') }}" placeholder="https://example.com">
@@ -131,7 +131,7 @@
         </div>
 
         <div class="col-md-5">
-            <label for="salary_min" class="form-label fw-semibold">Salary Min <span class="text-muted fw-normal">(optional)</span></label>
+            <label for="salary_min" class="form-label fw-semibold">Salary Min <span class="app-text-muted fw-normal">(optional)</span></label>
             <input type="number" name="salary_min" id="salary_min"
                 class="form-control @error('salary_min') is-invalid @enderror"
                 value="{{ old('salary_min', $job->salary_min ?? '') }}" min="0" step="0.01" placeholder="0">
@@ -141,7 +141,7 @@
         </div>
 
         <div class="col-md-5">
-            <label for="salary_max" class="form-label fw-semibold">Salary Max <span class="text-muted fw-normal">(optional)</span></label>
+            <label for="salary_max" class="form-label fw-semibold">Salary Max <span class="app-text-muted fw-normal">(optional)</span></label>
             <input type="number" name="salary_max" id="salary_max"
                 class="form-control @error('salary_max') is-invalid @enderror"
                 value="{{ old('salary_max', $job->salary_max ?? '') }}" min="0" step="0.01" placeholder="0">

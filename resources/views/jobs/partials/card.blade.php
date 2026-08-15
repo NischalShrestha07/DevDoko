@@ -8,13 +8,13 @@
         </div>
 
         <h5 class="fw-bold mb-1">
-            <a href="{{ route('jobs.show', $job) }}" class="text-decoration-none text-dark stretched-link">
+            <a href="{{ route('jobs.show', $job) }}" class="text-decoration-none app-text-primary stretched-link">
                 {{ $job->title }}
             </a>
         </h5>
-        <p class="text-muted mb-3">{{ $job->company_name }}</p>
+        <p class="app-text-muted mb-3">{{ $job->company_name }}</p>
 
-        <div class="d-flex flex-wrap gap-3 mb-3 small text-muted">
+        <div class="d-flex flex-wrap gap-3 mb-3 small app-text-muted">
             @if($job->location)
                 <span><i class="bi bi-geo-alt me-1"></i>{{ $job->location }}</span>
             @endif
@@ -48,10 +48,10 @@
 
     <div class="card-footer bg-white border-0 px-4 py-3">
         <div class="d-flex justify-content-between align-items-center">
-            <small class="text-muted">
+            <small class="app-text-muted">
                 <i class="bi bi-clock me-1"></i>{{ $job->created_at->diffForHumans() }}
             </small>
-            <small class="text-muted">
+            <small class="app-text-muted">
                 <i class="bi bi-eye me-1"></i>{{ $job->views_count }}
             </small>
         </div>

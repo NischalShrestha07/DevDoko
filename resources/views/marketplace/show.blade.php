@@ -26,9 +26,9 @@
                         <img src="{{ Storage::url($listing->images->first()->image_path) }}" class="img-fluid rounded"
                             alt="{{ $listing->title }}" style="max-height: 500px; width: 100%; object-fit: contain;">
                         @else
-                        <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                        <div class="app-bg-secondary rounded d-flex align-items-center justify-content-center"
                             style="height: 400px;">
-                            <i class="bi bi-image text-muted" style="font-size: 64px;"></i>
+                            <i class="bi bi-image app-text-muted" style="font-size: 64px;"></i>
                         </div>
                         @endif
                     </div>
@@ -39,7 +39,7 @@
                         @foreach($listing->images as $image)
                         <div class="col-3">
                             <img src="{{ Storage::url($image->image_path) }}" class="img-fluid rounded thumbnail-img"
-                                alt="Thumbnail" style="height: 80px; width: 100%; object-fit: cover; cursor: pointer;"
+                                alt="{{ $listing->title }}" style="height: 80px; width: 100%; object-fit: cover; cursor: pointer;"
                                 onclick="this.closest('.row').previousElementSibling.querySelector('img').src = this.src">
                         </div>
                         @endforeach
@@ -63,7 +63,7 @@
                     </div>
 
                     <!-- Seller Info -->
-                    <div class="d-flex align-items-center mb-4 p-3 bg-light rounded">
+                    <div class="d-flex align-items-center mb-4 p-3 app-bg-secondary rounded">
                         <img src="{{ $listing->user->profile->avatar_url }}" class="rounded-circle me-3"
                             style="width: 48px; height: 48px; object-fit: cover;">
                         <div>
@@ -71,7 +71,7 @@
                                 class="text-decoration-none fw-semibold d-block">
                                 {{ $listing->user->profile->username }}
                             </a>
-                            <small class="text-muted">Member since {{ $listing->user->created_at->format('M Y')
+                            <small class="app-text-muted">Member since {{ $listing->user->created_at->format('M Y')
                                 }}</small>
                         </div>
                     </div>
@@ -106,29 +106,29 @@
                     <!-- Details Table -->
                     <table class="table table-borderless">
                         <tr>
-                            <td class="text-muted">Condition:</td>
+                            <td class="app-text-muted">Condition:</td>
                             <td class="fw-semibold">{{ $listing->condition_label ?? 'Not specified' }}</td>
                         </tr>
                         @if($listing->brand)
                         <tr>
-                            <td class="text-muted">Brand:</td>
+                            <td class="app-text-muted">Brand:</td>
                             <td class="fw-semibold">{{ $listing->brand }}</td>
                         </tr>
                         @endif
                         @if($listing->model)
                         <tr>
-                            <td class="text-muted">Model:</td>
+                            <td class="app-text-muted">Model:</td>
                             <td class="fw-semibold">{{ $listing->model }}</td>
                         </tr>
                         @endif
                         @if($listing->location)
                         <tr>
-                            <td class="text-muted">Location:</td>
+                            <td class="app-text-muted">Location:</td>
                             <td class="fw-semibold">{{ $listing->location }}</td>
                         </tr>
                         @endif
                         <tr>
-                            <td class="text-muted">Shipping:</td>
+                            <td class="app-text-muted">Shipping:</td>
                             <td class="fw-semibold">
                                 @if($listing->is_shippable)
                                 <span class="badge bg-success">Available</span>
@@ -138,7 +138,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="text-muted">Local Pickup:</td>
+                            <td class="app-text-muted">Local Pickup:</td>
                             <td class="fw-semibold">
                                 @if($listing->is_local_pickup)
                                 <span class="badge bg-success">Available</span>
@@ -148,21 +148,88 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="text-muted">Listed:</td>
+                            <td class="app-text-muted">Listed:</td>
                             <td class="fw-semibold">{{ $listing->created_at->format('M d, Y') }}</td>
                         </tr>
                         <tr>
-                            <td class="text-muted">Views:</td>
+                            <td class="app-text-muted">Views:</td>
                             <td class="fw-semibold">{{ $listing->views_count }}</td>
                         </tr>
                     </table>
 
                     <!-- Description -->
                     <h6 class="fw-semibold mt-4 mb-2">Description</h6>
-                    <p class="text-muted">{{ nl2br(e($listing->description)) }}</p>
+                    <p class="app-text-muted">{{ nl2br(e($listing->description)) }}</p>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Reviews -->
+    <div class="mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="fw-semibold mb-0">
+                Reviews
+                @if($reviews->count() > 0)
+                <span class="app-text-muted fw-normal">
+                    ({{ $reviews->count() }}) &middot; <i class="bi bi-star-fill text-warning"></i> {{ $averageRating }}
+                </span>
+                @endif
+            </h5>
+        </div>
+
+        @if($canReview)
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h6 class="fw-semibold mb-3">Leave a Review</h6>
+                <form action="{{ route('marketplace.reviews.store', $listing->slug) }}" method="POST">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label">Rating</label>
+                        <select name="rating" class="form-select" style="max-width: 200px;" required>
+                            <option value="">Select rating</option>
+                            @for($i = 5; $i >= 1; $i--)
+                            <option value="{{ $i }}">{{ $i }} {{ Str::plural('star', $i) }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Comment (optional)</label>
+                        <textarea name="comment" class="form-control" rows="3"
+                            placeholder="Share your experience with this seller..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
+            </div>
+        </div>
+        @endif
+
+        @forelse($reviews as $review)
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ $review->buyer->profile->avatar_url }}" class="rounded-circle me-2"
+                            style="width: 32px; height: 32px; object-fit: cover;" alt="{{ $review->buyer->name }}">
+                        <div>
+                            <div class="fw-semibold small">{{ $review->buyer->name }}</div>
+                            <div class="app-text-muted" style="font-size: 0.75rem;">{{ $review->created_at->diffForHumans() }}</div>
+                        </div>
+                    </div>
+                    <span class="text-warning">
+                        @for($i = 1; $i <= 5; $i++)
+                        <i class="bi bi-star{{ $i <= $review->rating ? '-fill' : '' }}"></i>
+                        @endfor
+                    </span>
+                </div>
+                @if($review->comment)
+                <p class="mb-0">{{ $review->comment }}</p>
+                @endif
+            </div>
+        </div>
+        @empty
+        <p class="app-text-muted">No reviews yet.</p>
+        @endforelse
     </div>
 
     <!-- Similar Listings -->
@@ -202,7 +269,7 @@
                             <span class="input-group-text">Rs</span>
                             <input type="number" class="form-control" name="offered_price" step="0.01" min="0">
                         </div>
-                        <small class="text-muted">Leave blank to accept listed price</small>
+                        <small class="app-text-muted">Leave blank to accept listed price</small>
                     </div>
                 </form>
             </div>
@@ -290,6 +357,14 @@ document.addEventListener('DOMContentLoaded', function() {
             bsModal.show();
         };
 
+        const interestModalEl = document.getElementById('interestModal');
+        if (interestModalEl) {
+            interestModalEl.addEventListener('hidden.bs.modal', function() {
+                document.querySelector('#interestModal textarea[name="message"]').value = '';
+                document.querySelector('#interestModal input[name="offered_price"]').value = '';
+            });
+        }
+
         const submitInterestBtn = document.getElementById('submitInterestBtn');
         if (submitInterestBtn) {
             submitInterestBtn.addEventListener('click', async function() {
@@ -303,6 +378,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const message = document.querySelector('#interestModal textarea[name="message"]').value;
                 const offeredPrice = document.querySelector('#interestModal input[name="offered_price"]').value;
+
+                if (window.DevDoko && window.DevDoko.setLoading) {
+                    window.DevDoko.setLoading(submitInterestBtn, true);
+                }
 
                 try {
                     const response = await fetch(`/marketplace/${listingSlug}/interest`, {
@@ -324,9 +403,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         const bsModal = bootstrap.Modal.getInstance(modal);
                         bsModal.hide();
 
-                        document.querySelector('#interestModal textarea[name="message"]').value = '';
-                        document.querySelector('#interestModal input[name="offered_price"]').value = '';
-
                         alert('Interest expressed successfully! The seller will contact you soon.');
                     } else {
                         alert(data.error || data.message || 'Failed to express interest');
@@ -334,6 +410,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 } catch (error) {
                     console.error('Error expressing interest:', error);
                     alert('Failed to express interest. Please try again.');
+                } finally {
+                    if (window.DevDoko && window.DevDoko.setLoading) {
+                        window.DevDoko.setLoading(submitInterestBtn, false);
+                    }
                 }
             });
         }

@@ -15,19 +15,37 @@ class Profile extends Model
         'github_link',
         'portfolio_link',
         'reputation_score',
+        'is_verified',
     ];
 
-    protected $appends = ['avatar_url'];
+    protected $casts = [
+        'is_verified' => 'boolean',
+    ];
+
+    protected $appends = ['avatar_url', 'completeness'];
+
+    /** Rough profile-completion score (0-100) for the "complete your profile" nudge. */
+    public function getCompletenessAttribute(): int
+    {
+        $checks = [
+            ! empty($this->avatar),
+            ! empty($this->bio),
+            $this->relationLoaded('techTags') ? $this->techTags->isNotEmpty() : $this->techTags()->exists(),
+            ! empty($this->github_link) || ! empty($this->portfolio_link),
+        ];
+
+        return (int) round((array_sum($checks) / count($checks)) * 100);
+    }
 
     public function getAvatarUrlAttribute()
     {
         if ($this->avatar) {
-            return asset('storage/' . $this->avatar);
+            return asset('storage/'.$this->avatar);
         }
 
         return 'https://ui-avatars.com/api/?name='
-            . urlencode($this->username)
-            . '&background=random&color=fff';
+            .urlencode($this->username)
+            .'&background=random&color=fff';
     }
 
     public function user()
@@ -46,7 +64,7 @@ class Profile extends Model
         $this->increment('reputation_score', $points);
 
         // Create reputation log
-        \App\Models\ReputationLog::create([
+        ReputationLog::create([
             'user_id' => $this->user_id,
             'action' => $action,
             'points' => $points,

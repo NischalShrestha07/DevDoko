@@ -19,23 +19,23 @@
         </div>
 
         <div class="card-body">
-            <h6 class="fw-semibold text-dark mb-2">{{ Str::limit($listing->title, 50) }}</h6>
+            <h6 class="fw-semibold app-text-primary mb-2">{{ Str::limit($listing->title, 50) }}</h6>
 
-            <p class="small text-muted mb-2">
+            <p class="small app-text-muted mb-2">
                 <i class="bi bi-person-circle me-1"></i>
                 {{ $listing->user->profile->username }}
             </p>
 
             <div class="d-flex justify-content-between align-items-center">
                 <span class="h5 fw-bold text-primary mb-0">{{ $listing->formatted_price }}</span>
-                <small class="text-muted">
+                <small class="app-text-muted">
                     <i class="bi bi-clock"></i> {{ $listing->time_ago }}
                 </small>
             </div>
 
             @if($listing->category)
             <div class="mt-2">
-                <span class="badge bg-light text-dark">{{ $listing->category }}</span>
+                <span class="badge app-bg-secondary app-text-primary">{{ $listing->category }}</span>
             </div>
             @endif
         </div>

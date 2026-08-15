@@ -40,7 +40,7 @@
 
     <!-- Sort Options -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <p class="text-muted mb-0">
+        <p class="app-text-muted mb-0">
             Showing {{ $developers->firstItem() }}-{{ $developers->lastItem() }} of {{ $developers->total() }}
             developers
         </p>
@@ -76,11 +76,11 @@
                         </a>
                         <div class="flex-grow-1">
                             <a href="{{ route('profile.show', $developer->profile->username) }}"
-                                class="text-decoration-none text-dark">
+                                class="text-decoration-none app-text-primary">
                                 <h5 class="fw-semibold mb-1">{{ $developer->profile->username ?? $developer->name }}
                                 </h5>
                             </a>
-                            <p class="text-muted small mb-1">{{ $developer->profile->title ?? 'Developer' }}</p>
+                            <p class="app-text-muted small mb-1">{{ $developer->profile->title ?? 'Developer' }}</p>
                             @if($developer->isOnline())
                             <span class="badge bg-success bg-opacity-10 text-success rounded-pill">
                                 <span class="dot me-1 bg-success"
@@ -112,7 +112,7 @@
                     @endif
 
                     <!-- Bio -->
-                    <p class="small text-muted mb-3" style="min-height: 40px;">
+                    <p class="small app-text-muted mb-3" style="min-height: 40px;">
                         {{ Str::limit($developer->profile->bio ?? 'No bio yet', 80) }}
                     </p>
 
@@ -120,15 +120,15 @@
                     <div class="d-flex justify-content-around mb-3 pt-2 border-top">
                         <div class="text-center">
                             <span class="fw-bold">{{ $developer->followers_count ?? 0 }}</span>
-                            <small class="text-muted d-block">Followers</small>
+                            <small class="app-text-muted d-block">Followers</small>
                         </div>
                         <div class="text-center">
                             <span class="fw-bold">{{ $developer->posts_count ?? 0 }}</span>
-                            <small class="text-muted d-block">Posts</small>
+                            <small class="app-text-muted d-block">Posts</small>
                         </div>
                         <div class="text-center">
                             <span class="fw-bold">{{ $developer->projects_count ?? 0 }}</span>
-                            <small class="text-muted d-block">Projects</small>
+                            <small class="app-text-muted d-block">Projects</small>
                         </div>
                     </div>
 
@@ -169,11 +169,11 @@
         @empty
         <div class="col-12">
             <div class="text-center py-5">
-                <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
-                    <i class="bi bi-people fs-1 text-muted"></i>
+                <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
+                    <i class="bi bi-people fs-1 app-text-muted"></i>
                 </div>
                 <h5 class="mt-3">No developers found</h5>
-                <p class="text-muted mb-3">Try adjusting your search or filters</p>
+                <p class="app-text-muted mb-3">Try adjusting your search or filters</p>
                 <a href="{{ route('developers.index') }}" class="btn btn-primary">
                     <i class="bi bi-arrow-repeat me-2"></i>Clear Filters
                 </a>

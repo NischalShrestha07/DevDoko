@@ -11,7 +11,7 @@
                 <i class="bi bi-heart me-2 text-primary"></i>
                 My Interests
             </h1>
-            <p class="text-muted mb-0">Items you've shown interest in</p>
+            <p class="app-text-muted mb-0">Items you've shown interest in</p>
         </div>
         <a href="{{ route('marketplace.index') }}" class="btn btn-outline-primary">
             <i class="bi bi-shop me-2"></i> Browse More
@@ -30,8 +30,8 @@
                             class="card-img-top" alt="{{ $interest->listing->title }}"
                             style="height: 160px; object-fit: cover;">
                         @else
-                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 160px;">
-                            <i class="bi bi-image text-muted fs-1"></i>
+                        <div class="app-bg-secondary d-flex align-items-center justify-content-center" style="height: 160px;">
+                            <i class="bi bi-image app-text-muted fs-1"></i>
                         </div>
                         @endif
                         <span
@@ -44,12 +44,12 @@
                 <div class="card-body">
                     <h6 class="fw-semibold mb-1">
                         <a href="{{ route('marketplace.show', $interest->listing->slug) }}"
-                            class="text-dark text-decoration-none">
+                            class="app-text-primary text-decoration-none">
                             {{ Str::limit($interest->listing->title, 40) }}
                         </a>
                     </h6>
 
-                    <p class="small text-muted mb-2">
+                    <p class="small app-text-muted mb-2">
                         <i class="bi bi-person-circle me-1"></i>
                         <a href="{{ route('profile.show', $interest->listing->user->profile->username) }}"
                             class="text-decoration-none">
@@ -72,7 +72,7 @@
                     @endif
 
                     <div class="d-flex justify-content-between align-items-center mt-2">
-                        <small class="text-muted">
+                        <small class="app-text-muted">
                             <i class="bi bi-clock"></i> {{ $interest->created_at->diffForHumans() }}
                         </small>
 
@@ -93,9 +93,9 @@
     </div>
     @else
     <div class="text-center py-5">
-        <i class="bi bi-heart display-1 text-muted"></i>
+        <i class="bi bi-heart display-1 app-text-muted"></i>
         <h5 class="mt-3 mb-2">No interests yet</h5>
-        <p class="text-muted">When you express interest in items, they'll appear here</p>
+        <p class="app-text-muted">When you express interest in items, they'll appear here</p>
         <a href="{{ route('marketplace.index') }}" class="btn btn-primary">
             <i class="bi bi-shop me-2"></i> Browse Marketplace
         </a>

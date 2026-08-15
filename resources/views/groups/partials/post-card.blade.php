@@ -10,11 +10,11 @@
         <div class="d-flex justify-content-between align-items-start mb-1">
             <div>
                 <a href="{{ route('profile.show', $post->user->profile->username ?? $post->user->name) }}"
-                    class="text-decoration-none text-dark fw-semibold">
+                    class="text-decoration-none app-text-primary fw-semibold">
                     {{ $post->user->profile->username ?? $post->user->name }}
                 </a>
-                <span class="text-muted mx-2">·</span>
-                <span class="text-muted small">{{ $post->formatted_date }}</span>
+                <span class="app-text-muted mx-2">·</span>
+                <span class="app-text-muted small">{{ $post->formatted_date }}</span>
                 @if($post->is_pinned)
                 <span class="badge bg-warning bg-opacity-10 text-warning ms-2">
                     <i class="bi bi-pin-angle-fill"></i> Pinned
@@ -28,12 +28,12 @@
 
         <h6 class="fw-semibold mb-2">
             <a href="{{ route('groups.post', [$post->group->slug, $post->id]) }}"
-                class="text-dark text-decoration-none">
+                class="app-text-primary text-decoration-none">
                 {{ $post->title }}
             </a>
         </h6>
 
-        <p class="text-muted mb-2">{{ Str::limit($post->content, 200) }}</p>
+        <p class="app-text-muted mb-2">{{ Str::limit($post->content, 200) }}</p>
 
         {{-- Attachments Section --}}
         @if($post->attachments && count($post->attachments) > 0)
@@ -90,15 +90,15 @@
             @if(count($videoAttachments) > 0)
             <div class="mb-2">
                 @foreach($videoAttachments as $attachment)
-                <div class="position-relative rounded-3 overflow-hidden bg-light" style="max-width: 400px;">
+                <div class="position-relative rounded-3 overflow-hidden app-bg-secondary" style="max-width: 400px;">
                     <video class="w-100" controls style="max-height: 225px;">
                         <source src="{{ Storage::url($attachment['path']) }}" type="{{ $attachment['type'] }}">
                         Your browser does not support the video tag.
                     </video>
-                    <div class="p-2 bg-light border-top">
+                    <div class="p-2 app-bg-secondary border-top">
                         <div class="d-flex align-items-center">
                             <i class="bi bi-camera-video-fill text-primary me-2"></i>
-                            <small class="text-muted text-truncate flex-grow-1">{{ $attachment['name'] }}</small>
+                            <small class="app-text-muted text-truncate flex-grow-1">{{ $attachment['name'] }}</small>
                             <a href="{{ Storage::url($attachment['path']) }}"
                                 class="btn btn-sm btn-outline-primary ms-2" download="{{ $attachment['name'] }}">
                                 <i class="bi bi-download"></i>
@@ -182,12 +182,12 @@
                     @endphp
                     <a href="{{ Storage::url($attachment['path']) }}" class="text-decoration-none"
                         download="{{ $attachment['name'] }}" target="_blank">
-                        <div class="d-flex align-items-center bg-light rounded-3 p-2 border">
+                        <div class="d-flex align-items-center app-bg-secondary rounded-3 p-2 border">
                             <i class="bi {{ $icon }} fs-5 me-2"></i>
                             <div>
-                                <small class="fw-semibold text-dark d-block">{{ Str::limit($attachment['name'], 30)
+                                <small class="fw-semibold app-text-primary d-block">{{ Str::limit($attachment['name'], 30)
                                     }}</small>
-                                <small class="text-muted">{{ round($attachment['size'] / 1024) }} KB</small>
+                                <small class="app-text-muted">{{ round($attachment['size'] / 1024) }} KB</small>
                             </div>
                         </div>
                     </a>
@@ -202,14 +202,14 @@
             <form action="{{ route('groups.posts.like', [$post->group->slug, $post->id]) }}" method="POST"
                 class="like-form">
                 @csrf
-                <button type="submit" class="btn btn-link text-dark p-0 text-decoration-none small">
+                <button type="submit" class="btn btn-link app-text-primary p-0 text-decoration-none small">
                     <i class="bi bi-heart{{ $post->is_liked ? '-fill text-danger' : '' }}"></i>
                     <span class="ms-1">{{ $post->likes_count }}</span>
                 </button>
             </form>
 
             <a href="{{ route('groups.post', [$post->group->slug, $post->id]) }}#comments"
-                class="btn btn-link text-dark p-0 text-decoration-none small">
+                class="btn btn-link app-text-primary p-0 text-decoration-none small">
                 <i class="bi bi-chat"></i>
                 <span class="ms-1">{{ $post->comments_count }}</span>
             </a>
@@ -217,7 +217,7 @@
             @if($post->group->canManage(auth()->user()) && !$post->is_pinned)
             <form action="{{ route('groups.posts.pin', [$post->group->slug, $post->id]) }}" method="POST">
                 @csrf
-                <button type="submit" class="btn btn-link text-dark p-0 text-decoration-none small">
+                <button type="submit" class="btn btn-link app-text-primary p-0 text-decoration-none small">
                     <i class="bi bi-pin-angle"></i> Pin
                 </button>
             </form>
@@ -226,7 +226,7 @@
             @if($post->group->canManage(auth()->user()) && $post->is_pinned)
             <form action="{{ route('groups.posts.unpin', [$post->group->slug, $post->id]) }}" method="POST">
                 @csrf
-                <button type="submit" class="btn btn-link text-dark p-0 text-decoration-none small">
+                <button type="submit" class="btn btn-link app-text-primary p-0 text-decoration-none small">
                     <i class="bi bi-pin-angle"></i> Unpin
                 </button>
             </form>

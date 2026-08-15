@@ -43,7 +43,7 @@
                     <div class="composer-dropzone m-3" id="composerDropzone">
                         <i class="bi bi-images composer-dropzone-icon" id="composerDropIcon"></i>
                         <p class="fs-5 mb-1 mt-3" id="composerDropTitle">Drag photos and videos here</p>
-                        <p class="text-muted small mb-3">or paste from your clipboard</p>
+                        <p class="app-text-muted small mb-3">or paste from your clipboard</p>
                         <button type="button" class="btn btn-primary rounded-3 px-4" id="composerSelectBtn">
                             Select from computer
                         </button>
@@ -87,7 +87,7 @@
                                     <textarea class="form-control border-0 px-0 composer-caption" id="composerCaption"
                                         rows="5" maxlength="20000" placeholder="Write a caption..."></textarea>
                                     <div class="d-flex justify-content-end">
-                                        <small class="text-muted" id="composerCaptionCount">0/20000</small>
+                                        <small class="app-text-muted" id="composerCaptionCount">0/20000</small>
                                     </div>
                                 </div>
 
@@ -114,18 +114,18 @@
 
                                 {{-- tags --}}
                                 <div class="mb-3">
-                                    <label class="form-label small fw-semibold text-muted text-uppercase">Tags</label>
+                                    <label class="form-label small fw-semibold app-text-muted text-uppercase">Tags</label>
                                     <div class="composer-tag-box form-control d-flex flex-wrap gap-1 align-items-center"
                                         id="composerTagBox">
                                         <input type="text" class="border-0 flex-grow-1 composer-tag-input"
                                             id="composerTagInput" placeholder="Add tag and press Enter">
                                     </div>
-                                    <div class="form-text">Up to 10 tags</div>
+                                    <div class="form-text app-text-muted">Up to 10 tags</div>
                                 </div>
 
                                 {{-- visibility --}}
                                 <div class="mb-3">
-                                    <label for="composerVisibility" class="form-label small fw-semibold text-muted text-uppercase">Audience</label>
+                                    <label for="composerVisibility" class="form-label small fw-semibold app-text-muted text-uppercase">Audience</label>
                                     <select class="form-select form-select-sm" id="composerVisibility">
                                         <option value="public">🌐 Public — anyone can see</option>
                                         <option value="followers">👥 Followers only</option>

@@ -11,7 +11,7 @@
                 <i class="bi bi-bookmark me-2 text-primary"></i>
                 Saved Items
             </h1>
-            <p class="text-muted mb-0">Items you've saved for later</p>
+            <p class="app-text-muted mb-0">Items you've saved for later</p>
         </div>
     </div>
 
@@ -29,9 +29,9 @@
     </div>
     @else
     <div class="text-center py-5">
-        <i class="bi bi-bookmark display-1 text-muted"></i>
+        <i class="bi bi-bookmark display-1 app-text-muted"></i>
         <h5 class="mt-3 mb-2">No saved items</h5>
-        <p class="text-muted">Click the bookmark icon on items you like to save them here</p>
+        <p class="app-text-muted">Click the bookmark icon on items you like to save them here</p>
         <a href="{{ route('marketplace.index') }}" class="btn btn-primary">
             <i class="bi bi-shop me-2"></i> Browse Marketplace
         </a>

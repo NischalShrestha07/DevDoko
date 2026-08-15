@@ -11,7 +11,7 @@
                 <i class="bi bi-compass me-2 text-primary"></i>
                 Discover Groups
             </h4>
-            <p class="text-muted mb-0">
+            <p class="app-text-muted mb-0">
                 <a href="{{ route('groups.index') }}" class="text-decoration-none">
                     <i class="bi bi-arrow-left"></i> Back to All Groups
                 </a>
@@ -53,7 +53,7 @@
             @endforeach
         </div>
         @else
-        <p class="text-muted">No groups yet.</p>
+        <p class="app-text-muted">No groups yet.</p>
         @endif
     </div>
 
@@ -74,7 +74,7 @@
             @endforeach
         </div>
         @else
-        <p class="text-muted">No groups yet.</p>
+        <p class="app-text-muted">No groups yet.</p>
         @endif
     </div>
 </div>

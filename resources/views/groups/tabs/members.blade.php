@@ -30,7 +30,7 @@
                                 class="text-decoration-none fw-semibold">
                                 {{ $user->profile->username ?? $user->name }}
                             </a>
-                            <small class="text-muted d-block">
+                            <small class="app-text-muted d-block">
                                 Requested {{ $user->pivot->created_at->diffForHumans() }}
                             </small>
                         </div>
@@ -69,10 +69,10 @@
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
                                 <a href="{{ route('profile.show', $member->profile->username ?? $member->name) }}"
-                                    class="text-decoration-none fw-semibold text-dark">
+                                    class="text-decoration-none fw-semibold app-text-primary">
                                     {{ $member->profile->username ?? $member->name }}
                                 </a>
-                                <span class="badge bg-light text-dark ms-2">
+                                <span class="badge app-bg-secondary app-text-primary ms-2">
                                     @if($member->pivot->role === 'owner')
                                     👑 Owner
                                     @elseif($member->pivot->role === 'admin')
@@ -83,14 +83,14 @@
                                     👤 Member
                                     @endif
                                 </span>
-                                <small class="text-muted d-block">
+                                <small class="app-text-muted d-block">
                                     Joined {{ \Carbon\Carbon::parse($member->pivot->joined_at)->diffForHumans() }}
                                 </small>
                             </div>
                             @if($group->canManage(auth()->user()) && $member->id !== $group->owner_id && $member->id !==
                             auth()->id())
                             <div class="dropdown">
-                                <button class="btn btn-link text-dark p-0" data-bs-toggle="dropdown">
+                                <button class="btn btn-link app-text-primary p-0" data-bs-toggle="dropdown">
                                     <i class="bi bi-three-dots-vertical"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">

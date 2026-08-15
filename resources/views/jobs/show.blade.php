@@ -6,7 +6,7 @@
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
         <a href="{{ route('jobs.index') }}"
-            class="text-decoration-none text-dark d-flex align-items-center gap-2">
+            class="text-decoration-none app-text-primary d-flex align-items-center gap-2">
             <i class="bi bi-arrow-left"></i>
             <span>Back to Jobs</span>
         </a>
@@ -46,28 +46,28 @@
                                 </span>
                             @endif
                         </div>
-                        <small class="text-muted">
+                        <small class="app-text-muted">
                             <i class="bi bi-eye me-1"></i>{{ $job->views_count }} views
                         </small>
                     </div>
 
                     <h2 class="fw-bold mb-1">{{ $job->title }}</h2>
-                    <p class="h5 text-muted mb-3">{{ $job->company_name }}</p>
+                    <p class="h5 app-text-muted mb-3">{{ $job->company_name }}</p>
 
                     <div class="d-flex flex-wrap gap-3 mb-4">
                         @if($job->location)
-                            <span class="text-muted small">
+                            <span class="app-text-muted small">
                                 <i class="bi bi-geo-alt me-1"></i>{{ $job->location }}
                             </span>
                         @endif
-                        <span class="text-muted small">
+                        <span class="app-text-muted small">
                             <i class="bi bi-briefcase me-1"></i>{{ $job->location_type }}
                         </span>
-                        <span class="text-muted small">
+                        <span class="app-text-muted small">
                             <i class="bi bi-bar-chart me-1"></i>{{ $job->experience_level }}
                         </span>
                         @if($job->salary_min || $job->salary_max)
-                            <span class="text-muted small">
+                            <span class="app-text-muted small">
                                 <i class="bi bi-currency-exchange me-1"></i>
                                 {{ $job->salary_currency ?? 'NPR' }}
                                 @if($job->salary_min){{ number_format($job->salary_min) }}@endif
@@ -75,7 +75,7 @@
                                 @if($job->salary_max){{ number_format($job->salary_max) }}@endif
                             </span>
                         @endif
-                        <span class="text-muted small">
+                        <span class="app-text-muted small">
                             <i class="bi bi-clock me-1"></i>Posted {{ $job->created_at->diffForHumans() }}
                         </span>
                     </div>
@@ -93,7 +93,7 @@
 
                     @if($job->expires_at)
                         <div class="mb-4">
-                            <small class="text-muted">
+                            <small class="app-text-muted">
                                 <i class="bi bi-calendar-event me-1"></i>
                                 Applications close {{ $job->expires_at->format('M d, Y') }}
                             </small>
@@ -116,7 +116,7 @@
 
                     @auth
                         @if(auth()->id() === $job->user_id)
-                            <p class="text-muted small mb-3">This is your job listing.</p>
+                            <p class="app-text-muted small mb-3">This is your job listing.</p>
                             <a href="{{ route('jobs.applicants', $job) }}" class="btn btn-primary rounded-pill px-4">
                                 <i class="bi bi-people me-2"></i>View Applicants ({{ $job->applications_count }})
                             </a>
@@ -149,7 +149,7 @@
                             </div>
                         @endif
                     @else
-                        <p class="text-muted small mb-3">Log in to apply for this position.</p>
+                        <p class="app-text-muted small mb-3">Log in to apply for this position.</p>
                         <a href="{{ route('login') }}" class="btn btn-primary rounded-pill px-4">
                             <i class="bi bi-box-arrow-in-right me-2"></i>Login to Apply
                         </a>
@@ -171,9 +171,9 @@
                             <img src="{{ Storage::url($job->company_logo) }}" alt="{{ $job->company_name }}"
                                 class="rounded" style="width: 48px; height: 48px; object-fit: cover;">
                         @else
-                            <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                            <div class="app-bg-secondary rounded d-flex align-items-center justify-content-center"
                                 style="width: 48px; height: 48px;">
-                                <i class="bi bi-building text-muted fs-5"></i>
+                                <i class="bi bi-building app-text-muted fs-5"></i>
                             </div>
                         @endif
                         <div>
@@ -204,10 +204,10 @@
                         </a>
                         <div>
                             <a href="{{ route('profile.show', $job->user->profile->username) }}"
-                                class="text-decoration-none text-dark fw-semibold">
+                                class="text-decoration-none app-text-primary fw-semibold">
                                 {{ $job->user->profile->username ?? $job->user->name }}
                             </a>
-                            <small class="text-muted d-block">
+                            <small class="app-text-muted d-block">
                                 <i class="bi bi-clock me-1"></i>Posted {{ $job->created_at->diffForHumans() }}
                             </small>
                         </div>
@@ -223,20 +223,20 @@
                 </div>
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
-                        <small class="text-muted">Type</small>
+                        <small class="app-text-muted">Type</small>
                         <span class="fw-semibold small">{{ $job->type }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
-                        <small class="text-muted">Location</small>
+                        <small class="app-text-muted">Location</small>
                         <span class="fw-semibold small">{{ $job->location_type }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
-                        <small class="text-muted">Experience</small>
+                        <small class="app-text-muted">Experience</small>
                         <span class="fw-semibold small">{{ $job->experience_level }}</span>
                     </div>
                     @if($job->salary_min || $job->salary_max)
                         <div class="d-flex justify-content-between mb-2">
-                            <small class="text-muted">Salary</small>
+                            <small class="app-text-muted">Salary</small>
                             <span class="fw-semibold small">
                                 {{ $job->salary_currency ?? 'NPR' }}
                                 @if($job->salary_min){{ number_format($job->salary_min) }}@endif
@@ -246,7 +246,7 @@
                         </div>
                     @endif
                     <div class="d-flex justify-content-between">
-                        <small class="text-muted">Posted</small>
+                        <small class="app-text-muted">Posted</small>
                         <span class="small">{{ $job->created_at->format('M d, Y') }}</span>
                     </div>
                 </div>

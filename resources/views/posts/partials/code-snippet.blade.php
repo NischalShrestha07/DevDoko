@@ -26,12 +26,12 @@
     <div class="card-footer bg-light">
         <div class="row">
             <div class="col">
-                <small class="text-muted">
+                <small class="app-text-muted">
                     <i class="bi bi-eye"></i> {{ $snippet->views ?? 0 }} views
                 </small>
             </div>
             <div class="col text-end">
-                <small class="text-muted">
+                <small class="app-text-muted">
                     <i class="bi bi-download"></i> {{ $snippet->downloads ?? 0 }} downloads
                 </small>
             </div>

@@ -11,7 +11,7 @@
                 <i class="bi bi-bookmark-check-fill me-2 text-primary"></i>
                 My Groups
             </h1>
-            <p class="text-muted mb-0">Groups you've joined or created</p>
+            <p class="app-text-muted mb-0">Groups you've joined or created</p>
         </div>
         <a href="{{ route('groups.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-lg"></i> Create Group
@@ -64,11 +64,11 @@
                         {{ $group->category_label }}
                     </span>
 
-                    <p class="small text-muted mb-2">
+                    <p class="small app-text-muted mb-2">
                         {{ Str::limit($group->description, 80) }}
                     </p>
 
-                    <div class="d-flex justify-content-center gap-3 small text-muted">
+                    <div class="d-flex justify-content-center gap-3 small app-text-muted">
                         <span><i class="bi bi-people"></i> {{ $group->members_count }} members</span>
                         <span><i class="bi bi-chat"></i> {{ $group->posts_count }} posts</span>
                     </div>
@@ -91,13 +91,19 @@
         </div>
         @endforeach
     </div>
+
+    @if($groups->hasPages())
+    <div class="mt-4">
+        {{ $groups->links() }}
+    </div>
+    @endif
     @else
     <div class="text-center py-5">
-        <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
+        <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
             <i class="bi bi-people text-primary" style="font-size: 48px;"></i>
         </div>
         <h5 class="fw-semibold mb-2">No groups yet</h5>
-        <p class="text-muted mb-4">You haven't joined any groups. Discover and join groups that interest you!</p>
+        <p class="app-text-muted mb-4">You haven't joined any groups. Discover and join groups that interest you!</p>
         <a href="{{ route('groups.index') }}" class="btn btn-primary">
             <i class="bi bi-compass"></i> Discover Groups
         </a>

@@ -12,7 +12,7 @@
                 <i class="bi bi-activity me-2 text-primary"></i>
                 Activity Log
             </h4>
-            <p class="text-muted mb-0">
+            <p class="app-text-muted mb-0">
                 <a href="{{ route('groups.show', $group->slug) }}" class="text-decoration-none">
                     <i class="bi bi-arrow-left"></i> Back to {{ $group->name }}
                 </a>
@@ -82,7 +82,7 @@
                                 @else
                                 <span class="fw-semibold">System</span>
                                 @endif
-                                <span class="text-muted ms-2 small">
+                                <span class="app-text-muted ms-2 small">
                                     {{ $activity->created_at->diffForHumans() }}
                                 </span>
                             </div>
@@ -104,11 +104,11 @@
             </div>
             @else
             <div class="text-center py-5">
-                <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
+                <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
                     <i class="bi bi-activity text-primary" style="font-size: 48px;"></i>
                 </div>
                 <h5 class="fw-semibold mb-2">No activity yet</h5>
-                <p class="text-muted mb-0">Group activities will appear here</p>
+                <p class="app-text-muted mb-0">Group activities will appear here</p>
             </div>
             @endif
         </div>

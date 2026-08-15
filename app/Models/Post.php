@@ -55,6 +55,7 @@ class Post extends Model
         'formatted_reading_time',
         'type_icon',
         'type_label',
+        'reaction_type',
     ];
 
     // Relationship with user
@@ -101,6 +102,17 @@ class Post extends Model
         return $this->hasMany(Media::class);
     }
 
+    // "Not interested" hides
+    public function hides(): HasMany
+    {
+        return $this->hasMany(PostHide::class);
+    }
+
+    public function reports()
+    {
+        return $this->morphMany(Report::class, 'reportable');
+    }
+
     // Accessor for code_snippet (no need for relationship since it's a column)
     public function getCodeSnippetAttribute(): ?string
     {
@@ -118,6 +130,20 @@ class Post extends Model
         }
 
         return $this->likes()->where('user_id', Auth::id())->exists();
+    }
+
+    // Current user's reaction type ('like', 'love', ...), or null if not reacted
+    public function getReactionTypeAttribute(): ?string
+    {
+        if (! Auth::check()) {
+            return null;
+        }
+
+        if ($this->relationLoaded('likes')) {
+            return $this->likes->firstWhere('user_id', Auth::id())?->type;
+        }
+
+        return $this->likes()->where('user_id', Auth::id())->value('type');
     }
 
     // Check if post is saved by current user
@@ -214,6 +240,12 @@ class Post extends Model
         $hidden = $user->hiddenUserIds();
         if ($hidden) {
             $query->whereNotIn("{$table}.user_id", $hidden);
+        }
+
+        // Posts this user chose "not interested" on.
+        $hiddenPosts = $user->hiddenPostIds();
+        if ($hiddenPosts) {
+            $query->whereNotIn("{$table}.id", $hiddenPosts);
         }
 
         return $query->where(function ($q) use ($user, $table) {

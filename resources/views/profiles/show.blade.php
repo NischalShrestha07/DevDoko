@@ -43,6 +43,16 @@
                             <i class="bi bi-patch-check-fill text-primary fs-5" data-bs-toggle="tooltip"
                                 title="Verified Developer"></i>
                             @endif
+                            @auth
+                            @if(auth()->user()->isAdmin())
+                            <form action="{{ route('admin.users.toggle-verified', $profile->user) }}" method="POST" class="ms-2">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 11px;">
+                                    {{ $profile->is_verified ? 'Remove verification' : 'Verify' }}
+                                </button>
+                            </form>
+                            @endif
+                            @endauth
                         </div>
 
                         @if(auth()->id() === $profile->user_id)
@@ -118,18 +128,23 @@
                     <div class="d-flex flex-wrap gap-4 mb-3">
                         <div class="d-flex align-items-center">
                             <span class="fw-bold fs-5 me-2">{{ number_format($postsCount) }}</span>
-                            <span class="text-muted">posts</span>
+                            <span class="app-text-muted">posts</span>
                         </div>
                         <a href="{{ route('users.followers', $profile->user) }}"
                             class="text-decoration-none d-flex align-items-center">
-                            <span class="fw-bold fs-5 me-2 text-dark">{{ number_format($followersCount) }}</span>
-                            <span class="text-muted">followers</span>
+                            <span class="fw-bold fs-5 me-2 app-text-primary">{{ number_format($followersCount) }}</span>
+                            <span class="app-text-muted">followers</span>
                         </a>
                         <a href="{{ route('users.following', $profile->user) }}"
                             class="text-decoration-none d-flex align-items-center">
-                            <span class="fw-bold fs-5 me-2 text-dark">{{ number_format($followingCount) }}</span>
-                            <span class="text-muted">following</span>
+                            <span class="fw-bold fs-5 me-2 app-text-primary">{{ number_format($followingCount) }}</span>
+                            <span class="app-text-muted">following</span>
                         </a>
+                        <div class="d-flex align-items-center" title="Reputation score">
+                            <i class="bi bi-star-fill me-2 text-warning"></i>
+                            <span class="fw-bold fs-5 me-2">{{ number_format($profile->reputation_score) }}</span>
+                            <span class="app-text-muted">reputation</span>
+                        </div>
                     </div>
 
                     <!-- Name and Bio -->
@@ -146,7 +161,7 @@
                         <div class="d-flex flex-wrap gap-3 mt-2">
                             @if($profile->github_link)
                             <a href="{{ $profile->github_link }}" target="_blank"
-                                class="text-decoration-none text-dark d-flex align-items-center small">
+                                class="text-decoration-none app-text-primary d-flex align-items-center small">
                                 <i class="bi bi-github me-1 fs-5"></i>
                                 <span>{{ Str::after($profile->github_link, 'github.com/') }}</span>
                             </a>
@@ -154,7 +169,7 @@
 
                             @if($profile->twitter_link)
                             <a href="{{ $profile->twitter_link }}" target="_blank"
-                                class="text-decoration-none text-dark d-flex align-items-center small">
+                                class="text-decoration-none app-text-primary d-flex align-items-center small">
                                 <i class="bi bi-twitter me-1 fs-5 text-info"></i>
                                 <span>{{ Str::after($profile->twitter_link, 'twitter.com/') }}</span>
                             </a>
@@ -162,7 +177,7 @@
 
                             @if($profile->linkedin_link)
                             <a href="{{ $profile->linkedin_link }}" target="_blank"
-                                class="text-decoration-none text-dark d-flex align-items-center small">
+                                class="text-decoration-none app-text-primary d-flex align-items-center small">
                                 <i class="bi bi-linkedin me-1 fs-5 text-primary"></i>
                                 <span>{{ Str::after($profile->linkedin_link, 'linkedin.com/in/') }}</span>
                             </a>
@@ -170,7 +185,7 @@
 
                             @if($profile->portfolio_link)
                             <a href="{{ $profile->portfolio_link }}" target="_blank"
-                                class="text-decoration-none text-dark d-flex align-items-center small">
+                                class="text-decoration-none app-text-primary d-flex align-items-center small">
                                 <i class="bi bi-link-45deg me-1 fs-5 text-success"></i>
                                 <span>Portfolio</span>
                             </a>
@@ -188,7 +203,7 @@
                         <div class="d-flex flex-wrap gap-2">
                             @foreach($profile->techTags as $techTag)
                             <a href="{{ route('tags.show', $techTag->slug) }}"
-                                class="text-decoration-none badge bg-light text-dark border px-3 py-2 rounded-pill hover-bg-primary transition">
+                                class="text-decoration-none badge app-bg-secondary app-text-primary border px-3 py-2 rounded-pill hover-bg-primary transition">
                                 <i class="bi bi-hash"></i> {{ $techTag->name }}
                             </a>
                             @endforeach
@@ -197,7 +212,7 @@
                     @endif
 
                     <!-- Joined Date -->
-                    <div class="mt-3 text-muted small">
+                    <div class="mt-3 app-text-muted small">
                         <i class="bi bi-calendar3 me-1"></i>
                         Joined {{ $profile->user->created_at->format('F Y') }}
                     </div>
@@ -213,7 +228,7 @@
                 data-bs-target="#posts" type="button" role="tab">
                 <i class="bi bi-grid-3x3-gap-fill me-2"></i>
                 POSTS
-                <span class="badge bg-light text-dark ms-2">{{ $postsCount }}</span>
+                <span class="badge app-bg-secondary app-text-primary ms-2">{{ $postsCount }}</span>
             </button>
         </li>
         @if(auth()->id() === $profile->user_id)
@@ -222,7 +237,7 @@
                 data-bs-target="#saved" type="button" role="tab">
                 <i class="bi bi-bookmark-fill me-2"></i>
                 SAVED
-                <span class="badge bg-light text-dark ms-2">{{ $savedPosts->total() ?? 0 }}</span>
+                <span class="badge app-bg-secondary app-text-primary ms-2">{{ $savedPosts->total() ?? 0 }}</span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -233,6 +248,14 @@
             </button>
         </li>
         @endif
+        <li class="nav-item" role="presentation">
+            <button class="nav-link d-flex align-items-center px-4 py-3" id="reputation-tab" data-bs-toggle="tab"
+                data-bs-target="#reputation" type="button" role="tab">
+                <i class="bi bi-star-fill me-2"></i>
+                REPUTATION
+                <span class="badge app-bg-secondary app-text-primary ms-2">{{ number_format($profile->reputation_score) }}</span>
+            </button>
+        </li>
     </ul>
 
     <!-- Tab Content -->
@@ -240,55 +263,50 @@
         <!-- Posts Tab - Enhanced Grid -->
         <div class="tab-pane fade show active" id="posts" role="tabpanel">
             @if($posts->count())
-            <div class="row g-4">
+            <div class="row g-1 profile-grid">
                 @foreach($posts as $post)
-                <div class="col-md-4 col-lg-3">
-                    <div class="card h-100 border-0 shadow-sm hover-lift">
-                        <a href="{{ route('posts.show', $post) }}" class="text-decoration-none">
-                            <div class="position-relative" style="padding-bottom: 100%;">
-                                @if($post->type === 'image' && $post->media->count())
-                                <img src="{{ asset('storage/' . $post->media->first()->file_path) }}"
-                                    class="position-absolute w-100 h-100 rounded-top" style="object-fit: cover;">
+                <div class="col-4">
+                    <a href="{{ route('posts.show', $post) }}" class="text-decoration-none profile-grid-tile d-block position-relative">
+                        <div class="position-relative" style="padding-bottom: 100%;">
+                            @if($post->type === 'image' && $post->media->count())
+                            <img src="{{ asset('storage/' . $post->media->first()->file_path) }}"
+                                class="position-absolute w-100 h-100" style="object-fit: cover;">
 
-                                @elseif($post->type === 'code')
-                                <div
-                                    class="position-absolute w-100 h-100 bg-dark rounded-top d-flex flex-column align-items-center justify-content-center">
-                                    <i class="bi bi-code-slash text-white fs-1"></i>
-                                    <span class="text-white-50 mt-2 small">{{ $post->code_language ?? 'Code' }}</span>
-                                </div>
+                            @elseif($post->type === 'code')
+                            <div
+                                class="position-absolute w-100 h-100 bg-dark d-flex flex-column align-items-center justify-content-center">
+                                <i class="bi bi-code-slash text-white fs-1"></i>
+                                <span class="text-white-50 mt-2 small">{{ $post->code_language ?? 'Code' }}</span>
+                            </div>
 
-                                @elseif($post->type === 'video')
-                                <div
-                                    class="position-absolute w-100 h-100 bg-dark rounded-top d-flex align-items-center justify-content-center">
-                                    <i class="bi bi-play-circle-fill text-white fs-1"></i>
-                                </div>
+                            @elseif($post->type === 'video')
+                            <div
+                                class="position-absolute w-100 h-100 bg-dark d-flex align-items-center justify-content-center">
+                                <i class="bi bi-play-circle-fill text-white fs-1"></i>
+                            </div>
 
-                                @else
-                                <div
-                                    class="position-absolute w-100 h-100 bg-light rounded-top d-flex flex-column align-items-center justify-content-center">
-                                    <i class="bi bi-file-text text-secondary fs-1"></i>
-                                    <span class="text-muted mt-2 small">{{ $post->type ?? 'Post' }}</span>
-                                </div>
-                                @endif
+                            @else
+                            <div
+                                class="position-absolute w-100 h-100 app-bg-secondary d-flex flex-column align-items-center justify-content-center">
+                                <i class="bi bi-file-text text-secondary fs-1"></i>
+                                <span class="app-text-muted mt-2 small">{{ $post->type ?? 'Post' }}</span>
+                            </div>
+                            @endif
 
-                                @if($post->media->count() > 1)
-                                <span
-                                    class="position-absolute top-0 end-0 m-2 badge bg-dark bg-opacity-75 rounded-pill">
-                                    <i class="bi bi-collection"></i> {{ $post->media->count() }}
-                                </span>
-                                @endif
+                            @if($post->media->count() > 1)
+                            <span class="position-absolute top-0 end-0 m-2 text-white" style="font-size: 1.1rem; filter: drop-shadow(0 1px 2px rgba(0,0,0,.6));">
+                                <i class="bi bi-collection-fill"></i>
+                            </span>
+                            @endif
 
-                                <div class="position-absolute bottom-0 start-0 w-100 p-2 text-white rounded-bottom"
-                                    style="background: linear-gradient(transparent, rgba(0,0,0,0.7));">
-                                    <div class="d-flex justify-content-around small">
-                                        <span><i class="bi bi-heart-fill me-1"></i> {{ $post->likes_count ?? 0 }}</span>
-                                        <span><i class="bi bi-chat-fill me-1"></i> {{ $post->comments_count ?? 0
-                                            }}</span>
-                                    </div>
+                            <div class="position-absolute top-0 start-0 w-100 h-100 text-white d-flex align-items-center justify-content-center profile-grid-overlay">
+                                <div class="d-flex gap-3 fw-semibold">
+                                    <span><i class="bi bi-heart-fill me-1"></i>{{ $post->likes_count ?? 0 }}</span>
+                                    <span><i class="bi bi-chat-fill me-1"></i>{{ $post->comments_count ?? 0 }}</span>
                                 </div>
                             </div>
-                        </a>
-                    </div>
+                        </div>
+                    </a>
                 </div>
                 @endforeach
             </div>
@@ -298,17 +316,17 @@
             </div>
             @else
             <div class="text-center py-5">
-                <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
+                <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
                     <i class="bi bi-grid-3x3-gap-fill text-primary" style="font-size: 48px;"></i>
                 </div>
                 <h5 class="fw-semibold mb-2">No Posts Yet</h5>
                 @if(auth()->id() === $profile->user_id)
-                <p class="text-muted mb-4">Share your first code snippet or project with the community!</p>
+                <p class="app-text-muted mb-4">Share your first code snippet or project with the community!</p>
                 <a href="{{ route('posts.create') }}" class="btn btn-primary px-4">
                     <i class="bi bi-plus-lg me-2"></i> Create Post
                 </a>
                 @else
-                <p class="text-muted mb-0">This user hasn't posted anything yet.</p>
+                <p class="app-text-muted mb-0">This user hasn't posted anything yet.</p>
                 @endif
             </div>
             @endif
@@ -335,9 +353,9 @@
                                 </div>
                                 @else
                                 <div
-                                    class="position-absolute w-100 h-100 bg-light rounded-top d-flex flex-column align-items-center justify-content-center">
+                                    class="position-absolute w-100 h-100 app-bg-secondary rounded-top d-flex flex-column align-items-center justify-content-center">
                                     <i class="bi bi-file-text text-secondary fs-1"></i>
-                                    <span class="text-muted mt-2 small">Post</span>
+                                    <span class="app-text-muted mt-2 small">Post</span>
                                 </div>
                                 @endif
 
@@ -368,7 +386,7 @@
                                     <img src="{{ $post->user->profile->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($post->user->name) }}"
                                         class="rounded-circle me-2"
                                         style="width: 20px; height: 20px; object-fit: cover;">
-                                    <small class="text-muted">{{ '@' . ($post->user->profile->username ??
+                                    <small class="app-text-muted">{{ '@' . ($post->user->profile->username ??
                                         $post->user->name) }}</small>
                                 </div>
                             </div>
@@ -383,11 +401,11 @@
             </div>
             @else
             <div class="text-center py-5">
-                <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
+                <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
                     <i class="bi bi-bookmark text-primary" style="font-size: 48px;"></i>
                 </div>
                 <h5 class="fw-semibold mb-2">No Saved Posts</h5>
-                <p class="text-muted mb-4">Save interesting posts to come back to them later</p>
+                <p class="app-text-muted mb-4">Save interesting posts to come back to them later</p>
                 <a href="{{ route('explore') }}" class="btn btn-outline-primary px-4">
                     <i class="bi bi-compass me-2"></i> Explore Posts
                 </a>
@@ -400,14 +418,46 @@
         @if(auth()->id() === $profile->user_id)
         <div class="tab-pane fade" id="tagged" role="tabpanel">
             <div class="text-center py-5">
-                <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
+                <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
                     <i class="bi bi-tag text-primary" style="font-size: 48px;"></i>
                 </div>
                 <h5 class="fw-semibold mb-2">No Tagged Posts</h5>
-                <p class="text-muted mb-0">When other developers tag you in posts, they'll appear here</p>
+                <p class="app-text-muted mb-0">When other developers tag you in posts, they'll appear here</p>
             </div>
         </div>
         @endif
+
+        <!-- Reputation Tab -->
+        <div class="tab-pane fade" id="reputation" role="tabpanel">
+            @if($reputationLogs->count() > 0)
+            <div class="list-group">
+                @foreach($reputationLogs as $log)
+                <div class="list-group-item d-flex justify-content-between align-items-center border-0 border-bottom">
+                    <div>
+                        <span class="fw-semibold">{{ Str::headline($log->action) }}</span>
+                        <div class="app-text-muted small">{{ $log->created_at->diffForHumans() }}</div>
+                    </div>
+                    <span class="badge {{ $log->points >= 0 ? 'bg-success' : 'bg-danger' }} rounded-pill fs-6">
+                        {{ $log->points >= 0 ? '+' : '' }}{{ $log->points }}
+                    </span>
+                </div>
+                @endforeach
+            </div>
+            @if($reputationLogs->hasPages())
+            <div class="mt-4">
+                {{ $reputationLogs->links() }}
+            </div>
+            @endif
+            @else
+            <div class="text-center py-5">
+                <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
+                    <i class="bi bi-star text-primary" style="font-size: 48px;"></i>
+                </div>
+                <h5 class="fw-semibold mb-2">No Reputation Activity Yet</h5>
+                <p class="app-text-muted mb-0">Reputation points earned from likes, comments, and other activity will appear here</p>
+            </div>
+            @endif
+        </div>
     </div>
 
     <!-- GitHub Integration - Enhanced Card -->
@@ -450,6 +500,25 @@
         background-color: var(--bs-primary) !important;
         color: white !important;
         border-color: var(--bs-primary) !important;
+    }
+
+    .profile-grid {
+        --bs-gutter-x: 2px;
+        margin: 0 -1px;
+    }
+
+    .profile-grid .col-4 {
+        padding: 1px;
+    }
+
+    .profile-grid-overlay {
+        background: rgba(0, 0, 0, 0.35);
+        opacity: 0;
+        transition: opacity 0.15s ease;
+    }
+
+    .profile-grid-tile:hover .profile-grid-overlay {
+        opacity: 1;
     }
 
     .transition {

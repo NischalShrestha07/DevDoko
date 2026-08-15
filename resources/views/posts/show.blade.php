@@ -67,11 +67,11 @@
                                         {{ $post->user->profile->username ?? '' }}
                                     </a>
                                     <div class="d-flex gap-3 mt-1">
-                                        <small class="text-muted">
+                                        <small class="app-text-muted">
                                             <i class="bi bi-file-text me-1"></i>
                                             {{ $post->user->posts_count ?? $post->user->posts()->count() }} posts
                                         </small>
-                                        <small class="text-muted">
+                                        <small class="app-text-muted">
                                             <i class="bi bi-people me-1"></i>
                                             {{ $post->user->followers_count ?? 0 }} followers
                                         </small>
@@ -148,9 +148,9 @@
                         </div>
                         @empty
                         <div class="text-center py-5 px-3">
-                            <i class="bi bi-chat-square text-muted" style="font-size: 48px;"></i>
+                            <i class="bi bi-chat-square app-text-muted" style="font-size: 48px;"></i>
                             <p class="fw-semibold mb-1 mt-3">No comments yet</p>
-                            <small class="text-muted">Be the first to share your thoughts!</small>
+                            <small class="app-text-muted">Be the first to share your thoughts!</small>
                         </div>
                         @endforelse
                     </div>
@@ -175,7 +175,7 @@
                                         Post
                                     </button>
                                 </div>
-                                <small class="text-muted d-block text-end mt-1" id="charCount">0/500</small>
+                                <small class="app-text-muted d-block text-end mt-1" id="charCount">0/500</small>
                             </div>
                         </div>
                     </form>
@@ -306,7 +306,7 @@
             charCount.textContent = `${length}/500`;
             commentSubmit.disabled = length === 0 || length > 500;
             charCount.classList.toggle('text-danger', length > 450);
-            charCount.classList.toggle('text-muted', length <= 450);
+            charCount.classList.toggle('app-text-muted', length <= 450);
         });
     }
 });

@@ -12,7 +12,7 @@
                 <i class="bi bi-people-fill me-2 text-primary"></i>
                 Developer Groups
             </h1>
-            <p class="text-muted mb-0">Connect with developers who share your interests</p>
+            <p class="app-text-muted mb-0">Connect with developers who share your interests</p>
         </div>
 
         @auth
@@ -54,8 +54,8 @@
                                 </div>
                                 @endif
                             </div>
-                            <h6 class="fw-semibold text-dark mb-1">{{ $group->name }}</h6>
-                            <p class="small text-muted mb-2">{{ $group->members_count }} members</p>
+                            <h6 class="fw-semibold app-text-primary mb-1">{{ $group->name }}</h6>
+                            <p class="small app-text-muted mb-2">{{ $group->members_count }} members</p>
                             <span class="badge bg-light text-dark">{{ $group->category_label }}</span>
                         </div>
                     </a>
@@ -153,11 +153,11 @@
                             </span>
                         </div>
 
-                        <p class="small text-muted mb-2">
+                        <p class="small app-text-muted mb-2">
                             {{ Str::limit($group->description, 80) }}
                         </p>
 
-                        <div class="d-flex justify-content-between align-items-center small text-muted">
+                        <div class="d-flex justify-content-between align-items-center small app-text-muted">
                             <span>
                                 <i class="bi bi-people"></i> {{ $group->members_count }}
                             </span>
@@ -199,11 +199,11 @@
             @empty
             <div class="col-12">
                 <div class="text-center py-5">
-                    <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
+                    <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
                         <i class="bi bi-people text-primary" style="font-size: 48px;"></i>
                     </div>
                     <h5 class="fw-semibold mb-2">No groups found</h5>
-                    <p class="text-muted mb-4">Be the first to create a group for your tech community</p>
+                    <p class="app-text-muted mb-4">Be the first to create a group for your tech community</p>
                     @auth
                     <a href="{{ route('groups.create') }}" class="btn btn-primary">
                         <i class="bi bi-plus-lg me-2"></i> Create Group

@@ -5,7 +5,7 @@
 @section('content')
 <div class="container py-4">
     <div class="d-flex align-items-center gap-2 mb-4">
-        <a href="{{ route('jobs.show', $job) }}" class="text-decoration-none text-dark d-flex align-items-center gap-1">
+        <a href="{{ route('jobs.show', $job) }}" class="text-decoration-none app-text-primary d-flex align-items-center gap-1">
             <i class="bi bi-arrow-left"></i>
             <span>Back to Job</span>
         </a>
@@ -15,7 +15,7 @@
         <i class="bi bi-people text-primary me-2"></i>
         Applicants for {{ $job->title }}
     </h4>
-    <p class="text-muted mb-4">{{ $applications->total() }} total application(s)</p>
+    <p class="app-text-muted mb-4">{{ $applications->total() }} total application(s)</p>
 
     @if(session('success'))
         <div class="alert alert-success border-0 shadow-sm">{{ session('success') }}</div>
@@ -30,10 +30,10 @@
                             alt="{{ $application->user->name }}" class="rounded-circle" style="width: 48px; height: 48px; object-fit: cover;">
                         <div>
                             <a href="{{ route('profile.show', $application->user->profile->username ?? $application->user->name) }}"
-                                class="text-decoration-none text-dark fw-semibold d-block">
+                                class="text-decoration-none app-text-primary fw-semibold d-block">
                                 {{ $application->user->name }}
                             </a>
-                            <small class="text-muted">Applied {{ $application->created_at->diffForHumans() }}</small>
+                            <small class="app-text-muted">Applied {{ $application->created_at->diffForHumans() }}</small>
                         </div>
                     </div>
 

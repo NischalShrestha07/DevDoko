@@ -24,7 +24,7 @@
 
     <div class="card-body text-center pt-5 pb-3">
         <h6 class="fw-semibold mb-1">
-            <a href="{{ route('groups.show', $group->slug) }}" class="text-dark text-decoration-none">
+            <a href="{{ route('groups.show', $group->slug) }}" class="app-text-primary text-decoration-none">
                 {{ $group->name }}
             </a>
         </h6>
@@ -33,11 +33,11 @@
             {{ $group->privacy_label }}
         </span>
 
-        <p class="small text-muted mb-2">
+        <p class="small app-text-muted mb-2">
             {{ Str::limit($group->description, 80) }}
         </p>
 
-        <div class="d-flex justify-content-between align-items-center small text-muted">
+        <div class="d-flex justify-content-between align-items-center small app-text-muted">
             <span><i class="bi bi-people"></i> {{ $group->members_count }} members</span>
             <span><i class="bi bi-chat"></i> {{ $group->posts_count ?? 0 }} posts</span>
         </div>

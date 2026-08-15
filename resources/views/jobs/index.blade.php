@@ -70,27 +70,27 @@
                 <div class="d-flex align-items-center gap-2 mb-3">
                     <small class="text-muted">Active filters:</small>
                     @if(request('search'))
-                        <span class="badge bg-light text-dark border d-flex align-items-center gap-1">
+                        <span class="badge app-bg-secondary app-text-primary border d-flex align-items-center gap-1">
                             Keyword: "{{ request('search') }}"
-                            <a href="{{ route('jobs.index', array_merge(request()->except('search', 'page'), ['search' => ''])) }}" class="text-decoration-none text-muted ms-1">&times;</a>
+                            <a href="{{ route('jobs.index', array_merge(request()->except('search', 'page'), ['search' => ''])) }}" class="text-decoration-none app-text-muted ms-1">&times;</a>
                         </span>
                     @endif
                     @if(request('type'))
-                        <span class="badge bg-light text-dark border d-flex align-items-center gap-1">
+                        <span class="badge app-bg-secondary app-text-primary border d-flex align-items-center gap-1">
                             {{ request('type') }}
-                            <a href="{{ route('jobs.index', array_merge(request()->except('type', 'page'), ['type' => ''])) }}" class="text-decoration-none text-muted ms-1">&times;</a>
+                            <a href="{{ route('jobs.index', array_merge(request()->except('type', 'page'), ['type' => ''])) }}" class="text-decoration-none app-text-muted ms-1">&times;</a>
                         </span>
                     @endif
                     @if(request('location_type'))
-                        <span class="badge bg-light text-dark border d-flex align-items-center gap-1">
+                        <span class="badge app-bg-secondary app-text-primary border d-flex align-items-center gap-1">
                             {{ request('location_type') }}
-                            <a href="{{ route('jobs.index', array_merge(request()->except('location_type', 'page'), ['location_type' => ''])) }}" class="text-decoration-none text-muted ms-1">&times;</a>
+                            <a href="{{ route('jobs.index', array_merge(request()->except('location_type', 'page'), ['location_type' => ''])) }}" class="text-decoration-none app-text-muted ms-1">&times;</a>
                         </span>
                     @endif
                     @if(request('experience_level'))
-                        <span class="badge bg-light text-dark border d-flex align-items-center gap-1">
+                        <span class="badge app-bg-secondary app-text-primary border d-flex align-items-center gap-1">
                             {{ request('experience_level') }}
-                            <a href="{{ route('jobs.index', array_merge(request()->except('experience_level', 'page'), ['experience_level' => ''])) }}" class="text-decoration-none text-muted ms-1">&times;</a>
+                            <a href="{{ route('jobs.index', array_merge(request()->except('experience_level', 'page'), ['experience_level' => ''])) }}" class="text-decoration-none app-text-muted ms-1">&times;</a>
                         </span>
                     @endif
                     <a href="{{ route('jobs.index') }}" class="small text-decoration-none ms-2">Clear all</a>
@@ -103,11 +103,11 @@
                 </div>
             @empty
                 <div class="text-center py-5">
-                    <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
+                    <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
                         <i class="bi bi-briefcase text-primary" style="font-size: 48px;"></i>
                     </div>
                     <h5 class="fw-semibold mb-2">No jobs found</h5>
-                    <p class="text-muted mb-4">
+                    <p class="app-text-muted mb-4">
                         @if(request()->anyFilled(['search', 'type', 'location_type', 'experience_level']))
                             Try adjusting your search filters
                         @else
@@ -145,7 +145,7 @@
                         <div class="d-flex flex-wrap gap-1">
                             @foreach($types as $type)
                                 <a href="{{ route('jobs.index', array_merge(request()->except('type', 'page'), ['type' => $type])) }}"
-                                    class="badge {{ request('type') === $type ? 'bg-primary text-white' : 'bg-light text-dark border' }} text-decoration-none">
+                                    class="badge {{ request('type') === $type ? 'bg-primary text-white' : 'app-bg-secondary app-text-primary border' }} text-decoration-none">
                                     {{ $type }}
                                 </a>
                             @endforeach
@@ -156,7 +156,7 @@
                         <div class="d-flex flex-wrap gap-1">
                             @foreach($levels as $level)
                                 <a href="{{ route('jobs.index', array_merge(request()->except('experience_level', 'page'), ['experience_level' => $level])) }}"
-                                    class="badge {{ request('experience_level') === $level ? 'bg-primary text-white' : 'bg-light text-dark border' }} text-decoration-none">
+                                    class="badge {{ request('experience_level') === $level ? 'bg-primary text-white' : 'app-bg-secondary app-text-primary border' }} text-decoration-none">
                                     {{ $level }}
                                 </a>
                             @endforeach
@@ -167,7 +167,7 @@
                         <div class="d-flex flex-wrap gap-1">
                             @foreach($locations as $location)
                                 <a href="{{ route('jobs.index', array_merge(request()->except('location_type', 'page'), ['location_type' => $location])) }}"
-                                    class="badge {{ request('location_type') === $location ? 'bg-primary text-white' : 'bg-light text-dark border' }} text-decoration-none">
+                                    class="badge {{ request('location_type') === $location ? 'bg-primary text-white' : 'app-bg-secondary app-text-primary border' }} text-decoration-none">
                                     {{ $location }}
                                 </a>
                             @endforeach

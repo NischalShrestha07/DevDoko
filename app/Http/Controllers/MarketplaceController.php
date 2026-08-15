@@ -1,10 +1,11 @@
 <?php
+
 // app/Http/Controllers/MarketplaceController.php
 
 namespace App\Http\Controllers;
 
-use App\Models\MarketplaceListing;
 use App\Models\MarketplaceInterest;
+use App\Models\MarketplaceListing;
 use App\Models\MarketplaceListingImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,9 +26,9 @@ class MarketplaceController extends Controller
         // Search
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('title', 'LIKE', '%' . $request->search . '%')
-                    ->orWhere('description', 'LIKE', '%' . $request->search . '%')
-                    ->orWhere('category', 'LIKE', '%' . $request->search . '%');
+                $q->where('title', 'LIKE', '%'.$request->search.'%')
+                    ->orWhere('description', 'LIKE', '%'.$request->search.'%')
+                    ->orWhere('category', 'LIKE', '%'.$request->search.'%');
             });
         }
 
@@ -147,7 +148,7 @@ class MarketplaceController extends Controller
         // Handle images
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('marketplace/' . $listing->id, 'public');
+                $path = $image->store('marketplace/'.$listing->id, 'public');
 
                 $listing->images()->create([
                     'image_path' => $path,
@@ -170,7 +171,7 @@ class MarketplaceController extends Controller
         $listing = MarketplaceListing::with([
             'user.profile',
             'images',
-            'savedBy'
+            'savedBy',
         ])
             ->where('slug', $slug)
             ->firstOrFail();
@@ -198,7 +199,27 @@ class MarketplaceController extends Controller
             ->limit(4)
             ->get();
 
-        return view('marketplace.show', compact('listing', 'similarListings', 'sellerListings'));
+        $reviews = $listing->reviews()->with('buyer.profile')->latest()->get();
+        $averageRating = round($reviews->avg('rating'), 1);
+
+        $canReview = false;
+        if (Auth::check()) {
+            $hasCompletedInterest = $listing->interests()
+                ->where('user_id', Auth::id())
+                ->where('status', 'completed')
+                ->exists();
+            $alreadyReviewed = $reviews->contains('buyer_id', Auth::id());
+            $canReview = $hasCompletedInterest && ! $alreadyReviewed;
+        }
+
+        return view('marketplace.show', compact(
+            'listing',
+            'similarListings',
+            'sellerListings',
+            'reviews',
+            'averageRating',
+            'canReview'
+        ));
     }
 
     /**
@@ -206,7 +227,7 @@ class MarketplaceController extends Controller
      */
     public function edit(MarketplaceListing $listing)
     {
-        if (!$listing->canEdit(Auth::id())) {
+        if (! $listing->canEdit(Auth::id())) {
             abort(403);
         }
 
@@ -232,7 +253,7 @@ class MarketplaceController extends Controller
      */
     public function update(Request $request, MarketplaceListing $listing)
     {
-        if (!$listing->canEdit(Auth::id())) {
+        if (! $listing->canEdit(Auth::id())) {
             abort(403);
         }
 
@@ -270,7 +291,7 @@ class MarketplaceController extends Controller
      */
     public function destroy(MarketplaceListing $listing)
     {
-        if (!$listing->canEdit(Auth::id())) {
+        if (! $listing->canEdit(Auth::id())) {
             abort(403);
         }
 
@@ -289,7 +310,7 @@ class MarketplaceController extends Controller
             return response()->json(['error' => 'You cannot express interest in your own listing'], 400);
         }
 
-        if (!in_array($listing->status, ['active', 'reserved'])) {
+        if (! in_array($listing->status, ['active', 'reserved'])) {
             return response()->json(['error' => 'This listing is not available'], 400);
         }
 
@@ -306,9 +327,9 @@ class MarketplaceController extends Controller
             ->where('user_id', Auth::id())
             ->first();
 
-        if ($existingInterest && !in_array($existingInterest->status, ['pending'])) {
+        if ($existingInterest && ! in_array($existingInterest->status, ['pending'])) {
             return response()->json([
-                'error' => 'You have already expressed interest in this listing. Status: ' . $existingInterest->status,
+                'error' => 'You have already expressed interest in this listing. Status: '.$existingInterest->status,
             ], 400);
         }
 
@@ -350,7 +371,7 @@ class MarketplaceController extends Controller
 
         if ($interest->status !== 'pending') {
             return response()->json([
-                'error' => 'This interest has already been ' . $interest->status,
+                'error' => 'This interest has already been '.$interest->status,
             ], 400);
         }
 
@@ -362,7 +383,7 @@ class MarketplaceController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Interest ' . $request->action . 'ed successfully',
+            'message' => 'Interest '.$request->action.'ed successfully',
         ]);
     }
 
@@ -387,11 +408,10 @@ class MarketplaceController extends Controller
         ]);
     }
 
-
     /**
      * Get user's listings
      */
-    public function myListings()
+    public function myListings(Request $request)
     {
         $query = MarketplaceListing::with(['images', 'interests'])
             ->where('user_id', Auth::id());
@@ -403,10 +423,18 @@ class MarketplaceController extends Controller
             'total_views' => (clone $query)->sum('views_count'),
         ];
 
-        $listings = $query->orderBy('created_at', 'desc')
-            ->paginate(12);
+        $status = $request->get('status');
+        if (in_array($status, ['active', 'sold', 'expired'], true)) {
+            $query->where('status', $status);
+        } else {
+            $status = null;
+        }
 
-        return view('marketplace.my-listings', compact('listings', 'stats'));
+        $listings = $query->orderBy('created_at', 'desc')
+            ->paginate(12)
+            ->withQueryString();
+
+        return view('marketplace.my-listings', compact('listings', 'stats', 'status'));
     }
 
     /**
@@ -453,7 +481,7 @@ class MarketplaceController extends Controller
 
     public function addImages(Request $request, MarketplaceListing $listing)
     {
-        if (!$listing->canEdit(Auth::id())) {
+        if (! $listing->canEdit(Auth::id())) {
             abort(403);
         }
 
@@ -479,7 +507,7 @@ class MarketplaceController extends Controller
         $maxOrder = $listing->images()->max('order') ?? -1;
 
         foreach ($request->file('images') as $index => $image) {
-            $path = $image->store('marketplace/' . $listing->id, 'public');
+            $path = $image->store('marketplace/'.$listing->id, 'public');
 
             $listing->images()->create([
                 'image_path' => $path,
@@ -497,7 +525,7 @@ class MarketplaceController extends Controller
 
     public function deleteImage(MarketplaceListing $listing, MarketplaceListingImage $image)
     {
-        if (!$listing->canEdit(Auth::id())) {
+        if (! $listing->canEdit(Auth::id())) {
             abort(403);
         }
 
@@ -514,7 +542,7 @@ class MarketplaceController extends Controller
 
     public function setPrimaryImage(MarketplaceListing $listing, MarketplaceListingImage $image)
     {
-        if (!$listing->canEdit(Auth::id())) {
+        if (! $listing->canEdit(Auth::id())) {
             abort(403);
         }
 
@@ -558,6 +586,7 @@ class MarketplaceController extends Controller
     public function toggleSaveById($id)
     {
         $listing = MarketplaceListing::findOrFail($id);
+
         return $this->toggleSave($listing);
     }
 
@@ -567,6 +596,7 @@ class MarketplaceController extends Controller
     public function expressInterestById(Request $request, $id)
     {
         $listing = MarketplaceListing::findOrFail($id);
+
         return $this->expressInterest($request, $listing);
     }
 }

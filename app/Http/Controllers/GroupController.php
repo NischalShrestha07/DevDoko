@@ -4,6 +4,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\GroupInvitationMail;
 use App\Models\Group;
 use App\Models\GroupCommentLike;
 use App\Models\GroupEvent;
@@ -17,16 +18,17 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class GroupController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware('auth')->except(['index', 'show', 'members', 'resources', 'events', 'acceptInvitation']);
-    // }
+    public function __construct()
+    {
+        $this->middleware('auth')->except(['index', 'show', 'members', 'resources', 'events', 'acceptInvitation']);
+    }
 
     // ============== GROUP MANAGEMENT ==============
 
@@ -356,7 +358,7 @@ class GroupController extends Controller
             ->with('owner.profile')
             ->withCount('members')
             ->orderBy('last_active_at', 'desc')
-            ->get();
+            ->paginate(12);
 
         $pendingRequests = Group::whereHas('members', function ($q) {
             $q->where('user_id', Auth::id())
@@ -489,7 +491,7 @@ class GroupController extends Controller
         }
 
         $token = Str::random(32);
-        GroupInvitation::create([
+        $invitation = GroupInvitation::create([
             'group_id' => $group->id,
             'inviter_id' => Auth::id(),
             'email' => $request->email,
@@ -498,7 +500,7 @@ class GroupController extends Controller
             'expires_at' => now()->addDays(7),
         ]);
 
-        // TODO: Send email notification
+        Mail::to($invitation->email)->queue(new GroupInvitationMail($invitation));
 
         return redirect()->back()->with('success', 'Invitation sent successfully!');
     }
@@ -1064,7 +1066,7 @@ class GroupController extends Controller
             'status' => 'pending',
         ]);
 
-        // TODO: Resend email
+        Mail::to($invitation->email)->queue(new GroupInvitationMail($invitation));
 
         return redirect()->back()->with('success', 'Invitation resent successfully!');
     }
@@ -1145,7 +1147,9 @@ class GroupController extends Controller
 
         $newOwner = User::find($request->user_id);
 
-        if (! $group->isMember || $newOwner->id === $group->owner_id) {
+        $newOwnerIsMember = $group->members()->where('user_id', $newOwner->id)->exists();
+
+        if (! $newOwnerIsMember || $newOwner->id === $group->owner_id) {
             return redirect()->back()->with('error', 'Invalid user or user is not a member.');
         }
 
@@ -1173,11 +1177,8 @@ class GroupController extends Controller
             return redirect()->back()->withErrors($validator);
         }
 
-        // TODO: Create reports table and model
-        // For now, just log it
-        \Log::warning('Group reported', [
-            'group_id' => $group->id,
-            'user_id' => Auth::id(),
+        $group->reports()->create([
+            'reporter_id' => Auth::id(),
             'reason' => $request->reason,
             'details' => $request->details,
         ]);

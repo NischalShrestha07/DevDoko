@@ -12,7 +12,7 @@
                 <i class="bi bi-bag me-2 text-primary"></i>
                 My Listings
             </h1>
-            <p class="text-muted mb-0">Manage your marketplace listings</p>
+            <p class="app-text-muted mb-0">Manage your marketplace listings</p>
         </div>
         <a href="{{ route('marketplace.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-lg me-2"></i>
@@ -87,50 +87,29 @@
     <!-- Listings Tabs -->
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white border-0 py-3">
-            <ul class="nav nav-tabs card-header-tabs" id="listingTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all"
-                        type="button" role="tab">All Listings</button>
+            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                <li class="nav-item">
+                    <a href="{{ route('marketplace.my-listings') }}" class="nav-link {{ ! $status ? 'active' : '' }}">All Listings</a>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="active-tab" data-bs-toggle="tab" data-bs-target="#active" type="button"
-                        role="tab">Active</button>
+                <li class="nav-item">
+                    <a href="{{ route('marketplace.my-listings', ['status' => 'active']) }}" class="nav-link {{ $status === 'active' ? 'active' : '' }}">Active</a>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="sold-tab" data-bs-toggle="tab" data-bs-target="#sold" type="button"
-                        role="tab">Sold</button>
+                <li class="nav-item">
+                    <a href="{{ route('marketplace.my-listings', ['status' => 'sold']) }}" class="nav-link {{ $status === 'sold' ? 'active' : '' }}">Sold</a>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="expired-tab" data-bs-toggle="tab" data-bs-target="#expired"
-                        type="button" role="tab">Expired</button>
+                <li class="nav-item">
+                    <a href="{{ route('marketplace.my-listings', ['status' => 'expired']) }}" class="nav-link {{ $status === 'expired' ? 'active' : '' }}">Expired</a>
                 </li>
             </ul>
         </div>
         <div class="card-body p-4">
-            <div class="tab-content" id="listingTabsContent">
-                <!-- All Listings Tab -->
-                <div class="tab-pane fade show active" id="all" role="tabpanel">
-                    @include('marketplace.partials.my-listings-table', ['listings' => $listings])
-                </div>
+            @include('marketplace.partials.my-listings-table', ['listings' => $listings])
 
-                <!-- Active Tab -->
-                <div class="tab-pane fade" id="active" role="tabpanel">
-                    @include('marketplace.partials.my-listings-table', ['listings' => $listings->where('status',
-                    'active')])
-                </div>
-
-                <!-- Sold Tab -->
-                <div class="tab-pane fade" id="sold" role="tabpanel">
-                    @include('marketplace.partials.my-listings-table', ['listings' => $listings->where('status',
-                    'sold')])
-                </div>
-
-                <!-- Expired Tab -->
-                <div class="tab-pane fade" id="expired" role="tabpanel">
-                    @include('marketplace.partials.my-listings-table', ['listings' => $listings->where('status',
-                    'expired')])
-                </div>
+            @if($listings->hasPages())
+            <div class="mt-4">
+                {{ $listings->links() }}
             </div>
+            @endif
         </div>
     </div>
 </div>

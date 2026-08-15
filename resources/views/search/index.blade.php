@@ -13,11 +13,11 @@
                 <div class="card-body p-4">
                     <form method="GET" action="{{ route('search') }}">
                         <div class="input-group input-group-lg">
-                            <span class="input-group-text bg-light border-0">
+                            <span class="input-group-text app-bg-secondary border-0">
                                 <i class="bi bi-search"></i>
                             </span>
 
-                            <input type="text" name="q" class="form-control bg-light border-0"
+                            <input type="text" name="q" class="form-control app-bg-secondary border-0"
                                 placeholder="Search developers..." value="{{ $query ?? '' }}" autofocus>
 
                             @if(!empty($query))
@@ -43,7 +43,7 @@
             @endphp
 
             @if($hasUsers)
-            <h6 class="text-muted mb-3">
+            <h6 class="app-text-muted mb-3">
                 Developers ({{ $users->total() }})
             </h6>
 
@@ -57,7 +57,7 @@
             @endif
 
             @if($hasPosts)
-            <h6 class="text-muted mb-3">
+            <h6 class="app-text-muted mb-3">
                 Posts ({{ $posts->total() }})
             </h6>
 
@@ -72,9 +72,9 @@
 
             @if(!$hasUsers && !$hasPosts)
             <div class="text-center py-5">
-                <i class="bi bi-search display-5 text-muted mb-3"></i>
-                <h5 class="text-muted">No results found</h5>
-                <p class="text-muted small">
+                <i class="bi bi-search display-5 app-text-muted mb-3"></i>
+                <h5 class="app-text-muted">No results found</h5>
+                <p class="app-text-muted small">
                     Try searching with a different keyword.
                 </p>
             </div>

@@ -12,7 +12,7 @@
                 <i class="bi bi-send me-2 text-primary"></i>
                 Sent Interests
             </h1>
-            <p class="text-muted mb-0">Items you've shown interest in</p>
+            <p class="app-text-muted mb-0">Items you've shown interest in</p>
         </div>
         <div class="btn-group">
             <a href="{{ route('marketplace.interests.received') }}" class="btn btn-outline-primary">
@@ -51,7 +51,7 @@
                     <div class="d-flex align-items-center mb-2">
                         <img src="{{ $interest->listing->user->profile->avatar_url }}" class="rounded-circle me-2"
                             style="width: 24px; height: 24px; object-fit: cover;">
-                        <small class="text-muted">
+                        <small class="app-text-muted">
                             <a href="{{ route('profile.show', $interest->listing->user->profile->username) }}"
                                 class="text-decoration-none">
                                 {{ $interest->listing->user->profile->username }}
@@ -61,7 +61,7 @@
 
                     <h6 class="fw-semibold mb-2">
                         <a href="{{ route('marketplace.show', $interest->listing->slug) }}"
-                            class="text-dark text-decoration-none">
+                            class="app-text-primary text-decoration-none">
                             {{ Str::limit($interest->listing->title, 50) }}
                         </a>
                     </h6>
@@ -81,7 +81,7 @@
                     @endif
 
                     <div class="d-flex justify-content-between align-items-center mt-3">
-                        <small class="text-muted">
+                        <small class="app-text-muted">
                             <i class="bi bi-clock"></i> {{ $interest->time_ago }}
                         </small>
 
@@ -101,9 +101,9 @@
     </div>
     @else
     <div class="text-center py-5">
-        <i class="bi bi-send display-1 text-muted"></i>
+        <i class="bi bi-send display-1 app-text-muted"></i>
         <h5 class="mt-3 mb-2">No interests sent yet</h5>
-        <p class="text-muted">Browse the marketplace and express interest in items you like</p>
+        <p class="app-text-muted">Browse the marketplace and express interest in items you like</p>
         <a href="{{ route('marketplace.index') }}" class="btn btn-primary">
             <i class="bi bi-shop me-2"></i> Browse Marketplace
         </a>

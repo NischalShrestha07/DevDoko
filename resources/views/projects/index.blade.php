@@ -8,7 +8,7 @@
     <div class="row mb-5 fade-in">
         <div class="col-md-8 mx-auto text-center">
             <h1 class="display-5 fw-bold mb-3">Explore Developer Projects</h1>
-            <p class="lead text-muted mb-4">
+            <p class="lead app-text-muted mb-4">
                 Discover amazing projects, contribute to open source, or showcase your own work.
                 Connect with developers and collaborate on innovative ideas.
             </p>
@@ -71,7 +71,7 @@
                     <div class="row g-3">
                         <!-- Category -->
                         <div class="col-md-4">
-                            <label class="form-label small text-muted">Category</label>
+                            <label class="form-label small app-text-muted">Category</label>
                             <select class="form-select" name="category" onchange="this.form.submit()">
                                 <option value="">All Categories</option>
                                 @foreach($categories as $category)
@@ -84,7 +84,7 @@
 
                         <!-- Technology -->
                         <div class="col-md-4">
-                            <label class="form-label small text-muted">Technology</label>
+                            <label class="form-label small app-text-muted">Technology</label>
                             <select class="form-select" name="technology" onchange="this.form.submit()">
                                 <option value="">All Technologies</option>
                                 @foreach($technologies as $tech)
@@ -97,7 +97,7 @@
 
                         <!-- Difficulty -->
                         <div class="col-md-4">
-                            <label class="form-label small text-muted">Difficulty</label>
+                            <label class="form-label small app-text-muted">Difficulty</label>
                             <select class="form-select" name="difficulty" onchange="this.form.submit()">
                                 <option value="">All Levels</option>
                                 <option value="beginner" {{ request('difficulty')=='beginner' ? 'selected' : '' }}>
@@ -144,7 +144,7 @@
                             <h5 class="card-title fw-bold mb-0">{{ $project->title }}</h5>
                             <span class="badge bg-warning">Featured</span>
                         </div>
-                        <p class="card-text text-muted small mb-3">{{ $project->short_description }}</p>
+                        <p class="card-text app-text-muted small mb-3">{{ $project->short_description }}</p>
 
                         <div class="mb-3">
                             @foreach($project->techBadges as $tech)
@@ -157,9 +157,9 @@
                         <div class="d-flex align-items-center">
                             <img src="{{ $project->user->profile->avatar_url }}" alt="{{ $project->user->name }}"
                                 class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
-                            <small class="text-muted">
+                            <small class="app-text-muted">
                                 <a href="{{ route('profile.show', $project->user->profile->username) }}"
-                                    class="text-decoration-none text-dark fw-bold">
+                                    class="text-decoration-none app-text-primary fw-bold">
                                     {{ $project->user->name }}
                                 </a>
                             </small>
@@ -168,13 +168,13 @@
                     <div class="card-footer bg-transparent border-top-0">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="project-stats small">
-                                <span class="text-muted me-3">
+                                <span class="app-text-muted me-3">
                                     <i class="bi bi-eye"></i> {{ $project->views_count }}
                                 </span>
-                                <span class="text-muted me-3">
+                                <span class="app-text-muted me-3">
                                     <i class="bi bi-heart"></i> {{ $project->likes_count }}
                                 </span>
-                                <span class="text-muted">
+                                <span class="app-text-muted">
                                     <i class="bi bi-share"></i> {{ $project->forks_count }}
                                 </span>
                             </div>
@@ -194,7 +194,7 @@
     <div class="fade-in">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="fw-bold mb-0">All Projects</h3>
-            <span class="text-muted">{{ $projects->total() }} projects</span>
+            <span class="app-text-muted">{{ $projects->total() }} projects</span>
         </div>
 
         @if($projects->count() > 0)
@@ -220,7 +220,7 @@
                     </div>
                     <div class="card-body">
                         <h5 class="card-title fw-bold mb-2">{{ $project->title }}</h5>
-                        <p class="card-text text-muted small mb-3">{{ $project->short_description }}</p>
+                        <p class="card-text app-text-muted small mb-3">{{ $project->short_description }}</p>
 
                         <div class="mb-3">
                             @foreach($project->techBadges as $tech)
@@ -233,13 +233,13 @@
                         <div class="d-flex align-items-center mb-3">
                             <img src="{{ $project->user->profile->avatar_url }}" alt="{{ $project->user->name }}"
                                 class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
-                            <small class="text-muted">
+                            <small class="app-text-muted">
                                 <a href="{{ route('profile.show', $project->user->profile->username) }}"
-                                    class="text-decoration-none text-dark fw-bold">
+                                    class="text-decoration-none app-text-primary fw-bold">
                                     {{ $project->user->name }}
                                 </a>
                             </small>
-                            <span class="badge bg-light text-dark ms-auto">
+                            <span class="badge app-bg-secondary app-text-primary ms-auto">
                                 <i class="bi bi-{{ $project->difficulty }}"></i>
                                 {{ ucfirst($project->difficulty) }}
                             </span>
@@ -248,13 +248,13 @@
                     <div class="card-footer bg-transparent border-top-0">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="project-stats small">
-                                <span class="text-muted me-3">
+                                <span class="app-text-muted me-3">
                                     <i class="bi bi-eye"></i> {{ $project->views_count }}
                                 </span>
-                                <span class="text-muted me-3">
+                                <span class="app-text-muted me-3">
                                     <i class="bi bi-heart"></i> {{ $project->likes_count }}
                                 </span>
-                                <span class="text-muted">
+                                <span class="app-text-muted">
                                     <i class="bi bi-share"></i> {{ $project->forks_count }}
                                 </span>
                             </div>
@@ -275,9 +275,9 @@
         @else
         <!-- No Projects State -->
         <div class="text-center py-5">
-            <i class="bi bi-layers display-1 text-muted mb-3"></i>
-            <h4 class="text-muted">No projects found</h4>
-            <p class="text-muted mb-4">
+            <i class="bi bi-layers display-1 app-text-muted mb-3"></i>
+            <h4 class="app-text-muted">No projects found</h4>
+            <p class="app-text-muted mb-4">
                 @if(request()->hasAny(['search', 'category', 'technology', 'difficulty']))
                 Try different filters or create the first project in this category!
                 @else

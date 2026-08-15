@@ -10,7 +10,7 @@
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body text-center">
                 <h1 class="display-4 mb-3">#{{ $tag->name }}</h1>
-                <p class="text-muted">
+                <p class="app-text-muted">
                     {{ $posts->total() }} posts tagged with #{{ $tag->name }}
                 </p>
                 @if(auth()->check())
@@ -27,9 +27,9 @@
         @empty
         <div class="card border-0 shadow-sm">
             <div class="card-body text-center py-5">
-                <i class="bi bi-tag display-1 text-muted mb-3"></i>
-                <h5 class="text-muted">No posts with this tag yet</h5>
-                <p class="text-muted">Be the first to post with #{{ $tag->name }}</p>
+                <i class="bi bi-tag display-1 app-text-muted mb-3"></i>
+                <h5 class="app-text-muted">No posts with this tag yet</h5>
+                <p class="app-text-muted">Be the first to post with #{{ $tag->name }}</p>
                 @if(auth()->check())
                 <a href="{{ route('posts.create') }}" class="btn btn-primary">
                     Create First Post

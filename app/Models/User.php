@@ -144,6 +144,17 @@ class User extends Authenticatable
             ->all());
     }
 
+    public function hiddenPosts()
+    {
+        return $this->hasMany(PostHide::class);
+    }
+
+    /** IDs of posts this user chose "not interested" on. Cached per request. */
+    public function hiddenPostIds(): array
+    {
+        return once(fn () => $this->hiddenPosts()->pluck('post_id')->all());
+    }
+
     public function activeStories()
     {
         return $this->stories()->active()->oldest();

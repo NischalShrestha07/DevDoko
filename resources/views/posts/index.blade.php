@@ -12,7 +12,7 @@
                 <i class="bi bi-rss-fill me-2 text-primary"></i>
                 Feed
             </h1>
-            <p class="text-muted mb-0">Latest posts from developers you follow</p>
+            <p class="app-text-muted mb-0">Latest posts from developers you follow</p>
         </div>
 
         <!-- Create Post Button -->
@@ -25,7 +25,7 @@
                 <li>
                     <a class="dropdown-item rounded-3 py-2" href="{{ route('posts.create', ['type' => 'text']) }}">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="bg-light rounded-circle p-2">
+                            <div class="app-bg-secondary rounded-circle p-2">
                                 <i class="bi bi-file-text text-primary"></i>
                             </div>
                             <div>
@@ -41,7 +41,7 @@
                 <li>
                     <a class="dropdown-item rounded-3 py-2" href="{{ route('posts.create', ['type' => 'code']) }}">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="bg-light rounded-circle p-2">
+                            <div class="app-bg-secondary rounded-circle p-2">
                                 <i class="bi bi-code-slash text-success"></i>
                             </div>
                             <div>
@@ -54,7 +54,7 @@
                 <li>
                     <a class="dropdown-item rounded-3 py-2" href="{{ route('posts.create', ['type' => 'image']) }}">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="bg-light rounded-circle p-2">
+                            <div class="app-bg-secondary rounded-circle p-2">
                                 <i class="bi bi-image text-info"></i>
                             </div>
                             <div>
@@ -67,7 +67,7 @@
                 <li>
                     <a class="dropdown-item rounded-3 py-2" href="{{ route('posts.create', ['type' => 'link']) }}">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="bg-light rounded-circle p-2">
+                            <div class="app-bg-secondary rounded-circle p-2">
                                 <i class="bi bi-link-45deg text-warning"></i>
                             </div>
                             <div>
@@ -83,7 +83,7 @@
                 <li>
                     <a class="dropdown-item rounded-3 py-2" href="{{ route('posts.create', ['type' => 'question']) }}">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="bg-light rounded-circle p-2">
+                            <div class="app-bg-secondary rounded-circle p-2">
                                 <i class="bi bi-question-circle text-danger"></i>
                             </div>
                             <div>

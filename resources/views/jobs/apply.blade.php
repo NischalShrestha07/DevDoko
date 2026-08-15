@@ -5,7 +5,7 @@
 @section('content')
 <div class="container py-4">
     <div class="d-flex align-items-center gap-2 mb-4">
-        <a href="{{ route('jobs.show', $job) }}" class="text-decoration-none text-dark d-flex align-items-center gap-1">
+        <a href="{{ route('jobs.show', $job) }}" class="text-decoration-none app-text-primary d-flex align-items-center gap-1">
             <i class="bi bi-arrow-left"></i>
             <span>Back to Job</span>
         </a>
@@ -19,7 +19,7 @@
                         <i class="bi bi-send text-primary me-2"></i>
                         Apply for {{ $job->title }}
                     </h4>
-                    <p class="text-muted mb-4">at {{ $job->company_name }}</p>
+                    <p class="app-text-muted mb-4">at {{ $job->company_name }}</p>
 
                     @if($errors->any())
                         <div class="alert alert-danger border-0 shadow-sm">

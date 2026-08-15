@@ -15,7 +15,16 @@ class NotificationService
     /**
      * Send a like notification
      */
-    public function likeNotification(User $liker, $likeable, string $type = 'post'): void
+    private const REACTION_VERBS = [
+        'like' => 'liked',
+        'love' => 'loved',
+        'haha' => 'laughed at',
+        'wow' => 'was amazed by',
+        'sad' => 'felt sad about',
+        'angry' => 'was angry about',
+    ];
+
+    public function likeNotification(User $liker, $likeable, string $type = 'post', ?string $reaction = null): void
     {
         $owner = $type === 'post' ? $likeable->user : $likeable->user;
 
@@ -24,17 +33,20 @@ class NotificationService
             return;
         }
 
+        $verb = self::REACTION_VERBS[$reaction] ?? 'liked';
+
         $data = [
             'liker_id' => $liker->id,
             'liker_name' => $liker->name,
             'liker_username' => $liker->profile->username ?? $liker->name,
+            'reaction' => $reaction,
         ];
 
         if ($type === 'post') {
             $data['post_id'] = $likeable->id;
             $data['post_title'] = $likeable->title ?? 'post';
             $notificationType = 'post_like';
-            $message = $liker->name.' liked your post';
+            $message = $liker->name.' '.$verb.' your post';
         } else {
             $data['comment_id'] = $likeable->id;
             $data['post_id'] = $likeable->commentable_id ?? $likeable->post_id;

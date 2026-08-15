@@ -8,31 +8,31 @@
         <div class="d-flex justify-content-between align-items-start">
             <div>
                 <a href="{{ route('profile.show', $user->profile->username) }}"
-                    class="text-decoration-none text-dark fw-bold d-block">
+                    class="text-decoration-none app-text-primary fw-bold d-block">
                     {{ $user->profile->username }}
                     @if($user->profile->is_verified ?? false)
                     <i class="bi bi-patch-check-fill text-primary ms-1" style="font-size: 14px;"></i>
                     @endif
                 </a>
-                <small class="text-muted d-block">{{ $user->name }}</small>
+                <small class="app-text-muted d-block">{{ $user->name }}</small>
                 @if($user->profile->title)
-                <small class="text-muted">{{ $user->profile->title }}</small>
+                <small class="app-text-muted">{{ $user->profile->title }}</small>
                 @endif
             </div>
-            <div class="d-flex gap-3 text-muted small">
+            <div class="d-flex gap-3 app-text-muted small">
                 <span><i class="bi bi-people"></i> {{ $user->followers_count ?? $user->followers()->count() }}</span>
                 <span><i class="bi bi-file-text"></i> {{ $user->posts_count ?? $user->posts()->count() }}</span>
             </div>
         </div>
 
         @if($user->profile->bio)
-        <p class="small text-muted mt-2 mb-0">{{ Str::limit($user->profile->bio, 100) }}</p>
+        <p class="small app-text-muted mt-2 mb-0">{{ Str::limit($user->profile->bio, 100) }}</p>
         @endif
 
         @if($user->profile->tech_stack)
         <div class="mt-2">
             @foreach(explode(',', $user->profile->tech_stack) as $tech)
-            <span class="badge bg-light text-dark me-1">#{{ trim($tech) }}</span>
+            <span class="badge app-bg-secondary app-text-primary me-1">#{{ trim($tech) }}</span>
             @endforeach
         </div>
         @endif

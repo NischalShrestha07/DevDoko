@@ -11,7 +11,7 @@
                 <i class="bi bi-stars me-2 text-warning"></i>
                 Recommended For You
             </h4>
-            <p class="text-muted mb-0">
+            <p class="app-text-muted mb-0">
                 <a href="{{ route('groups.index') }}" class="text-decoration-none">
                     <i class="bi bi-arrow-left"></i> Back to All Groups
                 </a>
@@ -34,11 +34,11 @@
     </div>
     @else
     <div class="text-center py-5">
-        <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
+        <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
             <i class="bi bi-stars text-warning" style="font-size: 48px;"></i>
         </div>
         <h5 class="fw-semibold mb-2">No recommendations yet</h5>
-        <p class="text-muted mb-4">Explore all groups to find ones you like.</p>
+        <p class="app-text-muted mb-4">Explore all groups to find ones you like.</p>
         <a href="{{ route('groups.index') }}" class="btn btn-primary">
             <i class="bi bi-people me-2"></i> Browse All Groups
         </a>

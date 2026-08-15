@@ -11,27 +11,27 @@
 
         <!-- Comment Content -->
         <div class="flex-grow-1">
-            <div class="card bg-light border-0">
+            <div class="card app-bg-secondary border-0">
                 <div class="card-body py-2 px-3">
                     <!-- Comment Header -->
                     <div class="d-flex justify-content-between align-items-start mb-1">
                         <div>
                             <a href="{{ route('profile.show', $comment->user->profile->username ?? '') }}"
-                                class="text-decoration-none fw-bold text-dark">
+                                class="text-decoration-none fw-bold app-text-primary">
                                 {{ $comment->user->profile->username ?? '' }}
                             </a>
-                            @if($comment->user->is_verified)
+                            @if($comment->user->profile->is_verified ?? false)
                             <span class="badge bg-primary ms-1" style="font-size: 8px; padding: 1px 4px;">
                                 <i class="bi bi-check-circle-fill"></i>
                             </span>
                             @endif
-                            <small class="text-muted ms-2">{{ $comment->created_at->diffForHumans() }}</small>
+                            <small class="app-text-muted ms-2">{{ $comment->created_at->diffForHumans() }}</small>
                         </div>
 
                         <!-- Comment Actions Dropdown -->
                         @if(auth()->check() && (auth()->id() === $comment->user_id || auth()->user()->isAdmin()))
                         <div class="dropdown">
-                            <button class="btn btn-link text-dark p-0" type="button" data-bs-toggle="dropdown"
+                            <button class="btn btn-link app-text-primary p-0" type="button" data-bs-toggle="dropdown"
                                 style="font-size: 12px;">
                                 <i class="bi bi-three-dots"></i>
                             </button>
@@ -84,21 +84,21 @@
                         <!-- Like Button -->
                         <form action="{{ route('comments.like', $comment) }}" method="POST" class="like-comment-form">
                             @csrf
-                            <button type="submit" class="btn btn-link text-dark p-0" style="font-size: 12px;">
+                            <button type="submit" class="btn btn-link app-text-primary p-0" style="font-size: 12px;">
                                 <i class="bi bi-heart{{ $comment->is_liked ? '-fill text-danger' : '' }}"></i>
                                 <span class="ms-1">{{ $comment->likes_count }}</span>
                             </button>
                         </form>
 
                         <!-- Reply Button -->
-                        <button class="btn btn-link text-dark p-0 reply-toggle" style="font-size: 12px;"
+                        <button class="btn btn-link app-text-primary p-0 reply-toggle" style="font-size: 12px;"
                             data-comment-id="{{ $comment->id }}">
                             <i class="bi bi-reply"></i> Reply
                         </button>
 
                         <!-- View Replies (if any) -->
                         @if($comment->replies_count > 0)
-                        <button class="btn btn-link text-dark p-0 view-replies-toggle" style="font-size: 12px;"
+                        <button class="btn btn-link app-text-primary p-0 view-replies-toggle" style="font-size: 12px;"
                             data-comment-id="{{ $comment->id }}">
                             <i class="bi bi-chevron-down"></i>
                             {{ $comment->replies_count }} {{ Str::plural('reply', $comment->replies_count) }}

@@ -9,7 +9,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white py-3">
                     <div class="d-flex align-items-center">
-                        <a href="{{ route('home') }}" class="text-decoration-none text-dark me-3">
+                        <a href="{{ route('home') }}" class="text-decoration-none app-text-primary me-3">
                             <i class="bi bi-x-lg fs-4"></i>
                         </a>
                         <h5 class="mb-0 fw-bold">Create New Post</h5>
@@ -54,7 +54,7 @@
                                     placeholder="What's on your mind, {{ auth()->user()->name }}?"
                                     maxlength="20000">{{ old('content') }}</textarea>
                                 <div class="d-flex justify-content-between align-items-center mt-1">
-                                    <div class="text-muted small">
+                                    <div class="app-text-muted small">
                                         <span id="charCount">0</span>/20000
                                     </div>
                                     <div class="small">
@@ -97,7 +97,7 @@
                                 <textarea class="form-control font-monospace" id="code_snippet" name="code_snippet"
                                     rows="12" placeholder="Paste your code here..."
                                     maxlength="20000">{{ old('code_snippet') }}</textarea>
-                                <div class="text-end text-muted small mt-1">
+                                <div class="text-end app-text-muted small mt-1">
                                     <span id="codeCharCount">0</span>/20000
                                 </div>
                                 @error('code_snippet')
@@ -117,8 +117,8 @@
                                         </div>
                                     </div>
                                     <div id="imageUploadArea" class="py-5 text-center">
-                                        <i class="bi bi-cloud-arrow-up fs-1 text-muted d-block mb-3"></i>
-                                        <p class="text-muted mb-3">Drag & drop an image or click to browse</p>
+                                        <i class="bi bi-cloud-arrow-up fs-1 app-text-muted d-block mb-3"></i>
+                                        <p class="app-text-muted mb-3">Drag & drop an image or click to browse</p>
                                         <input type="file" id="image" name="image" accept="image/*" class="d-none">
                                         <button type="button" id="browseImage" class="btn btn-primary">
                                             <i class="bi bi-upload"></i> Select Image
@@ -133,7 +133,7 @@
                                             rows="3" placeholder="Add a caption... (optional)"
                                             maxlength="20000">{{ old('content') }}</textarea>
                                         <div class="d-flex justify-content-between align-items-center mt-1">
-                                            <div class="text-muted small">
+                                            <div class="app-text-muted small">
                                                 <span id="imageCaptionCount">0</span>/20000
                                             </div>
                                             <div class="small">
@@ -146,6 +146,15 @@
                                 @error('image')
                                 <div class="text-danger small mt-1">{{ $message }}</div>
                                 @enderror
+
+                                <div class="mt-3">
+                                    <label for="extraImages" class="form-label small fw-semibold">Add more photos (optional)</label>
+                                    <input type="file" id="extraImages" name="images[]" multiple accept="image/*" class="form-control form-control-sm">
+                                    <div class="form-text">The photo above is the cover. Extra photos become a swipeable gallery — up to 10, 20MB each.</div>
+                                    @error('images.*')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             </div>
 
                             <!-- Video Upload Section -->
@@ -164,8 +173,8 @@
                                         </div>
                                     </div>
                                     <div id="videoUploadArea" class="py-5">
-                                        <i class="bi bi-camera-video fs-1 text-muted d-block mb-3"></i>
-                                        <p class="text-muted mb-3">Select a video file to upload</p>
+                                        <i class="bi bi-camera-video fs-1 app-text-muted d-block mb-3"></i>
+                                        <p class="app-text-muted mb-3">Select a video file to upload</p>
                                         <input type="file" id="video" name="video" accept="video/*" class="d-none">
                                         <button type="button" id="browseVideo" class="btn btn-primary">
                                             <i class="bi bi-upload"></i> Select Video
@@ -241,13 +250,13 @@
                                             <i class="bi bi-plus"></i> Add
                                         </button>
                                     </div>
-                                    <div class="form-text mt-2">
+                                    <div class="app-text-muted small mt-2">
                                         Add relevant tags to help others discover your post. Max 10 tags.
                                     </div>
 
                                     <!-- Popular Tags -->
                                     <div class="mt-3">
-                                        <p class="text-muted small mb-2">
+                                        <p class="app-text-muted small mb-2">
                                             <i class="bi bi-fire"></i> Popular tags:
                                         </p>
                                         <div id="popularTags" class="d-flex flex-wrap gap-2">
@@ -279,7 +288,7 @@
                                             <h6 class="mb-1">
                                                 <i class="bi bi-globe text-primary"></i> Public
                                             </h6>
-                                            <p class="text-muted small mb-0">Anyone can see this post</p>
+                                            <p class="app-text-muted small mb-0">Anyone can see this post</p>
                                         </div>
                                     </label>
                                     <label class="list-group-item d-flex align-items-center">
@@ -289,7 +298,7 @@
                                             <h6 class="mb-1">
                                                 <i class="bi bi-people text-success"></i> Followers Only
                                             </h6>
-                                            <p class="text-muted small mb-0">Only your followers can see this post</p>
+                                            <p class="app-text-muted small mb-0">Only your followers can see this post</p>
                                         </div>
                                     </label>
                                     <label class="list-group-item d-flex align-items-center">
@@ -299,7 +308,7 @@
                                             <h6 class="mb-1">
                                                 <i class="bi bi-lock text-danger"></i> Private
                                             </h6>
-                                            <p class="text-muted small mb-0">Only you can see this post</p>
+                                            <p class="app-text-muted small mb-0">Only you can see this post</p>
                                         </div>
                                     </label>
                                 </div>

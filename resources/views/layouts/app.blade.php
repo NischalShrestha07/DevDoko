@@ -171,8 +171,7 @@
             ->latest()
             ->take(5)
             ->get();
-        $unreadCount = $recentNotifications->whereNull('read_at')->count();
-        if (!$unreadCount) $unreadCount = auth()->user()->unreadNotifications()->count();
+        $unreadCount = auth()->user()->unreadNotificationsCount();
     @endphp
     @endauth
 
@@ -188,12 +187,14 @@
                 <span class="d-md-none">DevDoko</span>
             </a>
             {{-- Desktop search bar --}}
-            <div class="d-none d-md-flex flex-grow-1 ms-4" style="max-width: 420px;">
+            <div class="d-none d-md-flex flex-grow-1 ms-4 position-relative" style="max-width: 420px;" id="quickSearchWrap">
                 <div class="input-group input-group-sm">
                     <span class="input-group-text app-input-icon border-0"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control app-search-input border-0" placeholder="Search developers, posts, groups..."
-                        onfocus="location.href='{{ route('search') }}'" readonly style="border-radius: 10px;">
+                    <input type="text" class="form-control app-search-input border-0" id="quickSearchInput"
+                        placeholder="Search developers, posts, tags..." autocomplete="off" style="border-radius: 10px;">
                 </div>
+                <div class="app-dropdown shadow border-0 rounded-3 d-none" id="quickSearchResults"
+                    style="position: absolute; top: 100%; left: 0; right: 0; margin-top: 6px; max-height: 70vh; overflow-y: auto; z-index: 1050;"></div>
             </div>
         </div>
         <div class="d-flex align-items-center gap-1 gap-md-2 flex-shrink-0">
@@ -471,6 +472,75 @@
     @auth
     @include('posts.partials.composer')
     @endauth
+
+    <script>
+    (function() {
+        const input = document.getElementById('quickSearchInput');
+        const results = document.getElementById('quickSearchResults');
+        if (!input || !results) return;
+
+        let debounce = null;
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str ?? '';
+            return div.innerHTML;
+        }
+
+        function renderSection(title, items, rowHtml) {
+            if (!items.length) return '';
+            return `<div class="px-3 pt-2 pb-1 small fw-semibold app-text-muted text-uppercase" style="font-size: 11px;">${title}</div>`
+                + items.map(rowHtml).join('');
+        }
+
+        function render(data) {
+            const html = renderSection('Developers', data.users, u => `
+                <a href="${u.url}" class="dropdown-item px-3 py-2 d-flex align-items-center gap-2">
+                    <img src="${escapeHtml(u.avatar_url)}" class="rounded-circle" style="width: 28px; height: 28px; object-fit: cover;">
+                    <span class="app-text-primary">${escapeHtml(u.username)}</span>
+                </a>`)
+                + renderSection('Tags', data.tags, t => `
+                <a href="${t.url}" class="dropdown-item px-3 py-2 d-flex align-items-center justify-content-between">
+                    <span class="app-text-primary">#${escapeHtml(t.name)}</span>
+                    <small class="app-text-muted">${t.posts_count}</small>
+                </a>`)
+                + renderSection('Posts', data.posts, p => `
+                <a href="${p.url}" class="dropdown-item px-3 py-2 text-truncate app-text-primary">${escapeHtml(p.title)}</a>`);
+
+            if (!html) {
+                results.innerHTML = '<div class="px-3 py-3 small app-text-muted text-center">No results</div>';
+            } else {
+                results.innerHTML = html;
+            }
+            results.classList.remove('d-none');
+        }
+
+        input.addEventListener('input', function() {
+            clearTimeout(debounce);
+            const q = this.value.trim();
+            if (!q) { results.classList.add('d-none'); return; }
+
+            debounce = setTimeout(async () => {
+                try {
+                    const res = await fetch(`{{ route('search.quick') }}?q=${encodeURIComponent(q)}`, {
+                        headers: { Accept: 'application/json' }
+                    });
+                    if (res.ok) render(await res.json());
+                } catch (e) {}
+            }, 250);
+        });
+
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && this.value.trim()) {
+                window.location.href = `{{ route('search') }}?q=${encodeURIComponent(this.value.trim())}`;
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#quickSearchWrap')) results.classList.add('d-none');
+        });
+    })();
+    </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
     @auth

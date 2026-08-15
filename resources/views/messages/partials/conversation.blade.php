@@ -5,7 +5,7 @@
     <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center gap-3">
             <a href="{{ route('profile.show', $conversationUser->profile->username) }}"
-                class="d-flex align-items-center gap-2 text-decoration-none text-dark">
+                class="d-flex align-items-center gap-2 text-decoration-none app-text-primary">
                 <div class="position-relative">
                     <img src="{{ $conversationUser->avatar_url }}" alt="{{ $conversationUser->name }}"
                         class="rounded-circle border" style="width: 48px; height: 48px; object-fit: cover;">
@@ -18,7 +18,7 @@
                 <div>
                     <h6 class="fw-semibold mb-0">{{ $conversationUser->profile->username ?? $conversationUser->name }}
                     </h6>
-                    <small class="text-muted">
+                    <small class="app-text-muted">
                         @if($conversationUser->isOnline())
                         <span class="text-success">● Online</span>
                         @else
@@ -88,7 +88,7 @@
         @if(isset($groupedMessages) && $groupedMessages->count() > 0)
         @foreach($groupedMessages as $date => $messagesGroup)
         <div class="text-center mb-4">
-            <span class="badge bg-light text-dark px-3 py-2 rounded-pill small">
+            <span class="badge app-bg-secondary app-text-primary px-3 py-2 rounded-pill small">
                 {{ \Carbon\Carbon::parse($date)->format('l, F j, Y') }}
             </span>
         </div>
@@ -100,13 +100,13 @@
         @else
         <div class="h-100 d-flex align-items-center justify-content-center">
             <div class="text-center" style="max-width: 400px;">
-                <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
+                <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
                     <i class="bi bi-chat-dots text-primary" style="font-size: 48px;"></i>
                 </div>
                 <h5 class="fw-semibold mb-2">
                     Start a conversation with {{ $conversationUser->profile->username ?? $conversationUser->name }}
                 </h5>
-                <p class="text-muted mb-4">
+                <p class="app-text-muted mb-4">
                     Introduce yourself, ask about their projects, or share some code!
                 </p>
 

@@ -90,6 +90,11 @@
                     </button>
                 </form>
                 @endif
+                @if(auth()->check() && $group->owner_id !== auth()->id())
+                <button type="button" class="btn btn-light btn-sm ms-1" data-bs-toggle="modal" data-bs-target="#reportGroupModal" title="Report group">
+                    <i class="bi bi-flag"></i>
+                </button>
+                @endif
                 @endauth
             </div>
         </div>
@@ -100,14 +105,14 @@
                 <div class="col-md-8">
                     <h3 class="fw-bold mb-1">{{ $group->name }}</h3>
                     <div class="d-flex flex-wrap gap-2 mb-3">
-                        <span class="badge bg-light text-dark">
+                        <span class="badge app-bg-secondary app-text-primary">
                             {{ $group->category_label }}
                         </span>
-                        <span class="badge bg-light text-dark">
+                        <span class="badge app-bg-secondary app-text-primary">
                             {{ $group->privacy_label }}
                         </span>
                         @foreach($group->tags ?? [] as $tag)
-                        <span class="badge bg-secondary bg-opacity-10 text-dark">
+                        <span class="badge bg-secondary bg-opacity-10 app-text-primary">
                             #{{ $tag }}
                         </span>
                         @endforeach
@@ -191,11 +196,11 @@
                                 enctype="multipart/form-data">
                                 @csrf
                                 <div class="mb-3">
-                                    <input type="text" name="title" class="form-control border-0 bg-light"
+                                    <input type="text" name="title" class="form-control border-0 app-bg-secondary"
                                         placeholder="Post title..." required>
                                 </div>
                                 <div class="mb-3">
-                                    <textarea name="content" class="form-control border-0 bg-light" rows="3"
+                                    <textarea name="content" class="form-control border-0 app-bg-secondary" rows="3"
                                         placeholder="Share something with the group..."></textarea>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
@@ -255,7 +260,7 @@
                             </div>
                         </div>
                         @empty
-                        <div class="text-center py-5 bg-light rounded">
+                        <div class="text-center py-5 app-bg-secondary rounded">
                             <i class="bi bi-chat-square-text fs-1 text-muted"></i>
                             <p class="text-muted mt-3 mb-0">No posts yet. Be the first to post!</p>
                         </div>
@@ -309,10 +314,10 @@
                                     style="width: 32px; height: 32px; object-fit: cover;">
                                 <div class="flex-grow-1">
                                     <a href="{{ route('profile.show', $admin->profile->username ?? '') }}"
-                                        class="text-decoration-none text-dark fw-semibold small">
+                                        class="text-decoration-none app-text-primary fw-semibold small">
                                         {{ $admin->profile->username ?? '' }}
                                     </a>
-                                    <span class="badge bg-light text-dark ms-2 small">
+                                    <span class="badge app-bg-secondary app-text-primary ms-2 small">
                                         {{ $admin->pivot->role }}
                                     </span>
                                 </div>
@@ -336,7 +341,7 @@
                         <div class="card-body pt-0">
                             @foreach($group->upcomingEvents as $event)
                             <div class="d-flex align-items-start mb-3 pb-2 border-bottom">
-                                <div class="bg-light rounded p-2 text-center me-3" style="min-width: 50px;">
+                                <div class="app-bg-secondary rounded p-2 text-center me-3" style="min-width: 50px;">
                                     <div class="small fw-bold">{{ $event->starts_at->format('M') }}</div>
                                     <div class="fs-5 fw-bold">{{ $event->starts_at->format('d') }}</div>
                                 </div>
@@ -369,7 +374,7 @@
                             <div class="d-flex align-items-center mb-2">
                                 <i class="bi bi-file-earmark-text me-2 text-primary"></i>
                                 <a href="#" class="text-decoration-none small flex-grow-1">{{ $resource->title }}</a>
-                                <span class="badge bg-light text-dark">{{ $resource->type }}</span>
+                                <span class="badge app-bg-secondary app-text-primary">{{ $resource->type }}</span>
                             </div>
                             @endforeach
                         </div>
@@ -395,6 +400,46 @@
         </div>
     </div>
 </div>
+
+@auth
+@if($group->owner_id !== auth()->id())
+<!-- Report Group Modal -->
+<div class="modal fade" id="reportGroupModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Report Group</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('groups.report', $group->slug) }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Reason for reporting</label>
+                        <select class="form-select" name="reason" required>
+                            <option value="">Select a reason</option>
+                            <option value="spam">Spam</option>
+                            <option value="harassment">Harassment or bullying</option>
+                            <option value="hate_speech">Hate speech or symbols</option>
+                            <option value="false_info">False information</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Additional details (optional)</label>
+                        <textarea class="form-control" name="details" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Submit Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+@endauth
 @endsection
 
 <style>

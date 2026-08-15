@@ -29,11 +29,11 @@
     </div>
     @else
     <div class="text-center py-5">
-        <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
+        <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
             <i class="bi bi-bookmark text-primary" style="font-size: 48px;"></i>
         </div>
         <h5 class="fw-semibold mb-2">No saved posts yet</h5>
-        <p class="text-muted mb-0">Posts saved by this user will show up here.</p>
+        <p class="app-text-muted mb-0">Posts saved by this user will show up here.</p>
     </div>
     @endif
 </div>

@@ -12,7 +12,7 @@
                 <i class="bi bi-chat-heart me-2 text-primary"></i>
                 Received Interests
             </h1>
-            <p class="text-muted mb-0">Manage buyers interested in your listings</p>
+            <p class="app-text-muted mb-0">Manage buyers interested in your listings</p>
         </div>
         <div class="btn-group">
             <a href="{{ route('marketplace.interests.received') }}" class="btn btn-primary">
@@ -100,14 +100,14 @@
                                 <div>
                                     <h6 class="fw-semibold mb-1">
                                         <a href="{{ route('marketplace.show', $interest->listing->slug) }}"
-                                            class="text-dark text-decoration-none">
+                                            class="app-text-primary text-decoration-none">
                                             {{ $interest->listing->title }}
                                         </a>
                                     </h6>
-                                    <p class="small text-muted mb-1">
+                                    <p class="small app-text-muted mb-1">
                                         <i class="bi bi-tag"></i> {{ $interest->listing->formatted_price }}
                                     </p>
-                                    <p class="small text-muted mb-0">
+                                    <p class="small app-text-muted mb-0">
                                         <i class="bi bi-clock"></i> {{ $interest->time_ago }}
                                     </p>
                                 </div>
@@ -132,7 +132,7 @@
                             </div>
 
                             @if($interest->message)
-                            <p class="small text-muted mt-2 mb-0">
+                            <p class="small app-text-muted mt-2 mb-0">
                                 <i class="bi bi-chat-quote"></i> "{{ Str::limit($interest->message, 50) }}"
                             </p>
                             @endif
@@ -209,9 +209,9 @@
     </div>
     @else
     <div class="text-center py-5">
-        <i class="bi bi-chat-heart display-1 text-muted"></i>
+        <i class="bi bi-chat-heart display-1 app-text-muted"></i>
         <h5 class="mt-3 mb-2">No interests yet</h5>
-        <p class="text-muted">When buyers express interest in your listings, they'll appear here</p>
+        <p class="app-text-muted">When buyers express interest in your listings, they'll appear here</p>
         <a href="{{ route('marketplace.my-listings') }}" class="btn btn-primary">
             <i class="bi bi-bag me-2"></i> View My Listings
         </a>

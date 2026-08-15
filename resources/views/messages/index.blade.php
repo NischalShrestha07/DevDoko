@@ -53,7 +53,7 @@
                     @forelse($conversations as $conversation)
                     @if($conversation['user'])
                     <a href="{{ route('messages.show', $conversation['user']) }}"
-                        class="list-group-item list-group-item-action border-0 p-3 {{ request()->route('user')?->id === $conversation['user']->id ? 'active bg-light' : '' }}"
+                        class="list-group-item list-group-item-action border-0 p-3 {{ request()->route('user')?->id === $conversation['user']->id ? 'active app-bg-secondary' : '' }}"
                         style="transition: all 0.2s;">
                         <div class="d-flex align-items-start gap-3">
                             <!-- Avatar with online status -->
@@ -74,7 +74,7 @@
                                     <h6 class="fw-semibold mb-0 text-truncate">
                                         {{ $conversation['user']->profile->username ?? $conversation['user']->name }}
                                     </h6>
-                                    <small class="text-muted flex-shrink-0 ms-2">
+                                    <small class="app-text-muted flex-shrink-0 ms-2">
                                         {{ $conversation['last_message']?->created_at->diffForHumans(null, null, true)
                                         }}
                                     </small>
@@ -93,7 +93,7 @@
                                     </span>
                                     @endif
 
-                                    <p class="mb-0 text-muted text-truncate small" style="max-width: 180px;">
+                                    <p class="mb-0 app-text-muted text-truncate small" style="max-width: 180px;">
                                         @if($conversation['last_message']->sender_id === Auth::id())
                                         <span class="text-secondary">You:</span>
                                         @endif
@@ -123,11 +123,11 @@
                     @endif
                     @empty
                     <div class="text-center py-5 px-3">
-                        <div class="bg-light rounded-circle d-inline-flex p-4 mb-3">
-                            <i class="bi bi-chat-dots text-muted" style="font-size: 32px;"></i>
+                        <div class="app-bg-secondary rounded-circle d-inline-flex p-4 mb-3">
+                            <i class="bi bi-chat-dots app-text-muted" style="font-size: 32px;"></i>
                         </div>
                         <h6 class="fw-semibold">No conversations yet</h6>
-                        <p class="text-muted small mb-3">Start messaging other developers</p>
+                        <p class="app-text-muted small mb-3">Start messaging other developers</p>
                         <a href="{{ route('developers.index') }}" class="btn btn-primary btn-sm px-4 rounded-pill">
                             <i class="bi bi-people me-2"></i>Find Developers
                         </a>
@@ -145,22 +145,22 @@
             <div class="card border-0 shadow-sm h-100 d-flex align-items-center justify-content-center"
                 style="min-height: 500px;">
                 <div class="text-center p-5">
-                    <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
+                    <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
                         <i class="bi bi-chat-left-text text-primary" style="font-size: 48px;"></i>
                     </div>
                     <h4 class="fw-semibold mb-3">Your Messages</h4>
-                    <p class="text-muted mb-4" style="max-width: 400px;">
+                    <p class="app-text-muted mb-4" style="max-width: 400px;">
                         Select a conversation from the left to start messaging. Share code, files, and collaborate with
                         other developers.
                     </p>
                     <div class="d-flex justify-content-center gap-3">
-                        <span class="badge bg-light text-dark p-3 rounded-3">
+                        <span class="badge app-bg-secondary app-text-primary p-3 rounded-3">
                             <i class="bi bi-code-slash me-2"></i>Code Sharing
                         </span>
-                        <span class="badge bg-light text-dark p-3 rounded-3">
+                        <span class="badge app-bg-secondary app-text-primary p-3 rounded-3">
                             <i class="bi bi-file-earmark me-2"></i>File Upload
                         </span>
-                        <span class="badge bg-light text-dark p-3 rounded-3">
+                        <span class="badge app-bg-secondary app-text-primary p-3 rounded-3">
                             <i class="bi bi-emoji-smile me-2"></i>Reactions
                         </span>
                     </div>
@@ -194,10 +194,10 @@
                                         {{ ($message->sender_id === Auth::id() ? $message->receiver :
                                         $message->sender)->profile->username }}
                                     </small>
-                                    <small class="text-muted">{{ $message->created_at->diffForHumans(null, null, true)
+                                    <small class="app-text-muted">{{ $message->created_at->diffForHumans(null, null, true)
                                         }}</small>
                                 </div>
-                                <p class="text-truncate small mb-0 text-muted">{{ Str::limit($message->content, 30) }}
+                                <p class="text-truncate small mb-0 app-text-muted">{{ Str::limit($message->content, 30) }}
                                 </p>
                             </div>
                         </div>
@@ -314,7 +314,7 @@
                     </div>
                     @empty
                     <div class="text-center py-4">
-                        <p class="text-muted small mb-0">No suggestions available</p>
+                        <p class="app-text-muted small mb-0">No suggestions available</p>
                     </div>
                     @endforelse
                 </div>
@@ -337,32 +337,32 @@
             <div class="modal-body">
                 <div class="list-group list-group-flush">
                     <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                        <span><kbd class="bg-light text-dark px-2 py-1 rounded">⌘/Ctrl</kbd> + <kbd
-                                class="bg-light text-dark px-2 py-1 rounded">Enter</kbd></span>
-                        <span class="text-muted">Send message</span>
+                        <span><kbd class="app-bg-secondary app-text-primary px-2 py-1 rounded">⌘/Ctrl</kbd> + <kbd
+                                class="app-bg-secondary app-text-primary px-2 py-1 rounded">Enter</kbd></span>
+                        <span class="app-text-muted">Send message</span>
                     </div>
                     <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                        <span><kbd class="bg-light text-dark px-2 py-1 rounded">⌘/Ctrl</kbd> + <kbd
-                                class="bg-light text-dark px-2 py-1 rounded">K</kbd></span>
-                        <span class="text-muted">Search messages</span>
+                        <span><kbd class="app-bg-secondary app-text-primary px-2 py-1 rounded">⌘/Ctrl</kbd> + <kbd
+                                class="app-bg-secondary app-text-primary px-2 py-1 rounded">K</kbd></span>
+                        <span class="app-text-muted">Search messages</span>
                     </div>
                     <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                        <span><kbd class="bg-light text-dark px-2 py-1 rounded">⌘/Ctrl</kbd> + <kbd
-                                class="bg-light text-dark px-2 py-1 rounded">I</kbd></span>
-                        <span class="text-muted">Insert code</span>
+                        <span><kbd class="app-bg-secondary app-text-primary px-2 py-1 rounded">⌘/Ctrl</kbd> + <kbd
+                                class="app-bg-secondary app-text-primary px-2 py-1 rounded">I</kbd></span>
+                        <span class="app-text-muted">Insert code</span>
                     </div>
                     <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                        <span><kbd class="bg-light text-dark px-2 py-1 rounded">⌘/Ctrl</kbd> + <kbd
-                                class="bg-light text-dark px-2 py-1 rounded">U</kbd></span>
-                        <span class="text-muted">Upload file</span>
+                        <span><kbd class="app-bg-secondary app-text-primary px-2 py-1 rounded">⌘/Ctrl</kbd> + <kbd
+                                class="app-bg-secondary app-text-primary px-2 py-1 rounded">U</kbd></span>
+                        <span class="app-text-muted">Upload file</span>
                     </div>
                     <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                        <span><kbd class="bg-light text-dark px-2 py-1 rounded">S</kbd></span>
-                        <span class="text-muted">Star message</span>
+                        <span><kbd class="app-bg-secondary app-text-primary px-2 py-1 rounded">S</kbd></span>
+                        <span class="app-text-muted">Star message</span>
                     </div>
                     <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                        <span><kbd class="bg-light text-dark px-2 py-1 rounded">R</kbd></span>
-                        <span class="text-muted">Reply to message</span>
+                        <span><kbd class="app-bg-secondary app-text-primary px-2 py-1 rounded">R</kbd></span>
+                        <span class="app-text-muted">Reply to message</span>
                     </div>
                 </div>
             </div>

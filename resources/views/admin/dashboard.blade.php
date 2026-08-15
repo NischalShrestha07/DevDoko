@@ -8,7 +8,7 @@
         <i class="bi bi-shield-check fs-2 me-3 text-primary"></i>
         <div>
             <h4 class="fw-bold mb-0">Admin Dashboard</h4>
-            <p class="text-muted mb-0">Site overview and management</p>
+            <p class="app-text-muted mb-0">Site overview and management</p>
         </div>
     </div>
 
@@ -18,7 +18,7 @@
                 <div class="card-body text-center py-4">
                     <i class="bi bi-people display-4 text-primary mb-3"></i>
                     <h2 class="fw-bold mb-1">{{\App\Models\User::count()}}</h2>
-                    <p class="text-muted mb-0">Total Users</p>
+                    <p class="app-text-muted mb-0">Total Users</p>
                 </div>
             </div>
         </div>
@@ -27,7 +27,7 @@
                 <div class="card-body text-center py-4">
                     <i class="bi bi-file-text display-4 text-success mb-3"></i>
                     <h2 class="fw-bold mb-1">{{\App\Models\Post::count()}}</h2>
-                    <p class="text-muted mb-0">Total Posts</p>
+                    <p class="app-text-muted mb-0">Total Posts</p>
                 </div>
             </div>
         </div>
@@ -36,7 +36,7 @@
                 <div class="card-body text-center py-4">
                     <i class="bi bi-people-fill display-4 text-info mb-3"></i>
                     <h2 class="fw-bold mb-1">{{\App\Models\Group::count()}}</h2>
-                    <p class="text-muted mb-0">Total Groups</p>
+                    <p class="app-text-muted mb-0">Total Groups</p>
                 </div>
             </div>
         </div>
@@ -45,7 +45,7 @@
                 <div class="card-body text-center py-4">
                     <i class="bi bi-shop display-4 text-warning mb-3"></i>
                     <h2 class="fw-bold mb-1">{{\App\Models\MarketplaceListing::count()}}</h2>
-                    <p class="text-muted mb-0">Marketplace Listings</p>
+                    <p class="app-text-muted mb-0">Marketplace Listings</p>
                 </div>
             </div>
         </div>
@@ -70,6 +70,11 @@
                 <div class="col-md-4">
                     <a href="{{ route('groups.index') }}" class="btn btn-outline-info w-100 py-3">
                         <i class="bi bi-people-fill me-2"></i> Manage Groups
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="{{ route('admin.reports') }}" class="btn btn-outline-danger w-100 py-3">
+                        <i class="bi bi-flag me-2"></i> Review Reports
                     </a>
                 </div>
             </div>

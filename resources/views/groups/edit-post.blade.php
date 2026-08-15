@@ -69,7 +69,7 @@
                             <textarea name="content" class="form-control @error('content') is-invalid @enderror"
                                 rows="10" placeholder="Write your post content here..."
                                 required>{{ old('content', $post->content) }}</textarea>
-                            <div class="form-text text-muted">
+                            <div class="form-text app-text-muted">
                                 <i class="bi bi-markdown"></i> Markdown is supported
                             </div>
                             @error('content')
@@ -245,7 +245,7 @@
                             <textarea name="content" class="form-control @error('content') is-invalid @enderror"
                                 rows="10" placeholder="Write your post content here..."
                                 required>{{ old('content', $post->content) }}</textarea>
-                            <div class="form-text text-muted">
+                            <div class="form-text app-text-muted">
                                 <i class="bi bi-markdown"></i> Markdown is supported
                             </div>
                             @error('content')
@@ -275,7 +275,7 @@
                                     @endphp
                                     <i class="bi {{ $icon }} me-2 fs-5"></i>
                                     <span class="flex-grow-1">{{ $attachment['name'] }}</span>
-                                    <span class="text-muted small me-3">{{ round($attachment['size'] / 1024) }}
+                                    <span class="app-text-muted small me-3">{{ round($attachment['size'] / 1024) }}
                                         KB</span>
                                     <a href="{{ Storage::url($attachment['path']) }}"
                                         class="btn btn-sm btn-outline-secondary" target="_blank" title="View file">
@@ -284,7 +284,7 @@
                                 </div>
                                 @endforeach
                             </div>
-                            <div class="form-text text-muted mt-2">
+                            <div class="form-text app-text-muted mt-2">
                                 <i class="bi bi-info-circle"></i> To add, remove, or update attachments, please create a
                                 new post or contact a group admin.
                             </div>
@@ -294,8 +294,8 @@
                         <!-- Post Metadata -->
                         <div class="row mb-4">
                             <div class="col-md-6">
-                                <div class="bg-light p-3 rounded-3">
-                                    <small class="text-muted d-block mb-1">
+                                <div class="app-bg-secondary p-3 rounded-3">
+                                    <small class="app-text-muted d-block mb-1">
                                         <i class="bi bi-calendar3"></i> Created
                                     </small>
                                     <span class="fw-semibold">{{ $post->created_at->format('M d, Y \a\t h:i A')
@@ -303,8 +303,8 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="bg-light p-3 rounded-3">
-                                    <small class="text-muted d-block mb-1">
+                                <div class="app-bg-secondary p-3 rounded-3">
+                                    <small class="app-text-muted d-block mb-1">
                                         <i class="bi bi-pencil"></i> Last Updated
                                     </small>
                                     <span class="fw-semibold">{{ $post->updated_at->diffForHumans() }}</span>

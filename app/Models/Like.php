@@ -10,7 +10,9 @@ class Like extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'post_id'];
+    protected $fillable = ['user_id', 'post_id', 'type'];
+
+    public const TYPES = ['like', 'love', 'haha', 'wow', 'sad', 'angry'];
 
     public function user(): BelongsTo
     {

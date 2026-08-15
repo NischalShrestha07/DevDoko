@@ -59,7 +59,7 @@
                             <i class="bi bi-search me-2 text-primary"></i>
                             Search Messages
                         </h5>
-                        <span class="badge bg-light text-dark px-3 py-2">
+                        <span class="badge app-bg-secondary app-text-primary px-3 py-2">
                             {{ $messages->total() }} results found
                         </span>
                     </div>
@@ -69,14 +69,14 @@
                     <!-- Search Form -->
                     <form action="{{ route('messages.search') }}" method="GET" class="mb-4">
                         <div class="input-group">
-                            <input type="text" name="query" class="form-control form-control-lg bg-light border-0"
+                            <input type="text" name="query" class="form-control form-control-lg app-bg-secondary border-0"
                                 placeholder="Search messages, code snippets, files..." value="{{ request('query') }}"
                                 autofocus>
                             <button type="submit" class="btn btn-primary px-4">
                                 <i class="bi bi-search me-2"></i>Search
                             </button>
                         </div>
-                        <small class="text-muted mt-2 d-block">
+                        <small class="app-text-muted mt-2 d-block">
                             <i class="bi bi-info-circle me-1"></i>
                             Search in messages, code snippets, and file names
                         </small>
@@ -104,7 +104,7 @@
                                                 {{ $message->sender_id === Auth::id() ? 'You' : 'Them' }}
                                             </span>
                                         </div>
-                                        <small class="text-muted">
+                                        <small class="app-text-muted">
                                             {{ $message->created_at->format('M j, Y • g:i A') }}
                                         </small>
                                     </div>
@@ -120,13 +120,13 @@
                                         <i class="bi bi-file-earmark fs-4 text-primary"></i>
                                         <div>
                                             <span class="fw-semibold d-block">{{ $message->file_name }}</span>
-                                            <small class="text-muted">{{ number_format($message->file_size / 1024, 1) }}
+                                            <small class="app-text-muted">{{ number_format($message->file_size / 1024, 1) }}
                                                 KB</small>
                                         </div>
                                     </div>
                                     @endif
 
-                                    <p class="mb-0 {{ $message->type === 'text' ? 'fs-6' : 'text-muted small' }}">
+                                    <p class="mb-0 {{ $message->type === 'text' ? 'fs-6' : 'app-text-muted small' }}">
                                         @if($message->type === 'text')
                                         {!! preg_replace('/(' . preg_quote(request('query'), '/') . ')/i', '<span
                                             class="bg-warning bg-opacity-25 p-1 rounded">$1</span>',
@@ -146,16 +146,16 @@
                     </div>
                     @else
                     <div class="text-center py-5">
-                        <i class="bi bi-search fs-1 text-muted mb-3"></i>
+                        <i class="bi bi-search fs-1 app-text-muted mb-3"></i>
                         <h5>No messages found</h5>
-                        <p class="text-muted mb-0">Try different keywords or check your spelling</p>
+                        <p class="app-text-muted mb-0">Try different keywords or check your spelling</p>
                     </div>
                     @endif
                     @else
                     <div class="text-center py-5">
-                        <i class="bi bi-chat-dots fs-1 text-muted mb-3"></i>
+                        <i class="bi bi-chat-dots fs-1 app-text-muted mb-3"></i>
                         <h5>Search your messages</h5>
-                        <p class="text-muted">Enter keywords to search through your conversations</p>
+                        <p class="app-text-muted">Enter keywords to search through your conversations</p>
                     </div>
                     @endif
                 </div>

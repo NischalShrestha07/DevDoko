@@ -45,7 +45,7 @@
                     </div>
                 </div>
                 <div class="dropdown">
-                    <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                    <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-label="Project options">
                         <i class="bi bi-three-dots"></i>
                     </button>
                     <ul class="dropdown-menu">
@@ -86,10 +86,10 @@
                     class="rounded-circle me-3" style="width: 56px; height: 56px; object-fit: cover;">
                 <div style="flex: 1;">
                     <a href="{{ route('profile.show', $project->user->profile->username ?? $project->user->id) }}"
-                        class="fw-bold text-dark text-decoration-none d-block">
+                        class="fw-bold app-text-primary text-decoration-none d-block">
                         {{ $project->user->name }}
                     </a>
-                    <small class="text-muted">Project Owner</small>
+                    <small class="app-text-muted">Project Owner</small>
                 </div>
                 @auth
                 @if(auth()->id() != $project->user_id)
@@ -110,25 +110,25 @@
                         <div class="col-6">
                             <div class="text-center p-3 border rounded">
                                 <div class="display-6 fw-bold text-primary">{{ $project->views_count }}</div>
-                                <small class="text-muted">Views</small>
+                                <small class="app-text-muted">Views</small>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="text-center p-3 border rounded">
                                 <div class="display-6 fw-bold text-success">{{ $project->likes_count }}</div>
-                                <small class="text-muted">Likes</small>
+                                <small class="app-text-muted">Likes</small>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="text-center p-3 border rounded">
                                 <div class="display-6 fw-bold text-warning">{{ $project->forks_count }}</div>
-                                <small class="text-muted">Forks</small>
+                                <small class="app-text-muted">Forks</small>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="text-center p-3 border rounded">
                                 <div class="display-6 fw-bold text-info">{{ $project->contributors->count() }}</div>
-                                <small class="text-muted">Contributors</small>
+                                <small class="app-text-muted">Contributors</small>
                             </div>
                         </div>
                     </div>
@@ -232,10 +232,10 @@
                                     class="rounded-circle me-3" style="width: 45px; height: 45px; object-fit: cover;">
                                 <div style="flex: 1; min-width: 0;">
                                     <a href="{{ route('profile.show', $contributor->profile->username) }}"
-                                        class="fw-bold text-dark text-decoration-none d-block text-truncate">
+                                        class="fw-bold app-text-primary text-decoration-none d-block text-truncate">
                                         {{ $contributor->name }}
                                     </a>
-                                    <small class="text-muted d-block text-truncate">
+                                    <small class="app-text-muted d-block text-truncate">
                                         {{ $contributor->pivot->role }}
                                     </small>
                                 </div>
@@ -261,7 +261,7 @@
                             <div class="card border-0 shadow-sm h-100">
                                 <div class="card-body">
                                     <h6 class="fw-bold">{{ $fork->title }}</h6>
-                                    <small class="text-muted d-block mb-2">Forked by {{ $fork->user->name }}</small>
+                                    <small class="app-text-muted d-block mb-2">Forked by {{ $fork->user->name }}</small>
                                     <a href="{{ route('projects.show', $fork) }}"
                                         class="btn btn-sm btn-outline-primary w-100">
                                         View Fork
@@ -284,22 +284,22 @@
                     <h6 class="fw-bold mb-3">Project Links</h6>
                     @if($project->repository_url)
                     <a href="{{ $project->repository_url }}" target="_blank"
-                        class="d-flex align-items-center p-3 border rounded mb-3 text-decoration-none text-dark">
+                        class="d-flex align-items-center p-3 border rounded mb-3 text-decoration-none app-text-primary">
                         <i class="bi bi-github fs-4 me-3"></i>
                         <div>
                             <div class="fw-bold">Repository</div>
-                            <small class="text-muted">View source code</small>
+                            <small class="app-text-muted">View source code</small>
                         </div>
                     </a>
                     @endif
 
                     @if($project->live_url)
                     <a href="{{ $project->live_url }}" target="_blank"
-                        class="d-flex align-items-center p-3 border rounded mb-3 text-decoration-none text-dark">
+                        class="d-flex align-items-center p-3 border rounded mb-3 text-decoration-none app-text-primary">
                         <i class="bi bi-box-arrow-up-right fs-4 me-3"></i>
                         <div>
                             <div class="fw-bold">Live Demo</div>
-                            <small class="text-muted">Try it live</small>
+                            <small class="app-text-muted">Try it live</small>
                         </div>
                     </a>
                     @endif
@@ -324,10 +324,10 @@
                                 </div>
                                 <div style="flex: 1; min-width: 0;">
                                     <a href="{{ route('projects.show', $related) }}"
-                                        class="fw-bold text-dark text-decoration-none d-block text-truncate">
+                                        class="fw-bold app-text-primary text-decoration-none d-block text-truncate">
                                         {{ $related->title }}
                                     </a>
-                                    <small class="text-muted d-block text-truncate">
+                                    <small class="app-text-muted d-block text-truncate">
                                         {{ $related->user->name }}
                                     </small>
                                 </div>
@@ -339,12 +339,42 @@
             </div>
             @endif
 
+            <!-- Pending Collaboration Requests (owner only) -->
+            @php $pendingCollaborations = auth()->id() === $project->user_id ? $project->collaborations->where('status', 'pending') : collect(); @endphp
+            @if($pendingCollaborations->isNotEmpty())
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">Collaboration Requests ({{ $pendingCollaborations->count() }})</h6>
+                    @foreach($pendingCollaborations as $collaboration)
+                    <div class="d-flex align-items-start gap-2 mb-3 pb-3 {{ ! $loop->last ? 'border-bottom' : '' }}">
+                        <img src="{{ $collaboration->user->profile->avatar_url ?? $collaboration->user->avatar_url }}"
+                            class="rounded-circle flex-shrink-0" style="width: 36px; height: 36px; object-fit: cover;">
+                        <div class="flex-grow-1 min-width-0">
+                            <div class="fw-semibold small">{{ $collaboration->user->name }}</div>
+                            <div class="app-text-muted small mb-2">{{ $collaboration->description }}</div>
+                            <div class="d-flex gap-2">
+                                <form action="{{ route('projects.collaboration.approve', $collaboration) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-primary">Approve</button>
+                                </form>
+                                <form action="{{ route('projects.collaboration.reject', $collaboration) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary">Decline</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
             <!-- Collaboration Section -->
             @if(auth()->id() != $project->user_id && $project->is_public)
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body">
                     <h6 class="fw-bold mb-3">Want to Collaborate?</h6>
-                    <p class="text-muted small mb-3">
+                    <p class="app-text-muted small mb-3">
                         Interested in contributing to this project? Send a collaboration request to the owner.
                     </p>
                     <button class="btn btn-outline-primary w-100" data-bs-toggle="modal"
@@ -369,7 +399,7 @@
             <form action="{{ route('projects.request.collaboration', $project) }}" method="POST">
                 @csrf
                 <div class="modal-body">
-                    <p class="text-muted mb-4">
+                    <p class="app-text-muted mb-4">
                         Tell the project owner why you want to collaborate and what you can contribute.
                     </p>
 
@@ -473,6 +503,18 @@
     const carouselEl = document.getElementById('screenshotsCarousel');
     if (carouselEl) {
         new bootstrap.Carousel(carouselEl);
+    }
+
+    // Reset the collaboration form when the modal is closed, so reopening it doesn't show stale input
+    const collaborateModalEl = document.getElementById('collaborateModal');
+    if (collaborateModalEl) {
+        collaborateModalEl.addEventListener('hidden.bs.modal', function () {
+            collaborateModalEl.querySelector('form')?.reset();
+        });
+
+        collaborateModalEl.querySelector('form')?.addEventListener('submit', function (e) {
+            window.DevDoko?.setLoading(e.target.querySelector('button[type="submit"]'), true);
+        });
     }
 </script>
 

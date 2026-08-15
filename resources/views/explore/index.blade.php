@@ -8,7 +8,7 @@
     <div class="bg-white border-bottom">
         <div class="container py-3">
             <h4 class="fw-bold mb-0">Explore</h4>
-            <p class="text-muted mb-0">Discover amazing content, developers, and topics</p>
+            <p class="app-text-muted mb-0">Discover amazing content, developers, and topics</p>
         </div>
     </div>
 
@@ -112,7 +112,7 @@
                                 <h6 class="card-title fw-bold mb-2">{{ Str::limit($post->title, 50) }}</h6>
                                 @endif
                                 @if($post->content)
-                                <div class="post-content text-muted" style="font-size: 14px;">
+                                <div class="post-content app-text-muted" style="font-size: 14px;">
                                     @rich(Str::limit($post->content, 120))
                                 </div>
                                 @endif
@@ -128,7 +128,7 @@
                                     class="text-decoration-none d-flex align-items-center">
                                     <img src="{{ $post->user->profile->avatar_url }}" class="rounded-circle me-2"
                                         style="width: 32px; height: 32px; object-fit: cover;">
-                                    <span class="fw-bold text-dark">{{ $post->user->profile->username }}</span>
+                                    <span class="fw-bold app-text-primary">{{ $post->user->profile->username }}</span>
                                 </a>
                                 <span class="badge bg-light text-dark ms-auto">
                                     <i class="bi bi-{{ $post->type_icon }} me-1"></i>
@@ -136,7 +136,7 @@
                             </div>
 
                             <!-- Stats -->
-                            <div class="d-flex justify-content-between text-muted small">
+                            <div class="d-flex justify-content-between app-text-muted small">
                                 <div class="d-flex gap-3">
                                     <span>
                                         <i class="bi bi-heart me-1"></i>{{ $post->likes_count }}
@@ -155,9 +155,9 @@
 
             @if(($type == 'trending' ? $trendingPosts->isEmpty() : $latestPosts->isEmpty()))
             <div class="text-center py-5">
-                <i class="bi bi-compass display-1 text-muted mb-3"></i>
-                <h5 class="text-muted mb-3">No posts to explore yet</h5>
-                <p class="text-muted">Be the first to share something amazing!</p>
+                <i class="bi bi-compass display-1 app-text-muted mb-3"></i>
+                <h5 class="app-text-muted mb-3">No posts to explore yet</h5>
+                <p class="app-text-muted">Be the first to share something amazing!</p>
                 <a href="{{ route('posts.create') }}" class="btn btn-primary">
                     <i class="bi bi-plus-circle me-2"></i> Create Post
                 </a>
@@ -196,17 +196,17 @@
                                     </span>
                                     @endif
                                 </div>
-                                <h6 class="fw-bold mb-1 text-dark">{{ $user->profile->username }}</h6>
-                                <small class="text-muted d-block mb-2">{{ $user->name }}</small>
+                                <h6 class="fw-bold mb-1 app-text-primary">{{ $user->profile->username }}</h6>
+                                <small class="app-text-muted d-block mb-2">{{ $user->name }}</small>
 
                                 <div class="d-flex justify-content-center gap-3 small mb-3">
                                     <div>
                                         <div class="fw-bold">{{ $user->posts_count ?? 0 }}</div>
-                                        <small class="text-muted">Posts</small>
+                                        <small class="app-text-muted">Posts</small>
                                     </div>
                                     <div>
                                         <div class="fw-bold">{{ $user->followers_count ?? 0 }}</div>
-                                        <small class="text-muted">Followers</small>
+                                        <small class="app-text-muted">Followers</small>
                                     </div>
                                 </div>
 
@@ -256,8 +256,8 @@
                                                 <i class="bi {{ $topic['icon'] }} fs-2"
                                                     style="color: {{ $topic['color'] }};"></i>
                                             </div>
-                                            <h6 class="fw-bold mb-1 text-dark">{{ $topic['name'] }}</h6>
-                                            <small class="text-muted">{{ $topic['count'] }} posts</small>
+                                            <h6 class="fw-bold mb-1 app-text-primary">{{ $topic['name'] }}</h6>
+                                            <small class="app-text-muted">{{ $topic['count'] }} posts</small>
                                         </div>
                                     </div>
                                 </a>
@@ -288,8 +288,8 @@
 
                         @if($popularTags->isEmpty())
                         <div class="text-center py-4">
-                            <i class="bi bi-tag display-1 text-muted mb-3"></i>
-                            <p class="text-muted">No topics yet</p>
+                            <i class="bi bi-tag display-1 app-text-muted mb-3"></i>
+                            <p class="app-text-muted">No topics yet</p>
                         </div>
                         @endif
                     </div>

@@ -38,13 +38,13 @@
                             <div class="flex-grow-1">
                                 <h6 class="fw-semibold mb-1">
                                     @if($resource->type === 'link' && $resource->url)
-                                    <a href="{{ $resource->url }}" target="_blank" class="text-decoration-none">
+                                    <a href="{{ $resource->url }}" target="_blank" class="text-decoration-none app-text-primary">
                                         {{ $resource->title }}
                                         <i class="bi bi-box-arrow-up-right ms-1 small"></i>
                                     </a>
                                     @elseif($resource->type === 'file' && $resource->file_path)
                                     <a href="{{ route('groups.resources.download', [$group->slug, $resource->id]) }}"
-                                        class="text-decoration-none">
+                                        class="text-decoration-none app-text-primary">
                                         {{ $resource->title }}
                                         <i class="bi bi-download ms-1 small"></i>
                                     </a>
@@ -52,24 +52,24 @@
                                     {{ $resource->title }}
                                     @endif
                                 </h6>
-                                <p class="small text-muted mb-2">{{ Str::limit($resource->description, 100) }}</p>
+                                <p class="small app-text-muted mb-2">{{ Str::limit($resource->description, 100) }}</p>
                                 <div class="d-flex align-items-center gap-2 small">
-                                    <span class="text-muted">
+                                    <span class="app-text-muted">
                                         <i class="bi bi-person"></i>
                                         <a href="{{ route('profile.show', $resource->user->profile->username ?? $resource->user->name) }}"
                                             class="text-decoration-none">
                                             {{ $resource->user->profile->username ?? $resource->user->name }}
                                         </a>
                                     </span>
-                                    <span class="text-muted">•</span>
-                                    <span class="text-muted">
+                                    <span class="app-text-muted">•</span>
+                                    <span class="app-text-muted">
                                         <i class="bi bi-clock"></i> {{ $resource->created_at->diffForHumans() }}
                                     </span>
                                 </div>
                                 @if($resource->tags)
                                 <div class="mt-2">
                                     @foreach($resource->tags as $tag)
-                                    <span class="badge bg-light text-dark me-1">#{{ $tag }}</span>
+                                    <span class="badge app-bg-secondary app-text-primary me-1">#{{ $tag }}</span>
                                     @endforeach
                                 </div>
                                 @endif
@@ -80,13 +80,13 @@
                                 <form action="{{ route('groups.resources.like', [$group->slug, $resource->id]) }}"
                                     method="POST" class="d-inline">
                                     @csrf
-                                    <button type="submit" class="btn btn-link text-dark p-0 text-decoration-none small">
+                                    <button type="submit" class="btn btn-link app-text-primary p-0 text-decoration-none small">
                                         <i class="bi bi-heart{{ $resource->is_liked ? '-fill text-danger' : '' }}"></i>
                                         <span class="ms-1">{{ $resource->likes_count }}</span>
                                     </button>
                                 </form>
                                 @if($resource->type === 'file' && $resource->file_path)
-                                <span class="small text-muted">
+                                <span class="small app-text-muted">
                                     <i class="bi bi-download"></i> {{ $resource->downloads_count }}
                                 </span>
                                 @endif
@@ -113,10 +113,10 @@
         </div>
         @else
         <div class="text-center py-5">
-            <i class="bi bi-folder2-open fs-1 text-muted"></i>
-            <p class="text-muted mt-3 mb-0">No resources yet.</p>
+            <i class="bi bi-folder2-open fs-1 app-text-muted"></i>
+            <p class="app-text-muted mt-3 mb-0">No resources yet.</p>
             @if($group->is_member)
-            <p class="text-muted small">Be the first to share a resource!</p>
+            <p class="app-text-muted small">Be the first to share a resource!</p>
             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#addResourceModal">
                 <i class="bi bi-plus-lg"></i> Add Resource

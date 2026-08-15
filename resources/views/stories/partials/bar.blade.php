@@ -2,7 +2,7 @@
     <div class="card-body p-3">
         <div class="d-flex gap-3 stories-scroll" id="storiesTray">
             <div class="text-center flex-shrink-0" style="width: 70px;">
-                <div class="spinner-border spinner-border-sm text-muted" role="status">
+                <div class="spinner-border spinner-border-sm app-text-muted" role="status">
                     <span class="visually-hidden">Loading stories…</span>
                 </div>
             </div>
@@ -22,10 +22,10 @@
             </div>
             <div class="modal-body">
                 <div class="story-composer-preview mb-3" id="storyComposerPreview"></div>
-                <label for="storyCaptionInput" class="form-label fw-semibold small">Caption <span class="text-muted fw-normal">(optional)</span></label>
+                <label for="storyCaptionInput" class="form-label fw-semibold small">Caption <span class="app-text-muted fw-normal">(optional)</span></label>
                 <textarea id="storyCaptionInput" class="form-control" rows="2" maxlength="280" placeholder="Say something about this…"></textarea>
                 <div class="d-flex justify-content-end mt-1">
-                    <small class="text-muted" id="storyCaptionCount">0/280</small>
+                    <small class="app-text-muted" id="storyCaptionCount">0/280</small>
                 </div>
                 <div class="progress mt-3 d-none" id="storyUploadProgress" style="height: 4px;">
                     <div class="progress-bar" id="storyUploadProgressBar" style="width: 0%;"></div>
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
             renderTray(data);
         } catch (e) {
             el('storiesTray').innerHTML =
-                '<small class="text-muted">Could not load stories. <a href="#" id="storyRetry">Retry</a></small>';
+                '<small class="app-text-muted">Could not load stories. <a href="#" id="storyRetry">Retry</a></small>';
             el('storyRetry')?.addEventListener('click', (ev) => { ev.preventDefault(); loadStories(); });
         }
     }
@@ -497,7 +497,7 @@ document.addEventListener('DOMContentLoaded', function () {
         pauseProgress();
 
         const list = el('storyViewersList');
-        list.innerHTML = '<div class="text-center text-muted py-4 small">Loading…</div>';
+        list.innerHTML = '<div class="text-center app-text-muted py-4 small">Loading…</div>';
         new bootstrap.Modal(el('storyViewersModal')).show();
 
         try {
@@ -507,12 +507,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="list-group-item d-flex align-items-center gap-2">
                         <img src="${escapeHtml(v.avatar_url)}" alt="" class="rounded-circle" style="width: 36px; height: 36px; object-fit: cover;">
                         <div class="flex-grow-1"><div class="small fw-semibold">${escapeHtml(v.username)}</div></div>
-                        <small class="text-muted">${escapeHtml(v.viewed_at)}</small>
+                        <small class="app-text-muted">${escapeHtml(v.viewed_at)}</small>
                     </div>
                 `).join('')
-                : '<div class="text-center text-muted py-4 small">No views yet</div>';
+                : '<div class="text-center app-text-muted py-4 small">No views yet</div>';
         } catch (e) {
-            list.innerHTML = '<div class="text-center text-muted py-4 small">Could not load viewers</div>';
+            list.innerHTML = '<div class="text-center app-text-muted py-4 small">Could not load viewers</div>';
         }
     });
 

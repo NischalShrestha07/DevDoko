@@ -31,7 +31,7 @@
                         <div class="position-relative flex-grow-1">
                             <i
                                 class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                            <input type="search" name="search" class="form-control rounded-pill bg-light border-0"
+                            <input type="search" name="search" class="form-control rounded-pill app-bg-secondary border-0"
                                 placeholder="Find a developer..." style="padding-left: 35px;">
                         </div>
                         <button type="submit" class="btn btn-primary rounded-pill px-4">
@@ -45,7 +45,7 @@
                     @forelse($conversations ?? [] as $conversation)
                     @if($conversation['user'])
                     <a href="{{ route('messages.show', $conversation['user']) }}"
-                        class="list-group-item list-group-item-action border-0 p-3 {{ $user->id === $conversation['user']->id ? 'active bg-light' : '' }}"
+                        class="list-group-item list-group-item-action border-0 p-3 {{ $user->id === $conversation['user']->id ? 'active app-bg-secondary' : '' }}"
                         style="transition: all 0.2s;">
                         <div class="d-flex align-items-start gap-3">
                             <!-- Avatar with online status -->
@@ -66,7 +66,7 @@
                                     <h6 class="fw-semibold mb-0 text-truncate">
                                         {{ $conversation['user']->profile->username ?? $conversation['user']->name }}
                                     </h6>
-                                    <small class="text-muted flex-shrink-0 ms-2">
+                                    <small class="app-text-muted flex-shrink-0 ms-2">
                                         {{ $conversation['last_message']?->created_at->diffForHumans(null, null, true)
                                         }}
                                     </small>
@@ -85,7 +85,7 @@
                                     </span>
                                     @endif
 
-                                    <p class="mb-0 text-muted text-truncate small" style="max-width: 180px;">
+                                    <p class="mb-0 app-text-muted text-truncate small" style="max-width: 180px;">
                                         @if($conversation['last_message']->sender_id === Auth::id())
                                         <span class="text-secondary">You:</span>
                                         @endif
@@ -108,11 +108,11 @@
                     @endif
                     @empty
                     <div class="text-center py-5 px-3">
-                        <div class="bg-light rounded-circle d-inline-flex p-4 mb-3">
-                            <i class="bi bi-chat-dots text-muted" style="font-size: 32px;"></i>
+                        <div class="app-bg-secondary rounded-circle d-inline-flex p-4 mb-3">
+                            <i class="bi bi-chat-dots app-text-muted" style="font-size: 32px;"></i>
                         </div>
                         <h6 class="fw-semibold">No conversations yet</h6>
-                        <p class="text-muted small mb-3">Start messaging other developers</p>
+                        <p class="app-text-muted small mb-3">Start messaging other developers</p>
                         <a href="{{ route('developers.index') }}" class="btn btn-primary btn-sm px-4 rounded-pill">
                             <i class="bi bi-people me-2"></i>Find Developers
                         </a>

@@ -125,6 +125,10 @@ class Message extends Model
 
     public function getReactionSummaryAttribute()
     {
+        if ($this->relationLoaded('reactions')) {
+            return $this->reactions->countBy('reaction')->toArray();
+        }
+
         return $this->reactions()
             ->select('reaction', \DB::raw('count(*) as count'))
             ->groupBy('reaction')

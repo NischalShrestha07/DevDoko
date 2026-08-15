@@ -7,7 +7,7 @@
     <div class="row justify-content-center">
         <div class="col-lg-7">
             <h4 class="fw-bold mb-1"><i class="bi bi-slash-circle me-2 text-danger"></i>Blocked Accounts</h4>
-            <p class="text-muted mb-4">Blocked accounts can't see your posts, message you, or follow you — and you won't see theirs.</p>
+            <p class="app-text-muted mb-4">Blocked accounts can't see your posts, message you, or follow you — and you won't see theirs.</p>
 
             <div class="card border-0 shadow-sm">
                 <div class="list-group list-group-flush">
@@ -17,7 +17,7 @@
                                 style="width: 44px; height: 44px; object-fit: cover;">
                             <div class="flex-grow-1 min-width-0">
                                 <div class="fw-semibold text-truncate">{{ $blocked->profile->username ?? $blocked->name }}</div>
-                                <small class="text-muted text-truncate d-block">{{ $blocked->name }}</small>
+                                <small class="app-text-muted text-truncate d-block">{{ $blocked->name }}</small>
                             </div>
                             <form action="{{ route('users.unblock', $blocked) }}" method="POST">
                                 @csrf
@@ -27,8 +27,8 @@
                         </div>
                     @empty
                         <div class="text-center py-5">
-                            <i class="bi bi-slash-circle text-muted" style="font-size: 2.5rem;"></i>
-                            <p class="text-muted mt-3 mb-0">You haven't blocked anyone.</p>
+                            <i class="bi bi-slash-circle app-text-muted" style="font-size: 2.5rem;"></i>
+                            <p class="app-text-muted mt-3 mb-0">You haven't blocked anyone.</p>
                         </div>
                     @endforelse
                 </div>

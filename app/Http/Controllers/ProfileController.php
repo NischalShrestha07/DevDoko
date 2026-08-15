@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Profile;
-use App\Models\User;
+use App\Models\ReputationLog;
 use App\Models\TechTag;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -18,7 +19,7 @@ class ProfileController extends Controller
     {
         $profile = Profile::with([
             'user',
-            'techTags'
+            'techTags',
         ])
             ->where('username', $username)
             ->firstOrFail();
@@ -57,6 +58,10 @@ class ProfileController extends Controller
         $followingCount = $profile->user->following_count;
         $postsCount = $profile->user->posts_count;
 
+        $reputationLogs = ReputationLog::where('user_id', $profile->user_id)
+            ->latest()
+            ->paginate(10, ['*'], 'reputation_page');
+
         return view('profiles.show', compact(
             'profile',
             'posts',
@@ -65,7 +70,8 @@ class ProfileController extends Controller
             'isFollowing',
             'followersCount',
             'followingCount',
-            'postsCount'
+            'postsCount',
+            'reputationLogs'
         ));
     }
 
@@ -90,7 +96,7 @@ class ProfileController extends Controller
         $profile = $user->profile;
 
         $request->validate([
-            'username' => 'required|string|max:30|unique:profiles,username,' . $profile->id,
+            'username' => 'required|string|max:30|unique:profiles,username,'.$profile->id,
             'bio' => 'nullable|string|max:500',
             'avatar' => 'nullable|image|max:2048',
             'github_link' => 'nullable|url|max:255',
@@ -123,7 +129,6 @@ class ProfileController extends Controller
         $user->update([
             'name' => $request->name,
         ]);
-
 
         // Sync tech tags
         if ($request->has('tech_tags')) {

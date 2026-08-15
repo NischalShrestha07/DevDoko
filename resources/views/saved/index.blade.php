@@ -15,11 +15,11 @@
                 @include('posts.partials.card', ['post' => $post, 'fullView' => false])
             @empty
                 <div class="text-center py-5">
-                    <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
+                    <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
                         <i class="bi bi-bookmark text-primary" style="font-size: 48px;"></i>
                     </div>
                     <h5 class="fw-semibold mb-2">No saved posts yet</h5>
-                    <p class="text-muted mb-4">Posts you save will show up here</p>
+                    <p class="app-text-muted mb-4">Posts you save will show up here</p>
                     <a href="{{ route('posts.index') }}" class="btn btn-primary rounded-pill px-4">
                         <i class="bi bi-newspaper me-2"></i>Browse Posts
                     </a>

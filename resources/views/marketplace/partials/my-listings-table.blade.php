@@ -23,14 +23,14 @@
                         <img src="{{ Storage::url($listing->images->first()->image_path) }}" class="rounded me-2"
                             style="width: 40px; height: 40px; object-fit: cover;">
                         @else
-                        <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center"
+                        <div class="app-bg-secondary rounded me-2 d-flex align-items-center justify-content-center"
                             style="width: 40px; height: 40px;">
-                            <i class="bi bi-image text-muted"></i>
+                            <i class="bi bi-image app-text-muted"></i>
                         </div>
                         @endif
                         <div>
                             <a href="{{ route('marketplace.show', $listing->slug) }}"
-                                class="fw-semibold text-dark text-decoration-none">
+                                class="fw-semibold app-text-primary text-decoration-none">
                                 {{ Str::limit($listing->title, 30) }}
                             </a>
                         </div>
@@ -57,21 +57,21 @@
                 <td>{{ $listing->views_count }}</td>
                 <td>{{ $listing->interests->count() }}</td>
                 <td>
-                    <small class="text-muted" title="{{ $listing->created_at->format('M d, Y') }}">
+                    <small class="app-text-muted" title="{{ $listing->created_at->format('M d, Y') }}">
                         {{ $listing->created_at->diffForHumans() }}
                     </small>
                 </td>
                 <td>
                     <div class="btn-group btn-group-sm">
                         <a href="{{ route('marketplace.show', $listing->slug) }}" class="btn btn-outline-primary"
-                            title="View">
+                            title="View" aria-label="View listing">
                             <i class="bi bi-eye"></i>
                         </a>
                         <a href="{{ route('marketplace.edit', $listing) }}" class="btn btn-outline-secondary"
-                            title="Edit">
+                            title="Edit" aria-label="Edit listing">
                             <i class="bi bi-pencil"></i>
                         </a>
-                        <button type="button" class="btn btn-outline-danger" title="Delete"
+                        <button type="button" class="btn btn-outline-danger" title="Delete" aria-label="Delete listing"
                             onclick="deleteListing('{{ $listing->slug }}')">
                             <i class="bi bi-trash"></i>
                         </button>
@@ -104,9 +104,9 @@
 </script>
 @else
 <div class="text-center py-5">
-    <i class="bi bi-bag-x display-1 text-muted"></i>
+    <i class="bi bi-bag-x display-1 app-text-muted"></i>
     <h5 class="mt-3">No listings found</h5>
-    <p class="text-muted">Start by creating your first listing</p>
+    <p class="app-text-muted">Start by creating your first listing</p>
     <a href="{{ route('marketplace.create') }}" class="btn btn-primary">
         <i class="bi bi-plus-lg me-2"></i> Create Listing
     </a>

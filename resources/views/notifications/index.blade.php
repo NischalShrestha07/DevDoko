@@ -11,7 +11,7 @@
                 <i class="bi bi-bell-fill me-2 text-primary"></i>
                 Notifications
             </h1>
-            <p class="text-muted mb-0">Stay updated with your developer network</p>
+            <p class="app-text-muted mb-0">Stay updated with your developer network</p>
         </div>
 
         <div class="d-flex gap-2">
@@ -87,9 +87,9 @@
                                     style="width: 56px; height: 56px; object-fit: cover;">
                             </a>
                             @else
-                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border"
+                            <div class="rounded-circle app-bg-secondary d-flex align-items-center justify-content-center border"
                                 style="width: 56px; height: 56px;">
-                                <i class="bi bi-person text-muted fs-4"></i>
+                                <i class="bi bi-person app-text-muted fs-4"></i>
                             </div>
                             @endif
 
@@ -127,17 +127,17 @@
                                 <div>
                                     @if($notification->fromUser)
                                     <a href="{{ route('profile.show', $notification->fromUser->profile->username ?? $notification->fromUser->name) }}"
-                                        class="text-decoration-none text-dark fw-semibold">
+                                        class="text-decoration-none app-text-primary fw-semibold">
                                         {{ $notification->fromUser->profile->username ?? $notification->fromUser->name
                                         }}
                                     </a>
                                     @endif
-                                    <span class="text-muted ms-2 small">
+                                    <span class="app-text-muted ms-2 small">
                                         {{ $notification->message }}
                                     </span>
                                 </div>
                                 <div class="d-flex align-items-center gap-2 ms-3">
-                                    <small class="text-muted"
+                                    <small class="app-text-muted"
                                         title="{{ $notification->created_at->format('M j, Y g:i A') }}">
                                         {{ $notification->time_ago }}
                                     </small>
@@ -151,8 +151,8 @@
 
                             <!-- Additional Data -->
                             @if($notification->type === 'message' && isset($notification->data['content']))
-                            <div class="mt-2 p-3 bg-light rounded-3">
-                                <p class="small text-muted mb-0">
+                            <div class="mt-2 p-3 app-bg-secondary rounded-3">
+                                <p class="small app-text-muted mb-0">
                                     <i class="bi bi-chat-quote me-1"></i>
                                     "{{ $notification->data['content'] }}"
                                 </p>
@@ -278,11 +278,11 @@
             @else
             <!-- Empty State -->
             <div class="text-center py-5">
-                <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
+                <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
                     <i class="bi bi-bell text-primary" style="font-size: 48px;"></i>
                 </div>
                 <h5 class="fw-semibold mb-2">No notifications yet</h5>
-                <p class="text-muted mb-4" style="max-width: 400px; margin: 0 auto;">
+                <p class="app-text-muted mb-4" style="max-width: 400px; margin: 0 auto;">
                     When you receive notifications about messages, likes, comments, and follows, they'll appear here.
                 </p>
 

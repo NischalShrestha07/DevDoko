@@ -28,10 +28,10 @@
                         <div class="ms-3">
                             <div class="d-flex align-items-center">
                                 <a href="{{ route('profile.show', $post->user->profile->username ?? $post->user->name) }}"
-                                    class="text-decoration-none text-dark fw-semibold">
+                                    class="text-decoration-none app-text-primary fw-semibold">
                                     {{ $post->user->profile->username ?? $post->user->name }}
                                 </a>
-                                @if($post->user->is_verified ?? false)
+                                @if($post->user->profile->is_verified ?? false)
                                 <i class="bi bi-patch-check-fill text-primary ms-2" style="font-size: 14px;"></i>
                                 @endif
                                 @if($post->user_id === $group->owner_id)
@@ -40,10 +40,10 @@
                                 <span class="badge bg-primary bg-opacity-10 text-primary ms-2">🛡️ Admin</span>
                                 @endif
                             </div>
-                            <div class="d-flex align-items-center text-muted small">
+                            <div class="d-flex align-items-center app-text-muted small">
                                 <span>{{ $post->formatted_date ?? $post->created_at->diffForHumans() }}</span>
                                 <span class="mx-2">•</span>
-                                <span class="badge bg-light text-dark">
+                                <span class="badge app-bg-secondary app-text-primary">
                                     @if($post->type === 'announcement') 📢 Announcement
                                     @elseif($post->type === 'question') ❓ Question
                                     @elseif($post->type === 'resource') 📚 Resource
@@ -69,7 +69,7 @@
                     <!-- Post Actions Dropdown -->
                     @if(auth()->id() === $post->user_id || $group->canManage(auth()->user()))
                     <div class="dropdown">
-                        <button class="btn btn-link text-dark p-0" data-bs-toggle="dropdown">
+                        <button class="btn btn-link app-text-primary p-0" data-bs-toggle="dropdown">
                             <i class="bi bi-three-dots-vertical fs-5"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
@@ -149,7 +149,7 @@
                 <div class="card-body p-4 pt-2">
                     <h4 class="fw-bold mb-3">{{ $post->title }}</h4>
 
-                    <div class="post-content lh-lg text-dark" style=" word-wrap: break-word;">
+                    <div class="post-content lh-lg app-text-primary" style=" word-wrap: break-word;">
                         {!! nl2br(e($post->content)) !!}
                     </div>
 
@@ -181,7 +181,7 @@
                         <!-- Image Gallery -->
                         @if(count($imageAttachments) > 0)
                         <div class="mb-4">
-                            <small class="text-muted d-block mb-2">
+                            <small class="app-text-muted d-block mb-2">
                                 <i class="bi bi-images me-1"></i> Images
                             </small>
                             <div class="row g-2">
@@ -210,7 +210,7 @@
                         <!-- Video Player -->
                         @if(count($videoAttachments) > 0)
                         <div class="mb-4">
-                            <small class="text-muted d-block mb-2">
+                            <small class="app-text-muted d-block mb-2">
                                 <i class="bi bi-camera-video me-1"></i> Videos
                             </small>
                             <div class="row g-3">
@@ -244,7 +244,7 @@
                         <!-- Code Preview -->
                         @if(count($codeAttachments) > 0)
                         <div class="mb-4">
-                            <small class="text-muted d-block mb-2">
+                            <small class="app-text-muted d-block mb-2">
                                 <i class="bi bi-file-earmark-code me-1"></i> Code Files
                             </small>
                             @foreach($codeAttachments as $attachment)
@@ -313,7 +313,7 @@
                         <!-- Other Files -->
                         @if(count($otherAttachments) > 0)
                         <div class="mb-2">
-                            <small class="text-muted d-block mb-2">
+                            <small class="app-text-muted d-block mb-2">
                                 <i class="bi bi-files me-1"></i> Other Files
                             </small>
                             <div class="row g-2">
@@ -335,21 +335,21 @@
                                         download="{{ $attachment['name'] }}">
                                         <div
                                             class="d-flex align-items-center p-2 border rounded-3 hover-shadow transition">
-                                            <div class="bg-light rounded-2 p-2 me-2">
+                                            <div class="app-bg-secondary rounded-2 p-2 me-2">
                                                 <i class="bi {{ $icon }} fs-5"></i>
                                             </div>
                                             <div class="flex-grow-1 min-width-0">
-                                                <small class="fw-semibold text-dark d-block text-truncate">
+                                                <small class="fw-semibold app-text-primary d-block text-truncate">
                                                     {{ $attachment['name'] }}
                                                 </small>
                                                 <div class="d-flex align-items-center">
-                                                    <small class="text-muted">{{ round($attachment['size'] / 1024) }}
+                                                    <small class="app-text-muted">{{ round($attachment['size'] / 1024) }}
                                                         KB</small>
-                                                    <span class="badge bg-light text-dark ms-2">{{
+                                                    <span class="badge app-bg-secondary app-text-primary ms-2">{{
                                                         strtoupper($extension) }}</span>
                                                 </div>
                                             </div>
-                                            <i class="bi bi-download text-muted ms-2"></i>
+                                            <i class="bi bi-download app-text-muted ms-2"></i>
                                         </div>
                                     </a>
                                 </div>
@@ -366,32 +366,32 @@
                             class="like-form">
                             @csrf
                             <button type="submit"
-                                class="btn btn-link text-dark p-0 text-decoration-none d-flex align-items-center gap-2">
+                                class="btn btn-link app-text-primary p-0 text-decoration-none d-flex align-items-center gap-2">
                                 <div
-                                    class="rounded-circle p-2 {{ $post->is_liked ? 'bg-danger bg-opacity-10' : 'bg-light' }} transition">
+                                    class="rounded-circle p-2 {{ $post->is_liked ? 'bg-danger bg-opacity-10' : 'app-bg-secondary' }} transition">
                                     <i class="bi bi-heart{{ $post->is_liked ? '-fill text-danger' : '' }} fs-5"></i>
                                 </div>
-                                <span class="{{ $post->is_liked ? 'text-danger fw-semibold' : 'text-muted' }}">
+                                <span class="{{ $post->is_liked ? 'text-danger fw-semibold' : 'app-text-muted' }}">
                                     {{ $post->likes_count }} {{ Str::plural('like', $post->likes_count) }}
                                 </span>
                             </button>
                         </form>
 
                         <div class="d-flex align-items-center gap-2">
-                            <div class="rounded-circle p-2 bg-light">
+                            <div class="rounded-circle p-2 app-bg-secondary">
                                 <i class="bi bi-chat fs-5 text-primary"></i>
                             </div>
-                            <span class="text-muted">
+                            <span class="app-text-muted">
                                 {{ $post->comments_count }} {{ Str::plural('comment', $post->comments_count) }}
                             </span>
                         </div>
 
                         @if($post->views_count ?? false)
                         <div class="d-flex align-items-center gap-2">
-                            <div class="rounded-circle p-2 bg-light">
+                            <div class="rounded-circle p-2 app-bg-secondary">
                                 <i class="bi bi-eye fs-5 text-info"></i>
                             </div>
-                            <span class="text-muted">
+                            <span class="app-text-muted">
                                 {{ $post->views_count }} {{ Str::plural('view', $post->views_count) }}
                             </span>
                         </div>
@@ -406,9 +406,9 @@
                     <h5 class="fw-semibold mb-0 d-flex align-items-center">
                         <i class="bi bi-chat-text me-2 text-primary"></i>
                         Comments
-                        <span class="badge bg-light text-dark ms-2">{{ $post->comments_count }}</span>
+                        <span class="badge app-bg-secondary app-text-primary ms-2">{{ $post->comments_count }}</span>
                     </h5>
-                    <small class="text-muted">Most relevant first</small>
+                    <small class="app-text-muted">Most relevant first</small>
                 </div>
 
                 <div class="card-body">
@@ -421,7 +421,7 @@
                             <img src="{{ auth()->user()->profile->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) }}"
                                 class="rounded-circle border" style="width: 44px; height: 44px; object-fit: cover;">
                             <div class="flex-grow-1">
-                                <div class="bg-light rounded-4 p-3">
+                                <div class="app-bg-secondary rounded-4 p-3">
                                     <textarea name="content" class="form-control border-0 bg-transparent p-0" rows="2"
                                         placeholder="Add a comment..."
                                         style="resize: none; outline: none; box-shadow: none;" id="commentInput"
@@ -454,25 +454,25 @@
                             style="width: 40px; height: 40px; object-fit: cover;">
 
                         <div class="flex-grow-1">
-                            <div class="bg-light rounded-4 p-3">
+                            <div class="app-bg-secondary rounded-4 p-3">
                                 <div class="d-flex justify-content-between align-items-start mb-1">
                                     <div>
                                         <a href="{{ route('profile.show', $comment->user->profile->username ?? $comment->user->name) }}"
-                                            class="text-decoration-none fw-semibold text-dark">
+                                            class="text-decoration-none fw-semibold app-text-primary">
                                             {{ $comment->user->profile->username ?? $comment->user->name }}
                                         </a>
                                         @if($comment->user_id === $post->user_id)
                                         <span
                                             class="badge bg-primary bg-opacity-10 text-primary ms-2 small">Author</span>
                                         @endif
-                                        <span class="text-muted small ms-2">
+                                        <span class="app-text-muted small ms-2">
                                             <i class="bi bi-clock"></i> {{ $comment->created_at->diffForHumans() }}
                                         </span>
                                     </div>
 
                                     @if(auth()->id() === $comment->user_id || $group->canManage(auth()->user()))
                                     <div class="dropdown">
-                                        <button class="btn btn-link text-dark p-0" data-bs-toggle="dropdown">
+                                        <button class="btn btn-link app-text-primary p-0" data-bs-toggle="dropdown">
                                             <i class="bi bi-three-dots-vertical"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
@@ -528,17 +528,17 @@
                                         method="POST" class="d-inline">
                                         @csrf
                                         <button type="submit"
-                                            class="btn btn-link text-dark p-0 text-decoration-none small d-flex align-items-center gap-1">
+                                            class="btn btn-link app-text-primary p-0 text-decoration-none small d-flex align-items-center gap-1">
                                             <i
                                                 class="bi bi-heart{{ $comment->is_liked ? '-fill text-danger' : '' }}"></i>
-                                            <span class="{{ $comment->is_liked ? 'text-danger' : 'text-muted' }}">
+                                            <span class="{{ $comment->is_liked ? 'text-danger' : 'app-text-muted' }}">
                                                 {{ $comment->likes_count }}
                                             </span>
                                         </button>
                                     </form>
 
                                     <button
-                                        class="btn btn-link text-dark p-0 text-decoration-none small d-flex align-items-center gap-1 reply-toggle"
+                                        class="btn btn-link app-text-primary p-0 text-decoration-none small d-flex align-items-center gap-1 reply-toggle"
                                         data-comment-id="{{ $comment->id }}">
                                         <i class="bi bi-reply"></i>
                                         Reply
@@ -546,7 +546,7 @@
 
                                     @if($comment->replies->count() > 0)
                                     <button
-                                        class="btn btn-link text-dark p-0 text-decoration-none small d-flex align-items-center gap-1 view-replies-toggle"
+                                        class="btn btn-link app-text-primary p-0 text-decoration-none small d-flex align-items-center gap-1 view-replies-toggle"
                                         data-comment-id="{{ $comment->id }}">
                                         <i class="bi bi-chevron-down"></i>
                                         {{ $comment->replies->count() }} {{ Str::plural('reply',
@@ -567,7 +567,7 @@
                                             class="rounded-circle"
                                             style="width: 32px; height: 32px; object-fit: cover;">
                                         <div class="flex-grow-1">
-                                            <div class="bg-light rounded-4 p-2">
+                                            <div class="app-bg-secondary rounded-4 p-2">
                                                 <input type="text" name="content"
                                                     class="form-control border-0 bg-transparent p-2"
                                                     placeholder="Write a reply...">
@@ -590,14 +590,14 @@
                                     <img src="{{ $reply->user->profile->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($reply->user->name) }}"
                                         class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
                                     <div class="flex-grow-1">
-                                        <div class="bg-light rounded-4 p-2">
+                                        <div class="app-bg-secondary rounded-4 p-2">
                                             <div class="d-flex justify-content-between align-items-start">
                                                 <div>
                                                     <a href="{{ route('profile.show', $reply->user->profile->username ?? $reply->user->name) }}"
-                                                        class="text-decoration-none fw-semibold small text-dark">
+                                                        class="text-decoration-none fw-semibold small app-text-primary">
                                                         {{ $reply->user->profile->username ?? $reply->user->name }}
                                                     </a>
-                                                    <span class="text-muted small ms-2">
+                                                    <span class="app-text-muted small ms-2">
                                                         {{ $reply->created_at->diffForHumans() }}
                                                     </span>
                                                 </div>
@@ -622,7 +622,7 @@
                                                     method="POST" class="d-inline">
                                                     @csrf
                                                     <button type="submit"
-                                                        class="btn btn-link text-dark p-0 text-decoration-none small">
+                                                        class="btn btn-link app-text-primary p-0 text-decoration-none small">
                                                         <i
                                                             class="bi bi-heart{{ $reply->is_liked ? '-fill text-danger' : '' }}"></i>
                                                         <span class="ms-1 small">{{ $reply->likes_count }}</span>
@@ -639,11 +639,11 @@
                     </div>
                     @empty
                     <div class="text-center py-5">
-                        <div class="bg-light rounded-circle d-inline-flex p-4 mb-3">
-                            <i class="bi bi-chat fs-1 text-muted"></i>
+                        <div class="app-bg-secondary rounded-circle d-inline-flex p-4 mb-3">
+                            <i class="bi bi-chat fs-1 app-text-muted"></i>
                         </div>
                         <h6 class="fw-semibold mb-2">No comments yet</h6>
-                        <p class="text-muted mb-0">Be the first to share your thoughts!</p>
+                        <p class="app-text-muted mb-0">Be the first to share your thoughts!</p>
                     </div>
                     @endforelse
                 </div>

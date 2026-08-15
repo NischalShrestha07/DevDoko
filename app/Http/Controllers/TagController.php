@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Tag;
 use App\Models\Post;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Models\Tag;
+use App\Models\TechTag;
 
 class TagController extends Controller
 {
@@ -36,15 +34,10 @@ class TagController extends Controller
 
     public function trending()
     {
-        $tag = (object) ['name' => 'Trending'];
+        $techTags = TechTag::withCount('profiles')
+            ->orderByDesc('profiles_count')
+            ->paginate(20);
 
-        $posts = Post::with(['user.profile', 'likes', 'comments'])
-            ->where('visibility', 'public')
-            ->where('created_at', '>=', Carbon::now()->subDays(7))
-            ->withCount('likes')
-            ->orderBy('likes_count', 'desc')
-            ->paginate(12);
-
-        return view('tags.show', compact('tag', 'posts'));
+        return view('tags.trending', compact('techTags'));
     }
 }

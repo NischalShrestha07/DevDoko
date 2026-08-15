@@ -1,4 +1,5 @@
 <?php
+
 // app/Models/MarketplaceListing.php
 
 namespace App\Models;
@@ -6,9 +7,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class MarketplaceListing extends Model
 {
@@ -71,7 +72,7 @@ class MarketplaceListing extends Model
         });
 
         static::updating(function ($listing) {
-            if ($listing->isDirty('title') && !$listing->isDirty('slug')) {
+            if ($listing->isDirty('title') && ! $listing->isDirty('slug')) {
                 $listing->slug = self::generateUniqueSlug($listing->title, $listing->id);
             }
         });
@@ -95,7 +96,7 @@ class MarketplaceListing extends Model
         }
 
         while ($query->exists()) {
-            $slug = $originalSlug . '-' . $counter;
+            $slug = $originalSlug.'-'.$counter;
             $query = self::withTrashed()->where('slug', $slug);
             if ($ignoreId) {
                 $query->where('id', '!=', $ignoreId);
@@ -133,13 +134,19 @@ class MarketplaceListing extends Model
             ->withTimestamps();
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(MarketplaceReview::class, 'listing_id');
+    }
+
     // Accessors
     public function getFormattedPriceAttribute()
     {
         if ($this->price_type === 'free') {
             return 'Free';
         }
-        return 'Rs ' . number_format($this->price, 2);
+
+        return 'Rs '.number_format($this->price, 2);
     }
 
     public function getTimeAgoAttribute()
@@ -149,7 +156,10 @@ class MarketplaceListing extends Model
 
     public function getIsSavedAttribute()
     {
-        if (!Auth::check()) return false;
+        if (! Auth::check()) {
+            return false;
+        }
+
         return $this->savedBy->contains('id', Auth::id());
     }
 

@@ -10,7 +10,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white py-3">
                     <div class="d-flex align-items-center">
-                        <a href="{{ route('posts.show', $post) }}" class="text-decoration-none text-dark me-3">
+                        <a href="{{ route('posts.show', $post) }}" class="text-decoration-none app-text-primary me-3">
                             <i class="bi bi-x-lg fs-4"></i>
                         </a>
                         <h5 class="mb-0 fw-bold">Edit Post</h5>
@@ -58,7 +58,7 @@
                                     placeholder="What's on your mind?"
                                     maxlength="20000">{{ old('content', $post->content) }}</textarea>
                                 <div class="d-flex justify-content-between align-items-center mt-1">
-                                    <div class="text-muted small">
+                                    <div class="app-text-muted small">
                                         <span id="charCount">{{ strlen($post->content ?? '') }}</span>/20000
                                     </div>
                                     <div class="small">

@@ -1,10 +1,12 @@
 <?php
+
 // app/Models/MarketplaceInterest.php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class MarketplaceInterest extends Model
 {
@@ -28,7 +30,7 @@ class MarketplaceInterest extends Model
         'formatted_offered_price',
         'status_badge',
         'status_color',
-        'time_ago'
+        'time_ago',
     ];
 
     protected static function boot()
@@ -56,10 +58,11 @@ class MarketplaceInterest extends Model
 
     public function getFormattedOfferedPriceAttribute()
     {
-        if (!$this->offered_price) {
+        if (! $this->offered_price) {
             return null;
         }
-        return 'Rs ' . number_format($this->offered_price, 2);
+
+        return 'Rs '.number_format($this->offered_price, 2);
     }
 
     public function getStatusBadgeAttribute()
@@ -104,6 +107,8 @@ class MarketplaceInterest extends Model
 
         // Mark listing as reserved
         $this->listing->update(['status' => 'reserved']);
+
+        $this->notifyBuyer('interest_accepted', 'Your interest in "'.$this->listing->title.'" was accepted!');
     }
 
     public function decline()
@@ -112,6 +117,8 @@ class MarketplaceInterest extends Model
             'status' => 'declined',
             'responded_at' => now(),
         ]);
+
+        $this->notifyBuyer('interest_declined', 'Your interest in "'.$this->listing->title.'" was declined.');
     }
 
     public function complete()
@@ -120,6 +127,22 @@ class MarketplaceInterest extends Model
             'status' => 'completed',
         ]);
         $this->listing->update(['status' => 'sold']);
+
+        $this->notifyBuyer('interest_completed', 'Your purchase of "'.$this->listing->title.'" is complete. Thanks!');
+    }
+
+    private function notifyBuyer(string $type, string $message): void
+    {
+        $this->user->notifications()->create([
+            'from_user_id' => Auth::id(),
+            'type' => $type,
+            'message' => $message,
+            'data' => [
+                'listing_id' => $this->listing_id,
+                'listing_title' => $this->listing->title,
+                'interest_id' => $this->id,
+            ],
+        ]);
     }
 
     public function canBeManagedBy($userId)

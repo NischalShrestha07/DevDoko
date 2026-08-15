@@ -26,7 +26,7 @@
                 </div>
                 <div class="card-body p-4">
                     <!-- Buyer/Seller Info -->
-                    <div class="d-flex align-items-center justify-content-between mb-4 p-3 bg-light rounded">
+                    <div class="d-flex align-items-center justify-content-between mb-4 p-3 app-bg-secondary rounded">
                         <div class="d-flex align-items-center">
                             @if($interest->user_id === auth()->id())
                             <!-- I'm the buyer, showing seller -->
@@ -60,23 +60,23 @@
                         <div class="border rounded p-3">
                             <div class="row">
                                 <div class="col-md-6 mb-2">
-                                    <small class="text-muted d-block">Listed Price</small>
+                                    <small class="app-text-muted d-block">Listed Price</small>
                                     <span class="fw-semibold">{{ $interest->listing->formatted_price }}</span>
                                 </div>
                                 @if($interest->offered_price)
                                 <div class="col-md-6 mb-2">
-                                    <small class="text-muted d-block">Offered Price</small>
+                                    <small class="app-text-muted d-block">Offered Price</small>
                                     <span class="fw-semibold text-info">{{ $interest->formatted_offered_price }}</span>
                                 </div>
                                 @endif
                                 <div class="col-12 mb-2">
-                                    <small class="text-muted d-block">Interested on</small>
+                                    <small class="app-text-muted d-block">Interested on</small>
                                     <span>{{ $interest->created_at->format('M d, Y \a\t g:i A') }}</span>
                                 </div>
                                 @if($interest->message)
                                 <div class="col-12">
-                                    <small class="text-muted d-block">Message</small>
-                                    <p class="mb-0 p-3 bg-light rounded">{{ $interest->message }}</p>
+                                    <small class="app-text-muted d-block">Message</small>
+                                    <p class="mb-0 p-3 app-bg-secondary rounded">{{ $interest->message }}</p>
                                 </div>
                                 @endif
                             </div>
@@ -156,19 +156,19 @@
                         <img src="{{ Storage::url($interest->listing->images->first()->image_path) }}" class="w-100"
                             alt="{{ $interest->listing->title }}" style="height: 200px; object-fit: cover;">
                         @else
-                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                            <i class="bi bi-image text-muted fs-1"></i>
+                        <div class="app-bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="bi bi-image app-text-muted fs-1"></i>
                         </div>
                         @endif
                     </a>
                     <div class="p-3">
                         <h6 class="fw-semibold mb-2">
                             <a href="{{ route('marketplace.show', $interest->listing->slug) }}"
-                                class="text-dark text-decoration-none">
+                                class="app-text-primary text-decoration-none">
                                 {{ $interest->listing->title }}
                             </a>
                         </h6>
-                        <p class="small text-muted mb-2">{{ Str::limit($interest->listing->description, 100) }}</p>
+                        <p class="small app-text-muted mb-2">{{ Str::limit($interest->listing->description, 100) }}</p>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="h5 fw-bold text-primary">{{ $interest->listing->formatted_price }}</span>
                             <a href="{{ route('marketplace.show', $interest->listing->slug) }}"

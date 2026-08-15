@@ -12,7 +12,7 @@
                 <i class="bi bi-grid-3x3-gap-fill me-2 text-primary"></i>
                 {{ $categoryName }} Groups
             </h4>
-            <p class="text-muted mb-0">
+            <p class="app-text-muted mb-0">
                 <a href="{{ route('groups.index') }}" class="text-decoration-none">
                     <i class="bi bi-arrow-left"></i> Back to All Groups
                 </a>
@@ -64,11 +64,11 @@
                         {{ $group->privacy_label }}
                     </span>
 
-                    <p class="small text-muted mb-2">
+                    <p class="small app-text-muted mb-2">
                         {{ Str::limit($group->description, 80) }}
                     </p>
 
-                    <div class="d-flex justify-content-between align-items-center small text-muted">
+                    <div class="d-flex justify-content-between align-items-center small app-text-muted">
                         <span><i class="bi bi-people"></i> {{ $group->members_count }} members</span>
                         <span><i class="bi bi-chat"></i> {{ $group->posts_count }} posts</span>
                     </div>
@@ -108,11 +108,11 @@
     </div>
     @else
     <div class="text-center py-5">
-        <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
+        <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
             <i class="bi bi-people text-primary" style="font-size: 48px;"></i>
         </div>
         <h5 class="fw-semibold mb-2">No groups found in this category</h5>
-        <p class="text-muted mb-4">Be the first to create a group in {{ $categoryName }}!</p>
+        <p class="app-text-muted mb-4">Be the first to create a group in {{ $categoryName }}!</p>
         @auth
         <a href="{{ route('groups.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-lg me-2"></i> Create Group

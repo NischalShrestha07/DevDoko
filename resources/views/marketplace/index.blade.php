@@ -12,7 +12,7 @@
                 <i class="bi bi-shop me-2 text-primary"></i>
                 Developer Marketplace
             </h1>
-            <p class="text-muted mb-0">Buy and sell developer gear, books, software, and services</p>
+            <p class="app-text-muted mb-0">Buy and sell developer gear, books, software, and services</p>
         </div>
         @auth
         <a href="{{ route('marketplace.create') }}" class="btn btn-primary">
@@ -166,7 +166,7 @@
 
             <!-- Results Count -->
             <div class="mb-3">
-                <p class="text-muted">
+                <p class="app-text-muted">
                     Showing {{ $listings->firstItem() ?? 0 }} - {{ $listings->lastItem() ?? 0 }}
                     of {{ $listings->total() }} listings
                 </p>
@@ -187,9 +187,9 @@
             </div>
             @else
             <div class="text-center py-5">
-                <i class="bi bi-shop display-1 text-muted"></i>
+                <i class="bi bi-shop display-1 app-text-muted"></i>
                 <h5 class="mt-3 mb-2">No listings found</h5>
-                <p class="text-muted">Try adjusting your filters or create a new listing</p>
+                <p class="app-text-muted">Try adjusting your filters or create a new listing</p>
                 @auth
                 <a href="{{ route('marketplace.create') }}" class="btn btn-primary">
                     <i class="bi bi-plus-lg me-2"></i>Create Listing

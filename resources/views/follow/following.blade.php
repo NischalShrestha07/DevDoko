@@ -9,12 +9,12 @@
             <div class="card-header bg-white border-0 py-3">
                 <div class="d-flex align-items-center">
                     <a href="{{ route('profile.show', $user->profile->username) }}"
-                        class="text-decoration-none text-dark me-3">
+                        class="text-decoration-none app-text-primary me-3">
                         <i class="bi bi-arrow-left"></i>
                     </a>
                     <div>
                         <h5 class="mb-0 fw-bold">{{ $user->profile->username }}</h5>
-                        <small class="text-muted">Following</small>
+                        <small class="app-text-muted">Following</small>
                     </div>
                 </div>
             </div>
@@ -28,10 +28,10 @@
                     </a>
                     <div class="flex-grow-1">
                         <a href="{{ route('profile.show', $followedUser->profile->username) }}"
-                            class="text-decoration-none text-dark fw-bold d-block">
+                            class="text-decoration-none app-text-primary fw-bold d-block">
                             {{ $followedUser->profile->username }}
                         </a>
-                        <small class="text-muted">{{ $followedUser->name }}</small>
+                        <small class="app-text-muted">{{ $followedUser->name }}</small>
                     </div>
                     @if(auth()->id() === $user->id)
                     <form action="{{ route('users.unfollow', $followedUser) }}" method="POST">
@@ -62,9 +62,9 @@
                 </div>
                 @empty
                 <div class="text-center py-5">
-                    <i class="bi bi-person-plus display-1 text-muted mb-3"></i>
-                    <h5 class="text-muted">Not following anyone yet</h5>
-                    <p class="text-muted">
+                    <i class="bi bi-person-plus display-1 app-text-muted mb-3"></i>
+                    <h5 class="app-text-muted">Not following anyone yet</h5>
+                    <p class="app-text-muted">
                         @if(auth()->id() === $user->id)
                         Discover and follow other developers!
                         @else

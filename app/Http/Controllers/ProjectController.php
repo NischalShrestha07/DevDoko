@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\ProjectCollaboration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -123,7 +124,7 @@ class ProjectController extends Controller
             abort(403, 'This project is private.');
         }
 
-        $project->load(['user.profile', 'contributors.profile', 'forks.user', 'likes.user']);
+        $project->load(['user.profile', 'contributors.profile', 'forks.user', 'likes.user', 'collaborations.user.profile']);
         $project->incrementViews();
 
         $relatedProjects = Project::where('category', $project->category)
@@ -296,6 +297,68 @@ class ProjectController extends Controller
         ]);
 
         return back()->with('success', 'Collaboration request sent!');
+    }
+
+    public function approveCollaboration(ProjectCollaboration $collaboration)
+    {
+        $project = $collaboration->project;
+
+        if (Auth::id() !== $project->user_id) {
+            abort(403);
+        }
+
+        if ($collaboration->status !== 'pending') {
+            return back()->with('error', 'This request has already been resolved.');
+        }
+
+        $collaboration->update(['status' => 'accepted']);
+
+        $project->contributors()->syncWithoutDetaching([
+            $collaboration->user_id => ['role' => 'contributor', 'joined_at' => now()],
+        ]);
+
+        $collaboration->user->notifications()->create([
+            'from_user_id' => Auth::id(),
+            'type' => 'collaboration_approved',
+            'message' => Auth::user()->name.' approved your collaboration request on "'.$project->title.'"',
+            'data' => [
+                'user_id' => Auth::id(),
+                'user_name' => Auth::user()->name,
+                'project_id' => $project->id,
+                'project_title' => $project->title,
+            ],
+        ]);
+
+        return back()->with('success', 'Collaboration request approved.');
+    }
+
+    public function rejectCollaboration(ProjectCollaboration $collaboration)
+    {
+        $project = $collaboration->project;
+
+        if (Auth::id() !== $project->user_id) {
+            abort(403);
+        }
+
+        if ($collaboration->status !== 'pending') {
+            return back()->with('error', 'This request has already been resolved.');
+        }
+
+        $collaboration->update(['status' => 'declined']);
+
+        $collaboration->user->notifications()->create([
+            'from_user_id' => Auth::id(),
+            'type' => 'collaboration_declined',
+            'message' => Auth::user()->name.' declined your collaboration request on "'.$project->title.'"',
+            'data' => [
+                'user_id' => Auth::id(),
+                'user_name' => Auth::user()->name,
+                'project_id' => $project->id,
+                'project_title' => $project->title,
+            ],
+        ]);
+
+        return back()->with('success', 'Collaboration request declined.');
     }
 
     private function getPopularTechnologies()

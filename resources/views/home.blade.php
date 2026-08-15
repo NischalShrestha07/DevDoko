@@ -88,7 +88,7 @@
                         <i class="bi bi-newspaper"></i>
                     </div>
                     <h5 class="fw-bold mb-2">Your feed is empty</h5>
-                    <p class="text-muted mb-4 mx-auto" style="max-width: 320px;">
+                    <p class="app-text-muted mb-4 mx-auto" style="max-width: 320px;">
                         Follow other developers or share your first post to get your feed started.
                     </p>
                     <div class="d-flex justify-content-center gap-3">
@@ -107,7 +107,7 @@
             {{-- Infinite scroll sentinel. Falls back to a plain link if JS is off. --}}
             @if($posts->hasMorePages())
                 <div id="feedSentinel" data-next-page="2" class="py-4 text-center">
-                    <div class="spinner-border spinner-border-sm text-muted d-none" id="feedSpinner" role="status">
+                    <div class="spinner-border spinner-border-sm app-text-muted d-none" id="feedSpinner" role="status">
                         <span class="visually-hidden">Loading more posts…</span>
                     </div>
                     <noscript>
@@ -116,7 +116,7 @@
                 </div>
             @endif
 
-            <div id="feedEnd" class="text-center text-muted small py-4 d-none">
+            <div id="feedEnd" class="text-center app-text-muted small py-4 d-none">
                 <i class="bi bi-check2-circle me-1"></i>You're all caught up
             </div>
         </div>
@@ -135,21 +135,21 @@
                         class="text-decoration-none fw-bold d-block fs-6 app-text-primary mb-0">
                         {{ auth()->user()->name }}
                     </a>
-                    <small class="text-muted d-block mb-3">{{ '@' . (auth()->user()->profile->username ?? '') }}</small>
+                    <small class="app-text-muted d-block mb-3">{{ '@' . (auth()->user()->profile->username ?? '') }}</small>
                     <div class="d-flex justify-content-around text-center border-top border-bottom py-3 mb-2">
                         <a href="{{ route('profile.show', auth()->user()->profile->username ?? '') }}"
                             class="text-decoration-none">
                             <div class="fw-bold app-text-primary">{{ auth()->user()->posts()->count() }}</div>
-                            <small class="text-muted">Posts</small>
+                            <small class="app-text-muted">Posts</small>
                         </a>
                         <div class="border-start border-end px-3">
                             <div class="fw-bold app-text-primary">{{ auth()->user()->followers()->count() }}</div>
-                            <small class="text-muted">Followers</small>
+                            <small class="app-text-muted">Followers</small>
                         </div>
                         <a href="{{ route('profile.show', auth()->user()->profile->username ?? '') }}"
                             class="text-decoration-none">
                             <div class="fw-bold app-text-primary">{{ auth()->user()->following()->count() }}</div>
-                            <small class="text-muted">Following</small>
+                            <small class="app-text-muted">Following</small>
                         </a>
                     </div>
                     <a href="{{ route('profile.edit') }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill mt-1">
@@ -157,6 +157,33 @@
                     </a>
                 </div>
             </div>
+
+            <!-- Profile Strength -->
+            @php $completeness = auth()->user()->profile->completeness; @endphp
+            @if($completeness < 100)
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <div class="position-relative flex-shrink-0" style="width: 44px; height: 44px;">
+                            <svg width="44" height="44" viewBox="0 0 44 44">
+                                <circle cx="22" cy="22" r="18" fill="none" stroke="#e9ecef" stroke-width="4"></circle>
+                                <circle cx="22" cy="22" r="18" fill="none" stroke="var(--brand-purple)" stroke-width="4"
+                                    stroke-dasharray="{{ round(2 * pi() * 18) }}"
+                                    stroke-dashoffset="{{ round(2 * pi() * 18 * (1 - $completeness / 100)) }}"
+                                    stroke-linecap="round" transform="rotate(-90 22 22)"></circle>
+                            </svg>
+                            <small class="position-absolute top-50 start-50 translate-middle fw-bold" style="font-size: 11px;">{{ $completeness }}%</small>
+                        </div>
+                        <div class="small app-app-text-muted">
+                            Add a bio, avatar, tech tags, and a portfolio link to complete your profile.
+                        </div>
+                    </div>
+                    <a href="{{ route('profile.edit') }}" class="small fw-semibold text-decoration-none" style="color: var(--brand-purple);">
+                        Complete your profile &rarr;
+                    </a>
+                </div>
+            </div>
+            @endif
 
             <!-- Suggested Developers -->
             @if(isset($suggestedUsers) && $suggestedUsers->count() > 0)
@@ -179,7 +206,7 @@
                                 class="text-decoration-none fw-semibold app-text-primary d-block text-truncate">
                                 {{ $user->profile->username ?? '' }}
                             </a>
-                            <small class="text-muted">{{ $user->followers->count() ?? 0 }} followers</small>
+                            <small class="app-text-muted">{{ $user->followers->count() ?? 0 }} followers</small>
                         </div>
                         <form action="{{ route('users.follow', $user) }}" method="POST" class="follow-form ms-2">
                             @csrf
@@ -220,14 +247,14 @@
             <!-- Platform Info / Footer -->
             <div class="px-3 pb-3">
                 <div class="d-flex flex-wrap gap-2 mb-2">
-                    <a href="{{route('posts.index')}}" class="text-decoration-none small text-muted">Posts</a>
-                    <a href="{{route('messages.index')}}" class="text-decoration-none small text-muted">Messages</a>
-                    <a href="{{route('notifications.index')}}" class="text-decoration-none small text-muted">Notifications</a>
-                    <a href="{{route('search')}}" class="text-decoration-none small text-muted">Search</a>
-                    <a href="#" class="text-decoration-none small text-muted">About</a>
-                    <a href="#" class="text-decoration-none small text-muted">Terms</a>
+                    <a href="{{route('posts.index')}}" class="text-decoration-none small app-text-muted">Posts</a>
+                    <a href="{{route('messages.index')}}" class="text-decoration-none small app-text-muted">Messages</a>
+                    <a href="{{route('notifications.index')}}" class="text-decoration-none small app-text-muted">Notifications</a>
+                    <a href="{{route('search')}}" class="text-decoration-none small app-text-muted">Search</a>
+                    <a href="#" class="text-decoration-none small app-text-muted">About</a>
+                    <a href="#" class="text-decoration-none small app-text-muted">Terms</a>
                 </div>
-                <small class="text-muted">&copy; {{ date('Y') }} DevDoko</small>
+                <small class="app-text-muted">&copy; {{ date('Y') }} DevDoko</small>
             </div>
         </div>
     </div>

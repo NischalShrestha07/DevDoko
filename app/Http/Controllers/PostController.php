@@ -26,7 +26,7 @@ class PostController extends Controller
 
     public function index(Request $request)
     {
-        $query = Post::with(['user.profile', 'tags', 'likes', 'saves' => fn ($q) => $q->where('user_id', Auth::id()), 'comments.user.profile'])
+        $query = Post::with(['user.profile', 'tags', 'likes', 'media', 'saves' => fn ($q) => $q->where('user_id', Auth::id()), 'comments.user.profile'])
             ->visibleTo(Auth::user())
             ->latest();
 
@@ -97,6 +97,8 @@ class PostController extends Controller
                 'code_snippet' => 'nullable|string|max:20000',
                 'code_language' => 'nullable|string|max:50',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,svg|max:20480',
+                'images' => 'nullable|array|max:10',
+                'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp,svg|max:20480',
                 'video' => 'nullable|mimes:mp4,avi,mov,wmv|max:51200',
                 'link_url' => 'nullable|url|max:500',
                 'link_title' => 'nullable|string|max:200',
@@ -168,6 +170,9 @@ class PostController extends Controller
             // Handle tags
             $this->handleTags($request, $post);
             Log::info('Tags handled for post', ['post_id' => $post->id]);
+
+            // Extra gallery images (carousel) alongside the primary image
+            $this->handleExtraImages($request, $post);
 
             // Notify anyone @mentioned in the body
             try {
@@ -425,12 +430,29 @@ class PostController extends Controller
 
     public function report(Request $request, Post $post)
     {
-        Log::warning('Post reported', [
-            'post_id' => $post->id,
-            'user_id' => Auth::id(),
+        $request->validate([
+            'reason' => 'required|string|max:100',
+            'details' => 'nullable|string|max:1000',
+        ]);
+
+        $post->reports()->create([
+            'reporter_id' => Auth::id(),
+            'reason' => $request->reason,
+            'details' => $request->details,
         ]);
 
         return back()->with('success', 'Post reported successfully.');
+    }
+
+    public function hide(Request $request, Post $post)
+    {
+        $post->hides()->firstOrCreate(['user_id' => Auth::id()]);
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true]);
+        }
+
+        return back()->with('success', "You won't see this post again.");
     }
 
     public function drafts()
@@ -587,6 +609,22 @@ class PostController extends Controller
         }
 
         return null;
+    }
+
+    private function handleExtraImages(Request $request, Post $post): void
+    {
+        if (! $request->hasFile('images')) {
+            return;
+        }
+
+        foreach ($request->file('images') as $image) {
+            try {
+                $path = $image->store('posts/images', 'public');
+                $post->media()->create(['file_path' => $path, 'media_type' => 'image']);
+            } catch (\Exception $e) {
+                Log::error('Extra image upload failed', ['error' => $e->getMessage(), 'post_id' => $post->id]);
+            }
+        }
     }
 
     private function handleTags(Request $request, Post $post): void

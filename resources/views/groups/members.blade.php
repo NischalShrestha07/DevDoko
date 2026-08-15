@@ -12,7 +12,7 @@
                 <i class="bi bi-people me-2 text-primary"></i>
                 Members
             </h4>
-            <p class="text-muted mb-0">
+            <p class="app-text-muted mb-0">
                 <a href="{{ route('groups.show', $group->slug) }}" class="text-decoration-none">
                     <i class="bi bi-arrow-left"></i> Back to {{ $group->name }}
                 </a>
@@ -35,7 +35,7 @@
                     </div>
                     <div>
                         <h5 class="fw-bold mb-0">{{ $members->total() ?? $group->members_count }}</h5>
-                        <small class="text-muted">Total Members</small>
+                        <small class="app-text-muted">Total Members</small>
                     </div>
                 </div>
             </div>
@@ -48,7 +48,7 @@
                     </div>
                     <div>
                         <h5 class="fw-bold mb-0">{{ $admins->count() }}</h5>
-                        <small class="text-muted">Admins & Moderators</small>
+                        <small class="app-text-muted">Admins & Moderators</small>
                     </div>
                 </div>
             </div>
@@ -61,7 +61,7 @@
                     </div>
                     <div>
                         <h5 class="fw-bold mb-0">{{ $group->created_at->diffForHumans() }}</h5>
-                        <small class="text-muted">Group Age</small>
+                        <small class="app-text-muted">Group Age</small>
                     </div>
                 </div>
             </div>
@@ -74,7 +74,7 @@
                     </div>
                     <div>
                         <h5 class="fw-bold mb-0">{{ $group->posts_count }}</h5>
-                        <small class="text-muted">Total Posts</small>
+                        <small class="app-text-muted">Total Posts</small>
                     </div>
                 </div>
             </div>
@@ -99,14 +99,14 @@
                             class="rounded-circle me-3 border" style="width: 48px; height: 48px; object-fit: cover;">
                         <div>
                             <a href="{{ route('profile.show', $user->profile->username ?? $user->name) }}"
-                                class="text-decoration-none fw-semibold text-dark">
+                                class="text-decoration-none fw-semibold app-text-primary">
                                 {{ $user->profile->username ?? $user->name }}
                             </a>
                             <div class="d-flex align-items-center mt-1">
                                 <span class="badge bg-light text-dark me-2">
                                     <i class="bi bi-envelope"></i> {{ $user->email }}
                                 </span>
-                                <small class="text-muted">
+                                <small class="app-text-muted">
                                     <i class="bi bi-clock"></i> Requested {{ $user->pivot->created_at->diffForHumans()
                                     }}
                                 </small>
@@ -151,14 +151,14 @@
             <div class="row g-3">
                 @foreach($admins as $admin)
                 <div class="col-md-6">
-                    <div class="d-flex align-items-center p-3 bg-light rounded-3">
+                    <div class="d-flex align-items-center p-3 app-bg-secondary rounded-3">
                         <img src="{{ $admin->profile->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($admin->name) }}"
                             class="rounded-circle me-3 border" style="width: 56px; height: 56px; object-fit: cover;">
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
                                     <a href="{{ route('profile.show', $admin->profile->username ?? $admin->name) }}"
-                                        class="text-decoration-none fw-semibold text-dark">
+                                        class="text-decoration-none fw-semibold app-text-primary">
                                         {{ $admin->profile->username ?? $admin->name }}
                                     </a>
                                     <span
@@ -171,7 +171,7 @@
                                         ⚔️ Moderator
                                         @endif
                                     </span>
-                                    <small class="d-block text-muted mt-1">
+                                    <small class="d-block app-text-muted mt-1">
                                         <i class="bi bi-calendar3"></i> Joined {{
                                         \Carbon\Carbon::parse($admin->pivot->joined_at)->format('M d, Y') }}
                                     </small>
@@ -179,7 +179,7 @@
                                 @if($group->canManage(auth()->user()) && $admin->id !== $group->owner_id && $admin->id
                                 !== auth()->id())
                                 <div class="dropdown">
-                                    <button class="btn btn-link text-dark p-0" data-bs-toggle="dropdown">
+                                    <button class="btn btn-link text-dark p-0" data-bs-toggle="dropdown" aria-label="Member options">
                                         <i class="bi bi-three-dots-vertical"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end shadow-sm">
@@ -284,7 +284,7 @@
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
                                     <a href="{{ route('profile.show', $member->profile->username ?? $member->name) }}"
-                                        class="text-decoration-none fw-semibold text-dark">
+                                        class="text-decoration-none fw-semibold app-text-primary">
                                         {{ $member->profile->username ?? $member->name }}
                                     </a>
                                     <span class="badge bg-light text-dark ms-2">
@@ -298,7 +298,7 @@
                                         👤 Member
                                         @endif
                                     </span>
-                                    <small class="d-block text-muted">
+                                    <small class="d-block app-text-muted">
                                         <i class="bi bi-calendar3"></i> Joined {{
                                         \Carbon\Carbon::parse($member->pivot->joined_at)->format('M d, Y') }}
                                     </small>
@@ -306,7 +306,7 @@
                                 @if($group->canManage(auth()->user()) && $member->id !== $group->owner_id && $member->id
                                 !== auth()->id())
                                 <div class="dropdown">
-                                    <button class="btn btn-link text-dark p-0" data-bs-toggle="dropdown">
+                                    <button class="btn btn-link text-dark p-0" data-bs-toggle="dropdown" aria-label="Member options">
                                         <i class="bi bi-three-dots-vertical"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end shadow-sm">
@@ -377,11 +377,11 @@
                 @empty
                 <div class="col-12">
                     <div class="text-center py-5">
-                        <div class="bg-light rounded-circle d-inline-flex p-4 mb-3">
-                            <i class="bi bi-people text-muted fs-1"></i>
+                        <div class="app-bg-secondary rounded-circle d-inline-flex p-4 mb-3">
+                            <i class="bi bi-people app-text-muted fs-1"></i>
                         </div>
                         <h5 class="fw-semibold mb-2">No members yet</h5>
-                        <p class="text-muted mb-0">Be the first to join this group!</p>
+                        <p class="app-text-muted mb-0">Be the first to join this group!</p>
                     </div>
                 </div>
                 @endforelse

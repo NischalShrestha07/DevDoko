@@ -12,7 +12,7 @@
                 <i class="bi bi-fire me-2 text-danger"></i>
                 Trending Groups
             </h4>
-            <p class="text-muted mb-0">
+            <p class="app-text-muted mb-0">
                 <a href="{{ route('groups.index') }}" class="text-decoration-none">
                     <i class="bi bi-arrow-left"></i> Back to All Groups
                 </a>
@@ -55,20 +55,20 @@
 
                 <div class="card-body text-center pt-5 pb-3">
                     <h6 class="fw-semibold mb-1">
-                        <a href="{{ route('groups.show', $group->slug) }}" class="text-dark text-decoration-none">
+                        <a href="{{ route('groups.show', $group->slug) }}" class="app-text-primary text-decoration-none">
                             {{ $group->name }}
                         </a>
                     </h6>
 
-                    <span class="badge bg-light text-dark mb-2">
+                    <span class="badge app-bg-secondary app-text-primary mb-2">
                         {{ $group->privacy_label }}
                     </span>
 
-                    <p class="small text-muted mb-2">
+                    <p class="small app-text-muted mb-2">
                         {{ Str::limit($group->description, 80) }}
                     </p>
 
-                    <div class="d-flex justify-content-between align-items-center small text-muted">
+                    <div class="d-flex justify-content-between align-items-center small app-text-muted">
                         <span><i class="bi bi-people"></i> {{ $group->members_count }} members</span>
                         <span><i class="bi bi-chat"></i> {{ $group->posts_count }} posts</span>
                     </div>
@@ -108,11 +108,11 @@
     </div>
     @else
     <div class="text-center py-5">
-        <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
+        <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
             <i class="bi bi-fire text-danger" style="font-size: 48px;"></i>
         </div>
         <h5 class="fw-semibold mb-2">No trending groups right now</h5>
-        <p class="text-muted mb-4">Check back later or explore all groups.</p>
+        <p class="app-text-muted mb-4">Check back later or explore all groups.</p>
         <a href="{{ route('groups.index') }}" class="btn btn-primary">
             <i class="bi bi-people me-2"></i> Browse All Groups
         </a>

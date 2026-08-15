@@ -85,6 +85,11 @@ class Group extends Model
         return $this->hasMany(GroupPost::class)->orderBy('created_at', 'desc');
     }
 
+    public function reports()
+    {
+        return $this->morphMany(Report::class, 'reportable');
+    }
+
     public function pinnedPosts()
     {
         return $this->hasMany(GroupPost::class)

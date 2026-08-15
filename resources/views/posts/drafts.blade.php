@@ -28,11 +28,11 @@
     </div>
     @else
     <div class="text-center py-5">
-        <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
+        <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
             <i class="bi bi-file-earmark-lock text-primary" style="font-size: 48px;"></i>
         </div>
         <h5 class="fw-semibold mb-2">No private posts yet</h5>
-        <p class="text-muted mb-4">Posts you mark as private will show up here.</p>
+        <p class="app-text-muted mb-4">Posts you mark as private will show up here.</p>
         <a href="{{ route('posts.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-lg me-2"></i> Create Post
         </a>

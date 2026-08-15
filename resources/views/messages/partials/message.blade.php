@@ -26,17 +26,17 @@ $isDocument = in_array($fileExtension, ['doc', 'docx', 'txt', 'md', 'rtf']);
         <div class="flex-grow-1">
             <!-- Reply indicator -->
             @if($message->replyTo)
-            <div class="mb-1 p-2 bg-light rounded-3 small" style="border-left: 3px solid #0d6efd;">
-                <span class="text-muted">Replying to</span>
+            <div class="mb-1 p-2 app-bg-secondary rounded-3 small" style="border-left: 3px solid #0d6efd;">
+                <span class="app-text-muted">Replying to</span>
                 <span class="fw-semibold">{{ $message->replyTo->sender->profile->username }}</span>
-                <p class="text-muted mb-0 text-truncate" style="max-width: 200px;">
+                <p class="app-text-muted mb-0 text-truncate" style="max-width: 200px;">
                     {{ Str::limit($message->replyTo->content, 50) }}
                 </p>
             </div>
             @endif
 
             <!-- Message bubble -->
-            <div class="rounded-4 p-3 {{ $isOwn ? 'bg-primary text-white' : 'bg-light' }}"
+            <div class="rounded-4 p-3 {{ $isOwn ? 'bg-primary text-white' : 'app-bg-secondary' }}"
                 style="word-wrap: break-word;">
 
                 @if($isCode)
@@ -119,7 +119,7 @@ $isDocument = in_array($fileExtension, ['doc', 'docx', 'txt', 'md', 'rtf']);
                                 <i class="bi bi-file-pdf fs-1 text-danger"></i>
                             </div>
                             <div class="flex-grow-1">
-                                <h6 class="fw-semibold text-dark mb-1">{{ $message->file_name }}</h6>
+                                <h6 class="fw-semibold app-text-primary mb-1">{{ $message->file_name }}</h6>
                                 <div class="mt-2">
                                     <a href="{{ $message->file_url }}" target="_blank"
                                         class="btn btn-sm btn-outline-primary me-2">
@@ -199,7 +199,7 @@ $isDocument = in_array($fileExtension, ['doc', 'docx', 'txt', 'md', 'rtf']);
             <!-- Message metadata -->
             <div
                 class="d-flex align-items-center gap-2 mt-1 {{ $isOwn ? 'justify-content-end' : 'justify-content-start' }}">
-                <small class="text-muted">{{ $message->created_at->format('g:i A') }}</small>
+                <small class="app-text-muted">{{ $message->created_at->format('g:i A') }}</small>
 
                 @if($isOwn)
                 @if($message->read_at)

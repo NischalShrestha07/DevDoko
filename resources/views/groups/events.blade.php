@@ -12,7 +12,7 @@
                 <i class="bi bi-calendar-event me-2 text-primary"></i>
                 Events
             </h4>
-            <p class="text-muted mb-0">
+            <p class="app-text-muted mb-0">
                 <a href="{{ route('groups.show', $group->slug) }}" class="text-decoration-none">
                     <i class="bi bi-arrow-left"></i> Back to {{ $group->name }}
                 </a>
@@ -56,13 +56,13 @@
 
                     <!-- Date -->
                     <div class="d-flex align-items-center mb-3">
-                        <div class="bg-light rounded-3 p-3 text-center me-3" style="min-width: 70px;">
-                            <div class="small text-muted">{{ $event->starts_at->format('M') }}</div>
+                        <div class="app-bg-secondary rounded-3 p-3 text-center me-3" style="min-width: 70px;">
+                            <div class="small app-text-muted">{{ $event->starts_at->format('M') }}</div>
                             <div class="fs-3 fw-bold">{{ $event->starts_at->format('d') }}</div>
                         </div>
                         <div>
                             <h5 class="fw-semibold mb-1">{{ $event->title }}</h5>
-                            <div class="small text-muted">
+                            <div class="small app-text-muted">
                                 <i class="bi bi-clock"></i> {{ $event->starts_at->format('g:i A') }}
                                 @if($event->ends_at)
                                 - {{ $event->ends_at->format('g:i A') }}
@@ -72,13 +72,13 @@
                     </div>
 
                     <!-- Description -->
-                    <p class="text-muted small mb-3">
+                    <p class="app-text-muted small mb-3">
                         {{ Str::limit($event->description, 100) }}
                     </p>
 
                     <!-- Location/Meeting Info -->
                     @if($event->format !== 'online' && $event->location)
-                    <div class="d-flex align-items-center small text-muted mb-2">
+                    <div class="d-flex align-items-center small app-text-muted mb-2">
                         <i class="bi bi-geo-alt me-2"></i>
                         {{ $event->location }}
                     </div>
@@ -96,7 +96,7 @@
                     <!-- Attendees & Actions -->
                     <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
                         <div>
-                            <span class="small text-muted">
+                            <span class="small app-text-muted">
                                 <i class="bi bi-people"></i>
                                 {{ $event->attendees_count ?? 0 }}/{{ $event->max_attendees ?? '∞' }} attending
                             </span>
@@ -132,7 +132,7 @@
                     <div class="d-flex align-items-center mt-3">
                         <img src="{{ $event->user->profile->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($event->user->name) }}"
                             class="rounded-circle me-2" style="width: 24px; height: 24px; object-fit: cover;">
-                        <small class="text-muted">
+                        <small class="app-text-muted">
                             Organized by
                             <a href="{{ route('profile.show', $event->user->profile->username ?? $event->user->name) }}"
                                 class="text-decoration-none fw-semibold">
@@ -151,11 +151,11 @@
     </div>
     @else
     <div class="text-center py-5">
-        <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
+        <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
             <i class="bi bi-calendar-x text-primary" style="font-size: 48px;"></i>
         </div>
         <h5 class="fw-semibold mb-2">No events yet</h5>
-        <p class="text-muted mb-4">Be the first to organize an event for this group!</p>
+        <p class="app-text-muted mb-4">Be the first to organize an event for this group!</p>
         @if($group->is_member)
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEventModal">
             <i class="bi bi-plus-lg"></i> Create Event
