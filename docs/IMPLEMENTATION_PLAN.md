@@ -36,6 +36,18 @@ Turns out most of the backend already existed, just unreachable — same pattern
   - No reading-feed weighting that prioritizes articles from people you follow over short posts.
   - No claps (separate from likes) on articles specifically — likes work today, claps would be new UI/UX, low priority.
 
+## Post-audit fix — privacy leak (commit 7e9cb51)
+Found while building Phase 2, more severe than anything in the original audit:
+`ProfileController::show()` listed a user's posts with **zero visibility
+filtering**, and `profile.show` has no auth middleware — any visitor, logged
+in or not, could see another user's private/draft posts by opening their
+profile. Same gap existed in `HomeController`'s Trending sidebar query and
+`TagController::show()` (partial — only checked `visibility=public`, missed
+blocked-user gating). All three now use `Post::visibleTo()`. Also deleted
+`PostService`/`FeedService` — dead code, zero references, and both had the
+same missing-filter bug plus a broken `orWhere` in `FeedService` that
+ignored its own following-filter.
+
 ## Phase 3 — Publishing growth (after Phase 2 ships and is used)
 - Real email delivery (`MAIL_MAILER` off `log`) + queued digest mail for new articles.
 - Author analytics (views, read time, subscriber growth).
