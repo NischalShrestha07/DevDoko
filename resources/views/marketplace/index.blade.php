@@ -127,8 +127,19 @@
                         <a href="{{ route('marketplace.index') }}" class="btn btn-outline-secondary w-100 mt-2">
                             Clear Filters
                         </a>
+                        @auth
+                        <button type="button" id="saveSearchBtn" class="btn btn-outline-primary w-100 mt-2">
+                            <i class="bi bi-bookmark-plus me-1"></i> Save This Search
+                        </button>
+                        @endauth
                         @endif
                     </form>
+
+                    @auth
+                    <a href="{{ route('marketplace.saved-searches.index') }}" class="btn btn-link w-100 mt-2 px-0">
+                        <i class="bi bi-search-heart me-1"></i> View Saved Searches
+                    </a>
+                    @endauth
                 </div>
             </div>
         </div>
@@ -259,6 +270,38 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    const saveSearchBtn = document.getElementById('saveSearchBtn');
+    if (saveSearchBtn) {
+        saveSearchBtn.addEventListener('click', async function () {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const payload = {
+                    search: params.get('search') || undefined,
+                    category: params.get('category') || undefined,
+                    min_price: params.get('min_price') || undefined,
+                    max_price: params.get('max_price') || undefined,
+                    sort: params.get('sort') || undefined,
+                    condition: params.getAll('condition[]'),
+                };
+
+                const response = await fetch('{{ route('marketplace.saved-searches.store') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                alert(data.message || (data.success ? 'Search saved!' : 'Could not save search.'));
+            } catch (error) {
+                console.error('Error saving search:', error);
+            }
+        });
+    }
 });
 </script>
 @endsection

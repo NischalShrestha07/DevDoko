@@ -7,10 +7,12 @@ namespace App\Http\Controllers;
 use App\Models\MarketplaceInterest;
 use App\Models\MarketplaceListing;
 use App\Models\MarketplaceListingImage;
+use App\Models\MarketplaceSavedSearch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class MarketplaceController extends Controller
 {
@@ -560,20 +562,30 @@ class MarketplaceController extends Controller
     public function saveSearch(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'keyword' => 'nullable|string|max:255',
+            'search' => 'nullable|string|max:255',
             'category' => 'nullable|string|max:100',
             'min_price' => 'nullable|numeric|min:0',
             'max_price' => 'nullable|numeric|min:0',
-            'condition' => 'nullable|string|max:50',
+            'condition' => 'nullable|array',
+            'condition.*' => 'string|max:50',
+            'sort' => 'nullable|string|max:50',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        $filters = array_filter($validator->validated(), fn ($value) => $value !== null && $value !== '' && $value !== []);
+
+        if (empty($filters)) {
+            return response()->json(['success' => false, 'message' => 'Add at least one filter before saving a search.'], 422);
+        }
+
+        $name = Str::limit($filters['search'] ?? $filters['category'] ?? 'Custom search', 60);
+
         $search = Auth::user()->savedMarketplaceSearches()->create([
-            'filters' => $validator->validated(),
-            'user_id' => Auth::id(),
+            'name' => $name,
+            'filters' => $filters,
         ]);
 
         return response()->json([
@@ -581,6 +593,28 @@ class MarketplaceController extends Controller
             'message' => 'Search saved successfully!',
             'search' => $search,
         ]);
+    }
+
+    /**
+     * List the current user's saved searches.
+     */
+    public function savedSearches()
+    {
+        $searches = Auth::user()->savedMarketplaceSearches()->latest()->paginate(20);
+
+        return view('marketplace.saved-searches', compact('searches'));
+    }
+
+    /**
+     * Delete a saved search.
+     */
+    public function destroySavedSearch(MarketplaceSavedSearch $savedSearch)
+    {
+        abort_unless($savedSearch->user_id === Auth::id(), 403);
+
+        $savedSearch->delete();
+
+        return back()->with('success', 'Saved search removed.');
     }
 
     public function toggleSaveById($id)

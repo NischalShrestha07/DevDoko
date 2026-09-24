@@ -245,7 +245,9 @@ Route::middleware(['auth', 'throttle:60,1'])->group(function () {
             Route::post('/interests/{interest}/respond', [MarketplaceController::class, 'respondToInterest'])->name('interests.respond');
 
             // Saved searches
+            Route::get('/saved-searches', [MarketplaceController::class, 'savedSearches'])->name('saved-searches.index');
             Route::post('/saved-searches', [MarketplaceController::class, 'saveSearch'])->name('saved-searches.store');
+            Route::delete('/saved-searches/{savedSearch}', [MarketplaceController::class, 'destroySavedSearch'])->name('saved-searches.destroy');
         });
 
         // Public — registered last so literal segments above (create, my-listings,
