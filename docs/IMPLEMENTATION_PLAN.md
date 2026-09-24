@@ -61,13 +61,16 @@ for all four.
   drop migration; run both together, back up first.
 - Kept: Posts/Articles, Follow, Messages, Notifications, Explore, Profile,
   Projects (portfolio, unrelated to the removed Jobs board), Search, Admin/Reports.
-- **UI retheme in progress** (dev-agent:frontend-developer): retheme the existing
-  `data-bs-theme="dark"` system in `resources/css/app.css` from its GitHub-ish
-  purple/blue palette to Substack's near-black + `#FF6719` orange, make dark the
-  default, restructure left nav (Home/Subscriptions/Chat/Activity/Explore/Profile/
-  Create) to match, restyle the post card / chat / explore pages. No browser/
-  screenshot tool available in this environment — verification is compile +
-  structural only unless the agent found browser tooling itself.
+- **UI retheme — DONE (commit c63b410)**: `resources/css/app.css` retoned to
+  Substack's near-black (`#0f0f10` page / `#1a1a1a` cards) + `#FF6719` orange
+  accent, dark is now the default theme on load. Left nav rebuilt to
+  Home/Subscriptions/Chat/Activity/Explore/Profile/Create. New shared
+  `partials/right-sidebar.blade.php` (search + Subscriptions + Recommended)
+  on Home and Explore. Post cards, Messages, and Explore restyled to match.
+  No browser/screenshot tool available in this environment — verified by lint
+  + Blade compile + route-count-unchanged + a clean `vite build`, not real
+  visual QA. **Do an eyeball pass at desktop and mobile widths before
+  considering this fully done** — spacing/responsive behavior unverified.
 
 ## Phase 3 — Publishing growth (after Phase 2 ships and is used)
 - Real email delivery (`MAIL_MAILER` off `log`) + queued digest mail for new articles.
