@@ -66,6 +66,12 @@
                         <i class="bi bi-compass fs-5 me-3"></i>
                         <span>Explore</span>
                     </a>
+                    <a href="{{ route('posts.index', ['type' => 'article']) }}"
+                        class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('posts.index') && request('type') === 'article' ? 'active' : '' }}">
+                        @if(request()->routeIs('posts.index') && request('type') === 'article')<span class="nav-active-indicator"></span>@endif
+                        <i class="bi bi-file-text fs-5 me-3"></i>
+                        <span>Articles</span>
+                    </a>
                     <a href="{{ route('jobs.index') }}"
                         class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('jobs.*') ? 'active' : '' }}">
                         @if(request()->routeIs('jobs.*'))<span class="nav-active-indicator"></span>@endif
