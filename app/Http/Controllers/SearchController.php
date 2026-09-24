@@ -23,6 +23,7 @@ class SearchController extends Controller
 
         $users = User::with('profile')
             ->whereHas('profile', fn ($q) => $q->where('username', 'LIKE', "%{$query}%"))
+            ->when(Auth::user(), fn ($q) => $q->whereNotIn('id', Auth::user()->hiddenUserIds()))
             ->limit(5)
             ->get()
             ->map(fn ($user) => [
@@ -45,9 +46,7 @@ class SearchController extends Controller
         $posts = Post::where(function ($q) use ($query) {
             $q->where('title', 'LIKE', "%{$query}%")->orWhere('content', 'LIKE', "%{$query}%");
         })
-            ->where(function ($q) {
-                $q->where('visibility', 'public')->orWhere('user_id', Auth::id());
-            })
+            ->visibleTo(Auth::user())
             ->latest()
             ->limit(5)
             ->get()
@@ -89,6 +88,7 @@ class SearchController extends Controller
                 ->whereHas('profile', function ($q) use ($query) {
                     $q->where('username', 'LIKE', "%{$query}%");
                 })
+                ->when(Auth::user(), fn ($q) => $q->whereNotIn('id', Auth::user()->hiddenUserIds()))
                 ->paginate(10);
         }
 
@@ -98,10 +98,7 @@ class SearchController extends Controller
                 $q->where('title', 'LIKE', "%{$query}%")
                     ->orWhere('content', 'LIKE', "%{$query}%");
             })
-                ->where(function ($q) {
-                    $q->where('visibility', 'public')
-                        ->orWhere('user_id', Auth::id());
-                })
+                ->visibleTo(Auth::user())
                 ->with('user.profile')
                 ->paginate(10);
         }

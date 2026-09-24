@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use App\Models\User;
 use App\Models\Tag;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 
 class ExploreController extends Controller
 {
@@ -17,7 +17,7 @@ class ExploreController extends Controller
 
         // Trending Posts (most liked in last 7 days)
         $trendingPosts = Post::with(['user.profile', 'tags'])
-            ->where('visibility', 'public')
+            ->visibleTo($request->user())
             ->where('created_at', '>=', Carbon::now()->subDays(7))
             ->withCount(['likes', 'comments'])
             ->orderByRaw('(likes_count * 2 + comments_count) DESC')
@@ -26,7 +26,7 @@ class ExploreController extends Controller
 
         // Latest Posts
         $latestPosts = Post::with(['user.profile', 'tags'])
-            ->where('visibility', 'public')
+            ->visibleTo($request->user())
             ->latest()
             ->take(12)
             ->get();
@@ -34,7 +34,7 @@ class ExploreController extends Controller
         // Popular Developers (most followers)
         $popularDevelopers = User::with('profile')
             ->whereHas('profile')
-            // ->where('is_active', true)
+            ->when($request->user(), fn ($q) => $q->whereNotIn('id', $request->user()->hiddenUserIds()))
             ->withCount(['followers', 'posts'])
             ->orderBy('followers_count', 'desc')
             ->take(12)
@@ -71,13 +71,13 @@ class ExploreController extends Controller
             END as keyword")
             ->where(function ($q) {
                 $q->where('name', 'like', '%laravel%')
-                  ->orWhere('name', 'like', '%react%')
-                  ->orWhere('name', 'like', '%vue%')
-                  ->orWhere('name', 'like', '%javascript%')
-                  ->orWhere('name', 'like', '%python%')
-                  ->orWhere('name', 'like', '%node%')
-                  ->orWhere('name', 'like', '%docker%')
-                  ->orWhere('name', 'like', '%aws%');
+                    ->orWhere('name', 'like', '%react%')
+                    ->orWhere('name', 'like', '%vue%')
+                    ->orWhere('name', 'like', '%javascript%')
+                    ->orWhere('name', 'like', '%python%')
+                    ->orWhere('name', 'like', '%node%')
+                    ->orWhere('name', 'like', '%docker%')
+                    ->orWhere('name', 'like', '%aws%');
             })
             ->groupBy('keyword')
             ->pluck('count', 'keyword');
@@ -85,6 +85,7 @@ class ExploreController extends Controller
         $techTopics = array_map(function ($topic) use ($topicCounts) {
             $topic['count'] = $topicCounts[$topic['keyword']] ?? 0;
             $topic['slug'] = Str::slug($topic['name']);
+
             return $topic;
         }, $topicKeywords);
 

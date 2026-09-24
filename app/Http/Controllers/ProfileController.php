@@ -171,7 +171,7 @@ class ProfileController extends Controller
             return response()->json(['following' => $following]);
         }
 
-        return view('profiles.following', compact('user', 'following'));
+        return view('follow.following', compact('user', 'following'));
     }
 
     /**

@@ -81,7 +81,7 @@
                     @if($listing->user_id !== auth()->id())
                     <div class="d-grid gap-2 mb-4">
                         <button class="btn btn-primary btn-lg" id="expressInterestBtn"
-                            onclick="showInterestModal({{ $listing->id }}, '{{ $listing->slug }}', '{!! addslashes($listing->title) !!}')">
+                            onclick="showInterestModal({{ $listing->id }}, @js($listing->slug), @js($listing->title))">
                             <i class="bi bi-chat-dots me-2"></i> Express Interest
                         </button>
                         <button class="btn btn-outline-primary save-listing-btn w-100"

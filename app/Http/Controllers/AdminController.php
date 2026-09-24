@@ -37,9 +37,10 @@ class AdminController extends Controller
 
     public function resolveReport(Report $report)
     {
+        $report->reportable?->delete();
         $report->update(['status' => 'resolved']);
 
-        return back()->with('success', 'Report marked as resolved.');
+        return back()->with('success', 'Report resolved — content removed.');
     }
 
     public function dismissReport(Report $report)
