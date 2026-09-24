@@ -472,6 +472,17 @@ class PostController extends Controller
 
         $post->update(['visibility' => 'public']);
 
+        try {
+            $mentioned = ContentParser::mentionedUsers($post->content, Auth::id());
+            if ($mentioned->isNotEmpty()) {
+                app(NotificationService::class)
+                    ->mentionNotification(Auth::user(), $mentioned, ['post_id' => $post->id]);
+            }
+            $this->notifyFollowers($post);
+        } catch (\Exception $e) {
+            Log::error('Publish notifications failed', ['error' => $e->getMessage()]);
+        }
+
         return redirect()->route('posts.show', $post)
             ->with('success', 'Post published successfully!');
     }

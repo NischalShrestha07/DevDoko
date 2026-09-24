@@ -308,7 +308,7 @@
                                             <h6 class="mb-1">
                                                 <i class="bi bi-lock text-danger"></i> Private
                                             </h6>
-                                            <p class="app-text-muted small mb-0">Only you can see this post</p>
+                                            <p class="app-text-muted small mb-0">Only you can see this post — use this to save a draft, publish it later from <a href="{{ route('posts.drafts') }}">My Drafts</a></p>
                                         </div>
                                     </label>
                                 </div>

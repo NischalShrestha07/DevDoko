@@ -93,6 +93,12 @@
                         <i class="bi bi-plus-square{{ request()->routeIs('posts.create') ? '-fill' : '' }} fs-5 me-3"></i>
                         <span>Create</span>
                     </a>
+                    <a href="{{ route('posts.drafts') }}"
+                        class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('posts.drafts') ? 'active' : '' }}">
+                        @if(request()->routeIs('posts.drafts'))<span class="nav-active-indicator"></span>@endif
+                        <i class="bi bi-file-earmark-lock{{ request()->routeIs('posts.drafts') ? '-fill' : '' }} fs-5 me-3"></i>
+                        <span>My Drafts</span>
+                    </a>
                     <a href="{{ route('developers.index') }}"
                         class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('developers.*') ? 'active' : '' }}">
                         @if(request()->routeIs('developers.*'))<span class="nav-active-indicator"></span>@endif
