@@ -1,8 +1,8 @@
 # DevDoko — Implementation Plan
 
-Laravel 12 dev-social platform. Started as capstone project, pivoting toward
-Substack-for-developers: writing/publishing + follow/subscribe, kept alongside
-existing social features (posts, groups, marketplace, jobs, messaging).
+Laravel 12 dev-social platform. Started as capstone project, pivoted (2026-09-24)
+to a focused Substack-for-developers scope: writing/publishing, follow, messaging,
+explore. Marketplace/Jobs/Groups/Stories were removed entirely — see Phase 2b.
 
 Full audit: see git log / PR history for `devdoko-audit` findings (2026-09-24).
 Verdict: core CRUD/authz/data-layer is solid (no mass-assignment, no N+1, no
@@ -47,6 +47,27 @@ blocked-user gating). All three now use `Post::visibleTo()`. Also deleted
 `PostService`/`FeedService` — dead code, zero references, and both had the
 same missing-filter bug plus a broken `orWhere` in `FeedService` that
 ignored its own following-filter.
+
+## Phase 2b — Scope cut + UI overhaul to match Substack (commit b8d0c75, in progress)
+User supplied 4 reference screenshots of Substack's actual UI and asked to match
+it, removing anything not in that IA. Confirmed via AskUserQuestion: hard delete
+(not soft-hide) for the removed features, since real DB tables already existed
+for all four.
+- **Removed entirely**: Marketplace, Jobs, Groups, Stories. 8 controllers, 20
+  models, 1 policy, 1 mailable, 2 console commands, 2 seeders, every view under
+  `groups/`, `jobs/`, `marketplace/`, `stories/`. Routes 205 → 102. Migration
+  `2026_09_24_191116_drop_groups_jobs_marketplace_stories_tables.php` drops all
+  23 backing tables — **not run yet**, same sandbox restriction as the Phase 1
+  drop migration; run both together, back up first.
+- Kept: Posts/Articles, Follow, Messages, Notifications, Explore, Profile,
+  Projects (portfolio, unrelated to the removed Jobs board), Search, Admin/Reports.
+- **UI retheme in progress** (dev-agent:frontend-developer): retheme the existing
+  `data-bs-theme="dark"` system in `resources/css/app.css` from its GitHub-ish
+  purple/blue palette to Substack's near-black + `#FF6719` orange, make dark the
+  default, restructure left nav (Home/Subscriptions/Chat/Activity/Explore/Profile/
+  Create) to match, restyle the post card / chat / explore pages. No browser/
+  screenshot tool available in this environment — verification is compile +
+  structural only unless the agent found browser tooling itself.
 
 ## Phase 3 — Publishing growth (after Phase 2 ships and is used)
 - Real email delivery (`MAIL_MAILER` off `log`) + queued digest mail for new articles.
