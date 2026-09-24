@@ -35,6 +35,10 @@ class MarketplaceListing extends Model
         'status',
         'interested_count',
         'expires_at',
+        'metadata',
+        'is_featured',
+        'is_boosted',
+        'boosted_until',
     ];
 
     protected $casts = [

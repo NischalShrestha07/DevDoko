@@ -46,6 +46,7 @@ class Post extends Model
         'comments_count' => 'integer',
         'shares_count' => 'integer',
         'reading_time' => 'integer',
+        'share_details' => 'array',
     ];
 
     protected $appends = [

@@ -520,7 +520,7 @@ class PostController extends Controller
         ];
 
         // Store original post details for better display
-        $sharedPostData['share_details'] = json_encode([
+        $sharedPostData['share_details'] = [
             'original_post_id' => $post->id,
             'original_post_type' => $post->type,
             'original_user_id' => $post->user_id,
@@ -537,7 +537,7 @@ class PostController extends Controller
             'original_video_url' => $originalVideoUrl, // Also store URL for direct access
             'original_created_at' => $post->created_at->toISOString(),
             'tags' => $post->tags->pluck('name')->toArray(),
-        ], JSON_UNESCAPED_SLASHES);
+        ];
 
         // Create shared post
         $sharedPost = Post::create($sharedPostData);

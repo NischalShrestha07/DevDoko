@@ -72,7 +72,7 @@ Route::middleware('guest')->group(function () {
 });
 
 // Authenticated routes
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'throttle:60,1'])->group(function () {
     // Logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
@@ -155,6 +155,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/messages/{user}', [MessageController::class, 'show'])->name('messages.show');
     Route::post('/messages/{user}', [MessageController::class, 'store'])->name('messages.store');
     Route::get('/messages/search/all', [MessageController::class, 'search'])->name('messages.search');
+    Route::get('/messages/unread/count', [MessageController::class, 'unreadCount'])->name('messages.unread-count');
     Route::post('/messages/{message}/star', [MessageController::class, 'toggleStar'])->name('messages.star');
     Route::delete('/messages/{message}', [MessageController::class, 'destroy'])->name('messages.destroy');
     Route::post('/messages/{user}/read', [MessageController::class, 'markAsRead'])->name('messages.read');
@@ -196,6 +197,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
     Route::post('/projects/{project}/fork', [ProjectController::class, 'fork'])->name('projects.fork');
+    Route::post('/projects/{project}/like', [ProjectController::class, 'toggleLike'])->name('projects.like');
     Route::post('/projects/{project}/collaboration', [ProjectController::class, 'requestCollaboration'])->name('projects.request.collaboration');
     Route::post('/projects/collaborations/{collaboration}/approve', [ProjectController::class, 'approveCollaboration'])->name('projects.collaboration.approve');
     Route::post('/projects/collaborations/{collaboration}/reject', [ProjectController::class, 'rejectCollaboration'])->name('projects.collaboration.reject');
@@ -294,6 +296,13 @@ Route::middleware('auth')->group(function () {
 
         // Invitations
         Route::post('/invite', [GroupController::class, 'invite'])->name('groups.invite');
+        Route::post('/invitations/{invitation}/resend', [GroupController::class, 'resendInvitation'])->name('groups.invitations.resend');
+        Route::delete('/invitations/{invitation}', [GroupController::class, 'cancelInvitation'])->name('groups.invitations.cancel');
+
+        // Settings
+        Route::put('/settings/general', [GroupController::class, 'updateGeneralSettings'])->name('groups.settings.general');
+        Route::put('/settings/permissions', [GroupController::class, 'updatePermissions'])->name('groups.settings.permissions');
+        Route::post('/transfer-ownership', [GroupController::class, 'transferOwnership'])->name('groups.transfer-ownership');
 
         // Posts
         Route::post('/posts', [GroupController::class, 'storePost'])->name('groups.posts.store')->middleware('throttle:10,1');
