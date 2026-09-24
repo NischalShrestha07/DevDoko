@@ -77,7 +77,8 @@ class HomeController extends Controller
             })->count(),
         ];
 
-        $trendingPosts = Post::where('created_at', '>=', Carbon::now()->subDays(7))
+        $trendingPosts = Post::visibleTo($user)
+            ->where('created_at', '>=', Carbon::now()->subDays(7))
             ->with('user.profile')
             ->withCount(['likes', 'comments', 'saves'])
             ->orderByRaw('(likes_count * 3 + comments_count * 2 + views_count) DESC')

@@ -26,6 +26,7 @@ class ProfileController extends Controller
 
         // Get user's posts with proper eager loading
         $posts = $profile->user->posts()
+            ->visibleTo(Auth::user())
             ->with(['likes', 'comments', 'tags', 'media', 'user.profile'])
             ->withCount(['likes', 'comments', 'saves'])
             ->latestStable()

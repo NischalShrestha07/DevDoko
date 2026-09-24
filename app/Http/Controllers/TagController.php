@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\TechTag;
+use Illuminate\Support\Facades\Auth;
 
 class TagController extends Controller
 {
@@ -14,7 +15,7 @@ class TagController extends Controller
             ->whereHas('tags', function ($query) use ($tag) {
                 $query->where('tags.id', $tag->id);
             })
-            ->where('visibility', 'public')
+            ->visibleTo(Auth::user())
             ->latestStable()
             ->paginate(12);
 
