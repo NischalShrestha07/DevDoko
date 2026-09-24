@@ -89,13 +89,18 @@ class ExploreController extends Controller
             return $topic;
         }, $topicKeywords);
 
+        $rightSidebarFollowing = $request->user()
+            ? $request->user()->following()->with('profile')->limit(10)->get()
+            : collect();
+
         return view('explore.index', compact(
             'trendingPosts',
             'latestPosts',
             'popularDevelopers',
             'popularTags',
             'techTopics',
-            'type'
+            'type',
+            'rightSidebarFollowing'
         ));
     }
 }

@@ -182,6 +182,7 @@ class HomeController extends Controller
                 ->orderBy('posts_count', 'desc')
                 ->limit(12)
                 ->get(),
+            'rightSidebarFollowing' => $user->following()->with('profile')->limit(10)->get(),
         ];
     }
 }

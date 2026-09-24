@@ -9,19 +9,15 @@
         <!-- Left Sidebar - Conversations -->
         <div class="col-lg-4 col-xl-3">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="fw-semibold mb-0">
-                        <i class="bi bi-chat-dots text-primary"></i>
-                        Messages
-                    </h5>
-                    <div class="d-flex gap-2">
-                        {{-- <span class="badge bg-primary rounded-pill px-3 py-2">
-                            {{ $conversations->count() }} chats
-                        </span> --}}
-                        <a href="{{ route('developers.index') }}"
-                            class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                            <i class="bi bi-plus-lg me-1"></i>
-                            New Chat
+                <div class="card-header bg-transparent border-0 pt-3 pb-2 px-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="input-group input-group-sm flex-grow-1">
+                            <span class="input-group-text app-input-icon border-0"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control app-search-input border-0" id="chatSearchInput"
+                                placeholder="Search chats" autocomplete="off" style="border-radius: 10px;">
+                        </div>
+                        <a href="{{ route('developers.index') }}" class="app-icon-btn border-0 flex-shrink-0" title="New chat" style="border-radius: 10px;">
+                            <i class="bi bi-pencil-square"></i>
                         </a>
                     </div>
                 </div>
@@ -30,19 +26,19 @@
                 <div class="px-3 pb-2 border-bottom">
                     <div class="btn-group w-100" role="group">
                         <a href="{{ route('messages.index', ['filter' => 'all']) }}"
-                            class="btn btn-sm {{ $filter === 'all' ? 'btn-primary' : 'btn-outline-secondary' }}">
+                            class="btn btn-sm {{ $filter === 'all' ? 'btn-accent' : 'btn-outline-secondary' }}">
                             All
                         </a>
                         <a href="{{ route('messages.index', ['filter' => 'unread']) }}"
-                            class="btn btn-sm {{ $filter === 'unread' ? 'btn-primary' : 'btn-outline-secondary' }}">
+                            class="btn btn-sm {{ $filter === 'unread' ? 'btn-accent' : 'btn-outline-secondary' }}">
                             Unread
                             @php $totalUnread = $conversations->sum('unread_count'); @endphp
                             @if($totalUnread > 0)
-                            <span class="badge bg-danger ms-1">{{ $totalUnread }}</span>
+                            <span class="app-nav-badge ms-1">{{ $totalUnread }}</span>
                             @endif
                         </a>
                         <a href="{{ route('messages.index', ['filter' => 'code']) }}"
-                            class="btn btn-sm {{ $filter === 'code' ? 'btn-primary' : 'btn-outline-secondary' }}">
+                            class="btn btn-sm {{ $filter === 'code' ? 'btn-accent' : 'btn-outline-secondary' }}">
                             <i class="bi bi-code-slash me-1"></i> Code
                         </a>
                     </div>
@@ -56,22 +52,25 @@
                         class="list-group-item list-group-item-action border-0 p-3 {{ request()->route('user')?->id === $conversation['user']->id ? 'active app-bg-secondary' : '' }}"
                         style="transition: all 0.2s;">
                         <div class="d-flex align-items-start gap-3">
-                            <!-- Avatar with online status -->
-                            <div class="position-relative">
+                            <!-- Avatar with unread + online status -->
+                            <div class="position-relative flex-shrink-0">
                                 <img src="{{ $conversation['user']->avatar_url }}"
-                                    alt="{{ $conversation['user']->name }}" class="rounded-circle border"
-                                    style="width: 56px; height: 56px; object-fit: cover;" loading="lazy">
+                                    alt="{{ $conversation['user']->name }}" class="rounded-circle"
+                                    style="width: 48px; height: 48px; object-fit: cover;" loading="lazy">
+                                @if($conversation['unread_count'] > 0)
+                                <span class="app-nav-badge position-absolute top-0 start-100 translate-middle" style="min-width: 10px; width: 10px; height: 10px; padding: 0;"></span>
+                                @endif
                                 @if($conversation['is_online'])
                                 <span
                                     class="position-absolute bottom-0 end-0 bg-success rounded-circle border border-2 border-white"
-                                    style="width: 14px; height: 14px;"></span>
+                                    style="width: 12px; height: 12px;"></span>
                                 @endif
                             </div>
 
                             <!-- Conversation Info -->
                             <div class="flex-grow-1 min-width-0">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <h6 class="fw-semibold mb-0 text-truncate">
+                                    <h6 class="fw-semibold mb-0 text-truncate app-text-primary">
                                         {{ $conversation['user']->profile->username ?? $conversation['user']->name }}
                                     </h6>
                                     <small class="app-text-muted flex-shrink-0 ms-2">
@@ -84,39 +83,19 @@
                                 @if($conversation['last_message'])
                                 <div class="d-flex align-items-center gap-2">
                                     @if($conversation['last_message']->type === 'code')
-                                    <span class="badge bg-dark text-white px-2 py-1" style="font-size: 11px;">
-                                        <i class="bi bi-code-slash me-1"></i> Code
-                                    </span>
+                                    <i class="bi bi-code-slash app-text-muted small"></i>
                                     @elseif($conversation['last_message']->type === 'file')
-                                    <span class="badge bg-info text-white px-2 py-1" style="font-size: 11px;">
-                                        <i class="bi bi-file-earmark me-1"></i> File
-                                    </span>
+                                    <i class="bi bi-file-earmark app-text-muted small"></i>
                                     @endif
 
-                                    <p class="mb-0 app-text-muted text-truncate small" style="max-width: 180px;">
+                                    <p class="mb-0 app-text-muted text-truncate small">
                                         @if($conversation['last_message']->sender_id === Auth::id())
-                                        <span class="text-secondary">You:</span>
+                                        <span>You:</span>
                                         @endif
                                         {{ Str::limit($conversation['last_message']->content, 30) }}
                                     </p>
                                 </div>
                                 @endif
-
-                                <!-- Meta Info -->
-                                <div class="d-flex align-items-center gap-2 mt-1">
-                                    @if($conversation['code_snippet_count'] > 0)
-                                    <span class="badge bg-dark-subtle text-dark px-2 py-1 rounded-pill"
-                                        style="font-size: 10px;">
-                                        <i class="bi bi-code-square me-1"></i> {{ $conversation['code_snippet_count'] }}
-                                    </span>
-                                    @endif
-
-                                    @if($conversation['unread_count'] > 0)
-                                    <span class="badge bg-danger rounded-pill px-2 py-1" style="font-size: 11px;">
-                                        {{ $conversation['unread_count'] }} new
-                                    </span>
-                                    @endif
-                                </div>
                             </div>
                         </div>
                     </a>
@@ -128,7 +107,7 @@
                         </div>
                         <h6 class="fw-semibold">No conversations yet</h6>
                         <p class="app-text-muted small mb-3">Start messaging other developers</p>
-                        <a href="{{ route('developers.index') }}" class="btn btn-primary btn-sm px-4 rounded-pill">
+                        <a href="{{ route('developers.index') }}" class="btn btn-accent btn-sm px-4 rounded-pill">
                             <i class="bi bi-people me-2"></i>Find Developers
                         </a>
                     </div>
@@ -145,25 +124,8 @@
             <div class="card border-0 shadow-sm h-100 d-flex align-items-center justify-content-center"
                 style="min-height: 500px;">
                 <div class="text-center p-5">
-                    <div class="app-bg-secondary rounded-circle d-inline-flex p-5 mb-4">
-                        <i class="bi bi-chat-left-text text-primary" style="font-size: 48px;"></i>
-                    </div>
-                    <h4 class="fw-semibold mb-3">Your Messages</h4>
-                    <p class="app-text-muted mb-4" style="max-width: 400px;">
-                        Select a conversation from the left to start messaging. Share code, files, and collaborate with
-                        other developers.
-                    </p>
-                    <div class="d-flex justify-content-center gap-3">
-                        <span class="badge app-bg-secondary app-text-primary p-3 rounded-3">
-                            <i class="bi bi-code-slash me-2"></i>Code Sharing
-                        </span>
-                        <span class="badge app-bg-secondary app-text-primary p-3 rounded-3">
-                            <i class="bi bi-file-earmark me-2"></i>File Upload
-                        </span>
-                        <span class="badge app-bg-secondary app-text-primary p-3 rounded-3">
-                            <i class="bi bi-emoji-smile me-2"></i>Reactions
-                        </span>
-                    </div>
+                    <h5 class="fw-bold mb-2 app-text-primary">No chat selected</h5>
+                    <p class="app-text-muted mb-0">Select a chat to view it here</p>
                 </div>
             </div>
             @endif
@@ -254,7 +216,7 @@
                 <div class="card-body">
                     <div class="d-grid gap-2">
                         <a href="{{ route('developers.index') }}"
-                            class="btn btn-outline-primary d-flex align-items-center justify-content-between">
+                            class="btn btn-outline-accent d-flex align-items-center justify-content-between">
                             <span><i class="bi bi-people me-2"></i>Find Developers</span>
                             <i class="bi bi-arrow-right"></i>
                         </a>
@@ -299,7 +261,7 @@
                                 </div>
                                 <div class="d-flex gap-2 mt-2">
                                     <a href="{{ route('messages.show', $dev) }}"
-                                        class="btn btn-sm btn-outline-primary flex-grow-1">
+                                        class="btn btn-sm btn-outline-accent flex-grow-1">
                                         <i class="bi bi-chat me-1"></i> Message
                                     </a>
                                     <form action="{{ route('users.follow', $dev) }}" method="POST">
@@ -374,6 +336,17 @@
     function showShortcuts() {
     new bootstrap.Modal(document.getElementById('shortcutsModal')).show();
 }
+
+// Chat search box — Enter navigates to the full message search page
+(function() {
+    const input = document.getElementById('chatSearchInput');
+    if (!input) return;
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && this.value.trim()) {
+            window.location.href = `{{ route('messages.search') }}?query=${encodeURIComponent(this.value.trim())}`;
+        }
+    });
+})();
 
 // Keyboard shortcuts
 document.addEventListener('keydown', function(e) {

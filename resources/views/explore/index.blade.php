@@ -3,453 +3,150 @@
 @section('title', 'Explore - DevDoko')
 
 @section('content')
-<div class="container-fluid px-0">
-    <!-- Explore Header -->
-    <div class="bg-white border-bottom">
-        <div class="container py-3">
-            <h4 class="fw-bold mb-0">Explore</h4>
-            <p class="app-text-muted mb-0">Discover amazing content, developers, and topics</p>
-        </div>
-    </div>
-
-    <!-- Explore Tabs -->
-    <div class="bg-white border-bottom">
-        <div class="container">
-            <ul class="nav nav-pills nav-fill">
-                <li class="nav-item ">
-                    <a class="nav-link {{ $type == 'trending' ? 'active' : '' }}"
-                        href="{{ route('explore') }}?type=trending">
-                        <i class="bi bi-fire me-1"></i> Trending
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ $type == 'latest' ? 'active' : '' }}"
-                        href="{{ route('explore') }}?type=latest">
-                        <i class="bi bi-clock me-1"></i> Latest
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ $type == 'developers' ? 'active' : '' }}"
-                        href="{{ route('explore') }}?type=developers">
-                        <i class="bi bi-people me-1"></i> Developers
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ $type == 'tags' ? 'active' : '' }}" href="{{ route('explore') }}?type=tags">
-                        <i class="bi bi-tags me-1"></i> Topics
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="container py-4">
-        @if($type == 'trending' || $type == 'latest')
-        <!-- Trending/Latest Posts -->
-        <div class="mb-5">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="fw-bold mb-0">
-                    @if($type == 'trending')
-                    <i class="bi bi-fire text-danger me-2"></i>Trending Now
-                    @else
-                    <i class="bi bi-clock text-primary me-2"></i>Latest Posts
-                    @endif
-                </h5>
-                <a href="{{ route('feed.latest') }}" class="text-decoration-none small">
-                    View all <i class="bi bi-arrow-right"></i>
+<div class="container py-3">
+    <div class="row justify-content-center">
+        <!-- Left Column - Main -->
+        <div class="col-lg-8">
+            <!-- Pill tab row -->
+            <div class="d-flex align-items-center gap-2 overflow-auto pb-1 mb-4 stories-scroll">
+                <a href="{{ route('explore') }}" class="btn btn-sm rounded-pill fw-semibold flex-shrink-0 explore-pill active">Explore</a>
+                @foreach($techTopics as $topic)
+                @if($topic['count'] > 0)
+                <a href="{{ route('tags.show', $topic['slug']) }}" class="btn btn-sm rounded-pill flex-shrink-0 explore-pill">
+                    {{ $topic['name'] }}
                 </a>
-            </div>
-
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
-                @foreach(($type == 'trending' ? $trendingPosts : $latestPosts) as $post)
-                <div class="col">
-                    <div class="card border-0 shadow-sm h-100">
-                        <!-- Post Image/Preview -->
-                        @if($post->type === 'image' && $post->image_url)
-                        <a href="{{ route('posts.show', $post) }}" class="text-decoration-none">
-                            <img src="{{ $post->image_url }}" class="card-img-top"
-                                style="height: 200px; object-fit: cover; border-radius: 8px 8px 0 0;"
-                                alt="{{ $post->title }}">
-                        </a>
-                        @elseif($post->type === 'video' && $post->video_path)
-                        <a href="{{ route('posts.show', $post) }}" class="text-decoration-none">
-                            <div class="position-relative"
-                                style="height: 200px; background-color: #000; border-radius: 8px 8px 0 0;">
-                                <div class="ratio ratio-16x9 h-100">
-                                    <video class="w-100 h-100" style="object-fit: cover;">
-                                        <source src="{{ Storage::url($post->video_path) }}" type="video/mp4">
-                                    </video>
-                                </div>
-                                <div class="position-absolute top-50 start-50 translate-middle">
-                                    <i class="bi bi-play-circle-fill text-white fs-1"></i>
-                                </div>
-                            </div>
-                        </a>
-                        @elseif($post->type === 'code')
-                        <a href="{{ route('posts.show', $post) }}" class="text-decoration-none">
-                            <div class="bg-dark text-light" style="height: 200px; border-radius: 8px 8px 0 0;">
-                                <div class="p-3 border-bottom border-secondary">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-code-slash me-2"></i>
-                                            <span class="badge bg-primary">{{ $post->code_language ?? 'Code' }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="p-3" style="height: calc(200px - 60px); overflow: hidden;">
-                                    <pre class="mb-0"
-                                        style="background: transparent; border: none; color: #d4d4d4; font-size: 12px;">
-                                        <code>{{ Str::limit($post->code_snippet, 150) }}</code>
-                                    </pre>
-                                </div>
-                            </div>
-                        </a>
-                        @else
-                        <a href="{{ route('posts.show', $post) }}" class="text-decoration-none">
-                            <div class="card-body" style="height: 200px; border-radius: 8px 8px 0 0;">
-                                @if($post->title)
-                                <h6 class="card-title fw-bold mb-2">{{ Str::limit($post->title, 50) }}</h6>
-                                @endif
-                                @if($post->content)
-                                <div class="post-content app-text-muted" style="font-size: 14px;">
-                                    @rich(Str::limit($post->content, 120))
-                                </div>
-                                @endif
-                            </div>
-                        </a>
-                        @endif
-
-                        <!-- Post Footer -->
-                        <div class="card-body py-2">
-                            <!-- User Info -->
-                            <div class="d-flex align-items-center mb-2">
-                                <a href="{{ route('profile.show', $post->user->profile->username) }}"
-                                    class="text-decoration-none d-flex align-items-center">
-                                    <img src="{{ $post->user->profile->avatar_url }}" class="rounded-circle me-2"
-                                        style="width: 32px; height: 32px; object-fit: cover;">
-                                    <span class="fw-bold app-text-primary">{{ $post->user->profile->username }}</span>
-                                </a>
-                                <span class="badge bg-light text-dark ms-auto">
-                                    <i class="bi bi-{{ $post->type_icon }} me-1"></i>
-                                </span>
-                            </div>
-
-                            <!-- Stats -->
-                            <div class="d-flex justify-content-between app-text-muted small">
-                                <div class="d-flex gap-3">
-                                    <span>
-                                        <i class="bi bi-heart me-1"></i>{{ $post->likes_count }}
-                                    </span>
-                                    <span>
-                                        <i class="bi bi-chat me-1"></i>{{ $post->comments_count }}
-                                    </span>
-                                </div>
-                                <span>{{ $post->created_at->diffForHumans() }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @endif
                 @endforeach
             </div>
 
-            @if(($type == 'trending' ? $trendingPosts->isEmpty() : $latestPosts->isEmpty()))
+            @php $heroPost = $trendingPosts->first(); @endphp
+            @if($heroPost)
+            <a href="{{ route('posts.show', $heroPost) }}" class="text-decoration-none d-block mb-4 explore-hero {{ $heroPost->image_url ? '' : 'explore-hero-noimage' }}"
+                @if($heroPost->image_url) style="background-image: linear-gradient(180deg, rgba(0,0,0,0.05) 40%, rgba(0,0,0,0.85) 100%), url('{{ $heroPost->image_url }}');" @endif>
+                <div class="explore-hero-inner">
+                    <span class="badge explore-hero-badge mb-2"><i class="bi bi-fire me-1"></i>Trending</span>
+                    <h3 class="fw-bold text-white mb-1">{{ $heroPost->title ?? Str::limit(strip_tags($heroPost->content ?? ''), 90) }}</h3>
+                    <div class="small text-white-50">
+                        {{ $heroPost->user->profile->username ?? $heroPost->user->name }} &middot; {{ $heroPost->created_at->diffForHumans() }}
+                    </div>
+                </div>
+            </a>
+            @endif
+
+            <!-- Headline rows -->
+            @php $headlinePosts = $trendingPosts->skip(1)->count() ? $trendingPosts->skip(1) : $latestPosts; @endphp
+            @if($headlinePosts->count())
+            <div class="mb-5">
+                @foreach($headlinePosts->take(8) as $post)
+                <a href="{{ route('posts.show', $post) }}" class="d-flex align-items-center justify-content-between text-decoration-none py-3 explore-headline-row {{ !$loop->last ? 'border-bottom' : '' }}">
+                    <div class="min-width-0 me-3">
+                        <div class="fw-bold app-text-primary text-truncate">{{ $post->title ?? Str::limit(strip_tags($post->content ?? ''), 70) }}</div>
+                        <div class="small app-text-muted text-truncate">
+                            {{ $post->user->profile->username ?? $post->user->name }} &middot; {{ Str::limit(strip_tags($post->content ?? ''), 80) }}
+                        </div>
+                    </div>
+                    @if($post->image_url)
+                    <img src="{{ $post->image_url }}" alt="" class="rounded-3 flex-shrink-0" style="width: 64px; height: 64px; object-fit: cover;">
+                    @endif
+                </a>
+                @endforeach
+            </div>
+            @else
             <div class="text-center py-5">
                 <i class="bi bi-compass display-1 app-text-muted mb-3"></i>
                 <h5 class="app-text-muted mb-3">No posts to explore yet</h5>
                 <p class="app-text-muted">Be the first to share something amazing!</p>
-                <a href="{{ route('posts.create') }}" class="btn btn-primary">
+                <a href="{{ route('posts.create') }}" class="btn btn-accent">
                     <i class="bi bi-plus-circle me-2"></i> Create Post
                 </a>
             </div>
             @endif
-        </div>
-        @endif
 
-        @if($type == 'developers')
-        <!-- Popular Developers -->
-        <div class="mb-5">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="fw-bold mb-0">
-                    <i class="bi bi-people text-primary me-2"></i>Popular Developers
-                </h5>
-                <a href="{{ route('explore') }}?type=trending" class="text-decoration-none small">
-                    View trending posts <i class="bi bi-arrow-right"></i>
-                </a>
-            </div>
-
-            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6 g-3">
-                @foreach($popularDevelopers as $user)
-                <div class="col">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body text-center">
-                            <a href="{{ route('profile.show', $user->profile->username) }}"
-                                class="text-decoration-none">
-                                <div class="position-relative mx-auto mb-3" style="width: 80px;">
-                                    <img src="{{ $user->profile->avatar_url }}" class="rounded-circle border border-2"
-                                        style="width: 80px; height: 80px; object-fit: cover; border-color: #dbdbdb !important;">
-                                    @if($user->followers_count > 100)
-                                    <span
-                                        class="position-absolute top-0 start-100 translate-middle badge bg-warning border border-2 border-white rounded-circle p-0"
-                                        style="width: 20px; height: 20px;">
-                                        <i class="bi bi-star-fill text-white" style="font-size: 10px;"></i>
-                                    </span>
-                                    @endif
-                                </div>
-                                <h6 class="fw-bold mb-1 app-text-primary">{{ $user->profile->username }}</h6>
-                                <small class="app-text-muted d-block mb-2">{{ $user->name }}</small>
-
-                                <div class="d-flex justify-content-center gap-3 small mb-3">
-                                    <div>
-                                        <div class="fw-bold">{{ $user->posts_count ?? 0 }}</div>
-                                        <small class="app-text-muted">Posts</small>
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold">{{ $user->followers_count ?? 0 }}</div>
-                                        <small class="app-text-muted">Followers</small>
-                                    </div>
-                                </div>
-
-                                @auth
-                            @if(auth()->id() !== $user->id)
-                                <form action="{{ route('users.follow', $user) }}" method="POST" class="follow-form">
-                                    @csrf
-                                    <button type="submit" class="btn btn-primary btn-sm w-100">
-                                        @if(auth()->user()->isFollowing($user))
-                                        Following
-                                        @else
-                                        <i class="bi bi-person-plus me-1"></i> Follow
-                                        @endif
-                                    </button>
-                                </form>
-                            @endif
-                            @endauth
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        </div>
-        @endif
-
-        @if($type == 'tags')
-        <!-- Popular Tags & Topics -->
-        <div class="row">
-            <!-- Tech Topics -->
-            <div class="col-lg-8 mb-4">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="fw-bold mb-4">
-                            <i class="bi bi-code-slash text-primary me-2"></i>Popular Tech Topics
-                        </h5>
-
-                        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
-                            @foreach($techTopics as $topic)
-                            <div class="col">
-                                <a href="{{ route('tags.show', $topic['slug']) }}"
-                                    class="text-decoration-none">
-                                    <div class="card border-0 shadow-sm h-100"
-                                        style="border-left: 4px solid {{ $topic['color'] }} !important;">
-                                        <div class="card-body text-center">
-                                            <div class="mb-3">
-                                                <i class="bi {{ $topic['icon'] }} fs-2"
-                                                    style="color: {{ $topic['color'] }};"></i>
-                                            </div>
-                                            <h6 class="fw-bold mb-1 app-text-primary">{{ $topic['name'] }}</h6>
-                                            <small class="app-text-muted">{{ $topic['count'] }} posts</small>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
+            <!-- Horizontal scroll: popular developers -->
+            @if($popularDevelopers->count())
+            <div class="mb-5">
+                <h6 class="fw-bold mb-3 app-text-primary">Popular Developers</h6>
+                <div class="d-flex gap-3 overflow-auto pb-2 stories-scroll">
+                    @foreach($popularDevelopers as $dev)
+                    <a href="{{ route('profile.show', $dev->profile->username) }}" class="text-decoration-none text-center flex-shrink-0" style="width: 100px;">
+                        <img src="{{ $dev->profile->avatar_url }}" alt="{{ $dev->name }}" class="rounded-circle mb-2" style="width: 72px; height: 72px; object-fit: cover;">
+                        <div class="small fw-semibold app-text-primary text-truncate">{{ $dev->profile->username }}</div>
+                        <div class="small app-text-muted">{{ number_format($dev->followers_count ?? 0) }} followers</div>
+                    </a>
+                    @endforeach
                 </div>
             </div>
-
-            <!-- All Tags -->
-            <div class="col-lg-4">
-                <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
-                    <div class="card-body">
-                        <h5 class="fw-bold mb-3">
-                            <i class="bi bi-tags text-primary me-2"></i>All Topics
-                        </h5>
-
-                        <div class="d-flex flex-wrap gap-2">
-                            @foreach($popularTags as $tag)
-                            <a href="{{ route('tags.show', $tag->slug) }}"
-                                class="badge bg-light text-dark text-decoration-none border px-3 py-2">
-                                #{{ $tag->name }}
-                                <span class="badge bg-secondary rounded-pill ms-1">{{ $tag->posts_count }}</span>
-                            </a>
-                            @endforeach
-                        </div>
-
-                        @if($popularTags->isEmpty())
-                        <div class="text-center py-4">
-                            <i class="bi bi-tag display-1 app-text-muted mb-3"></i>
-                            <p class="app-text-muted">No topics yet</p>
-                        </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
+            @endif
         </div>
-        @endif
+
+        <!-- Right Column - Sidebar -->
+        <div class="col-lg-4 d-none d-lg-block">
+            @include('partials.right-sidebar', [
+                'rightSidebarFollowing' => $rightSidebarFollowing,
+                'rightSidebarHeading' => 'New & Trending',
+                'rightSidebarPosts' => $latestPosts->take(5),
+                'rightSidebarSeeAllUrl' => route('feed.latest'),
+            ])
+        </div>
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize highlight.js for code snippets
-        if (typeof hljs !== 'undefined') {
-            document.querySelectorAll('pre code').forEach((block) => {
-                hljs.highlightElement(block);
-            });
-        }
-
-        // Follow form submission
-        document.querySelectorAll('.follow-form').forEach(form => {
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault();
-
-                const button = this.querySelector('button');
-                const originalText = button.textContent;
-
-                try {
-                    const response = await fetch(this.action, {
-                        method: 'POST',
-                        body: new FormData(this),
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                            'Accept': 'application/json'
-                        }
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-
-                        if (data.following) {
-                            button.textContent = 'Following';
-                            button.classList.remove('btn-primary');
-                            button.classList.add('btn-outline-secondary');
-                        } else {
-                            button.textContent = 'Follow';
-                            button.classList.remove('btn-outline-secondary');
-                            button.classList.add('btn-primary');
-                        }
-
-                        // Animation
-                        button.style.transform = 'scale(1.1)';
-                        setTimeout(() => {
-                            button.style.transform = 'scale(1)';
-                        }, 200);
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    button.textContent = originalText;
-                }
-            });
-        });
-
-        // Card hover effects
-        document.querySelectorAll('.card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-4px)';
-                this.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
-                this.style.transition = 'all 0.2s ease';
-            });
-
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0)';
-                this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
-            });
-        });
-    });
-</script>
-
 <style>
-    /* Explore specific styles */
-    .nav-pills .nav-link {
-        border-radius: 0;
-        border-bottom: 3px solid transparent;
-        color: #666;
-        padding: 12px 0;
-        margin: 0 15px;
+    .explore-pill {
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        color: var(--bs-body-color);
+        white-space: nowrap;
+        background: transparent;
     }
 
-    .nav-pills .nav-link.active {
-        background-color: transparent;
-        color: #0095f6;
-        border-bottom-color: #0095f6;
+    [data-bs-theme="dark"] .explore-pill {
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .explore-pill.active,
+    .explore-pill:hover {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+    }
+
+    .explore-hero {
+        position: relative;
+        min-height: 320px;
+        border-radius: 16px;
+        overflow: hidden;
+        background-color: #1a1a1a;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .explore-hero-noimage {
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    }
+
+    .explore-hero-inner {
+        padding: 24px;
+        width: 100%;
+    }
+
+    .explore-hero-badge {
+        background: var(--accent);
+        color: #fff;
         font-weight: 600;
     }
 
-    .nav-pills .nav-link:hover:not(.active) {
-        color: #0095f6;
-        border-bottom-color: #dee2e6;
+    .explore-headline-row {
+        border-color: rgba(0, 0, 0, 0.08) !important;
     }
 
-    /* Card styling */
-    .card {
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        transition: all 0.2s ease;
+    [data-bs-theme="dark"] .explore-headline-row {
+        border-color: rgba(255, 255, 255, 0.06) !important;
     }
 
-    .card:hover {
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Badge styling */
-    .badge.bg-light {
-        font-weight: 500;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Topic cards */
-    .topic-card {
-        border-left: 4px solid;
-        transition: all 0.2s;
-    }
-
-    .topic-card:hover {
-        transform: translateX(5px);
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .nav-pills .nav-link {
-            margin: 0 8px;
-            font-size: 14px;
-        }
-
-        .card-body {
-            padding: 1rem !important;
-        }
-    }
-
-    /* Video placeholder */
-    .video-placeholder {
-        background: linear-gradient(45deg, #667eea, #764ba2);
-    }
-
-    /* Code snippet styling */
-    pre {
-        background: #1e1e1e !important;
-        color: #d4d4d4;
-        padding: 1rem;
-        border-radius: 4px;
-        overflow-x: auto;
-        font-size: 12px;
-        margin: 0;
-    }
-
-    code {
-        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-        white-space: pre-wrap;
-        word-break: break-word;
+    .explore-headline-row:hover .app-text-primary {
+        color: var(--accent) !important;
     }
 </style>
 @endsection

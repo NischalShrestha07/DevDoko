@@ -1,28 +1,26 @@
 {{-- resources/views/posts/partials/card.blade.php --}}
 {{-- Post Card Component --}}
-<div class="post-card mb-4" id="post-{{ $post->id }}" data-post-id="{{ $post->id }}">
+<div class="post-card" id="post-{{ $post->id }}" data-post-id="{{ $post->id }}">
     <!-- Post Header -->
-    <div class="card-header bg-white border-0 p-4 pb-2">
+    <div class="card-header bg-transparent border-0 px-0 pt-3 pb-2">
         <div class="d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center min-width-0">
                 <!-- User Avatar -->
-                <a href="{{ route('profile.show', $post->user->profile->username ?? '') }}" class="text-decoration-none">
+                <a href="{{ route('profile.show', $post->user->profile->username ?? '') }}" class="text-decoration-none flex-shrink-0">
                     <img src="{{ $post->user->profile->avatar_url }}" alt="{{ $post->user->name }}"
-                        class="rounded-circle border" style="width: 42px; height: 42px; object-fit: cover;">
+                        class="rounded-circle" style="width: 36px; height: 36px; object-fit: cover;">
                 </a>
 
                 <!-- User Info -->
-                <div class="ms-3">
-                    <div class="d-flex align-items-center">
+                <div class="ms-2 min-width-0">
+                    <div class="d-flex align-items-center flex-wrap">
                         <a href="{{ route('profile.show', $post->user->profile->username ?? '') }}"
-                            class="text-decoration-none app-text-primary fw-bold">
+                            class="text-decoration-none app-text-primary fw-bold" style="font-size: 14px;">
                             {{ $post->user->profile->username ?? '' }}
                         </a>
 
                         @if($post->user->profile->is_verified ?? false)
-                        <span class="badge bg-primary ms-2" style="font-size: 10px; padding: 2px 6px;">
-                            <i class="bi bi-check-circle-fill"></i>
-                        </span>
+                        <i class="bi bi-patch-check-fill ms-1" style="font-size: 12px; color: var(--accent);" title="Verified"></i>
                         @endif
 
                         @if($post->visibility === 'private')
@@ -57,9 +55,29 @@
                 </div>
             </div>
 
+            <!-- Post Actions -->
+            <div class="d-flex align-items-center flex-shrink-0 ms-2">
+                @auth
+                @if($post->user_id !== auth()->id() && ! auth()->user()->isFollowing($post->user))
+                <form action="{{ route('users.follow', $post->user) }}" method="POST" class="follow-form me-1">
+                    @csrf
+                    <button type="submit" class="btn btn-sm btn-link fw-semibold text-decoration-none p-0" style="font-size: 13px; color: var(--accent);">
+                        Follow
+                    </button>
+                </form>
+                @elseif($post->user_id !== auth()->id())
+                <form action="{{ route('posts.hide', $post) }}" method="POST" class="hide-post-form me-1">
+                    @csrf
+                    <button type="submit" class="btn btn-link text-body-secondary p-0 action-btn-icon" title="Not interested">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </form>
+                @endif
+                @endauth
+
             <!-- Post Actions Dropdown -->
             <div class="dropdown">
-                <button class="btn btn-link text-dark p-0" type="button" data-bs-toggle="dropdown">
+                <button class="btn btn-link app-text-muted p-0 action-btn-icon" type="button" data-bs-toggle="dropdown">
                     <i class="bi bi-three-dots fs-5"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
@@ -144,6 +162,7 @@
                     @endif
                 </ul>
             </div>
+            </div>
         </div>
     </div>
 
@@ -151,19 +170,19 @@
     <div class="card-body px-0 py-2">
         <!-- Title -->
         @if($post->title)
-        <div class="px-4 mb-2">
-            <h5 class="fw-bold mb-1">{{ $post->title }}</h5>
+        <div class="px-0 mb-2">
+            <h5 class="fw-bold mb-1 {{ $post->type !== 'article' ? 'fst-italic' : '' }}">{{ $post->title }}</h5>
         </div>
         @endif
 
         <!-- Content -->
         @if($post->content)
-        <div class="px-4 mb-3">
+        <div class="px-0 mb-3">
             <div class="post-content post-content-truncate" id="post-content-{{ $post->id }}">
                 @rich($post->content)
             </div>
             @if(strlen($post->content) > 300)
-            <button class="btn btn-link text-primary p-0 mt-1 post-read-more" data-post-id="{{ $post->id }}" onclick="toggleReadMore({{ $post->id }})">
+            <button class="btn btn-link p-0 mt-1 post-read-more" style="color: var(--accent);" data-post-id="{{ $post->id }}" onclick="toggleReadMore({{ $post->id }})">
                 Read more <i class="bi bi-chevron-down small"></i>
             </button>
             @endif
@@ -173,7 +192,7 @@
         <!-- Code Snippet -->
         @if($post->type === 'code' && $post->code_snippet)
         <div class="mb-3">
-            <div class="bg-dark text-light rounded mx-4">
+            <div class="bg-dark text-light rounded mx-0">
                 <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom border-secondary">
                     <div class="d-flex align-items-center">
                         <i class="bi bi-code-slash me-2"></i>
@@ -237,7 +256,7 @@
 
         <!-- Video -->
         @if($post->type === 'video' && $post->video_path)
-        <div class="mb-3 px-4">
+        <div class="mb-3 px-0">
             <video controls class="w-100 rounded" style="max-height: 500px;">
                 <source src="{{ Storage::url($post->video_path) }}" type="video/mp4">
                 Your browser does not support the video tag.
@@ -247,7 +266,7 @@
 
         <!-- Link Preview -->
         @if($post->type === 'link' && $post->link_url)
-        <div class="mb-3 px-4">
+        <div class="mb-3 px-0">
             <a href="{{ $post->link_url }}" target="_blank" class="text-decoration-none">
                 <div class="card border">
                     <div class="row g-0">
@@ -275,11 +294,11 @@
 
         <!-- Tags -->
         @if($post->tags->count() > 0)
-        <div class="px-4 mb-3">
+        <div class="px-0 mb-3">
             <div class="d-flex flex-wrap gap-1">
                 @foreach($post->tags as $tag)
                 <a href="{{ route('tags.show', $tag->slug) }}"
-                    class="badge bg-light text-dark border text-decoration-none">
+                    class="badge tag-badge text-decoration-none">
                     <i class="bi bi-hash"></i>{{ $tag->name }}
                 </a>
                 @endforeach
@@ -289,18 +308,18 @@
     </div>
 
     <!-- Post Stats -->
-    <div class="card-footer bg-white border-0 pt-0">
+    <div class="card-footer bg-transparent border-0 px-0 pt-0 pb-3">
         <!-- Action Buttons -->
-        <div class="px-4 pt-2">
-            <div class="d-flex align-items-center gap-1">
+        <div class="px-0 pt-2">
+            <div class="d-flex align-items-center gap-4">
                 <!-- Like / Reaction Button -->
                 @php $reactionEmoji = ['like' => '<i class="bi bi-heart-fill text-danger"></i>', 'love' => '❤️', 'haha' => '😂', 'wow' => '😮', 'sad' => '😢', 'angry' => '😡']; @endphp
-                <div class="position-relative reaction-wrap" data-reacted="{{ $post->reaction_type ? '1' : '0' }}">
+                <div class="position-relative reaction-wrap d-flex align-items-center gap-1" data-reacted="{{ $post->reaction_type ? '1' : '0' }}">
                     <form action="{{ route('posts.like.toggle', $post) }}" method="POST" class="like-form">
                         @csrf
                         <input type="hidden" name="type" value="{{ $post->reaction_type ?? 'like' }}" class="reaction-type-input">
-                        <button type="submit" class="btn btn-link text-dark p-0 action-btn action-btn-icon">
-                            <span class="reaction-icon fs-4">
+                        <button type="submit" class="btn btn-link app-text-muted p-0 action-btn action-btn-icon">
+                            <span class="reaction-icon fs-5">
                                 @if($post->reaction_type)
                                     {!! $reactionEmoji[$post->reaction_type] ?? $reactionEmoji['like'] !!}
                                 @else
@@ -309,6 +328,9 @@
                             </span>
                         </button>
                     </form>
+                    <span class="small app-text-muted likes-count-wrap {{ $post->likes_count > 0 ? '' : 'd-none' }}">
+                        <span class="likes-count-text">{{ number_format($post->likes_count) }} {{ Str::plural('like', $post->likes_count) }}</span>
+                    </span>
                     <div class="reaction-picker">
                         @foreach($reactionEmoji as $key => $emoji)
                         <button type="button" class="reaction-option" data-type="{{ $key }}" title="{{ ucfirst($key) }}">{!! $emoji !!}</button>
@@ -317,14 +339,16 @@
                 </div>
 
                 <!-- Comment Button -->
-                <button class="btn btn-link text-dark p-0 action-btn action-btn-icon comment-toggle" data-post-id="{{ $post->id }}">
-                    <i class="bi bi-chat fs-4"></i>
+                <button class="btn btn-link app-text-muted p-0 d-flex align-items-center gap-1 action-btn action-btn-icon comment-toggle" data-post-id="{{ $post->id }}">
+                    <i class="bi bi-chat fs-5"></i>
+                    @if($post->comments_count > 0)<span class="small">{{ $post->comments_count }}</span>@endif
                 </button>
 
-                <!-- Share Button -->
-                <button class="btn btn-link text-dark p-0 action-btn action-btn-icon" data-bs-toggle="modal"
+                <!-- Share / Repost Button -->
+                <button class="btn btn-link app-text-muted p-0 d-flex align-items-center gap-1 action-btn action-btn-icon" data-bs-toggle="modal"
                     data-bs-target="#shareModal-{{ $post->id }}">
-                    <i class="bi bi-send fs-4"></i>
+                    <i class="bi bi-repeat fs-5"></i>
+                    @if($post->shares_count > 0)<span class="small">{{ $post->shares_count }}</span>@endif
                 </button>
 
                 <!-- Save Button -->
@@ -332,51 +356,27 @@
                     @csrf
                     @if($post->is_saved)
                     @method('DELETE')
-                    <button type="submit" class="btn btn-link text-dark p-0 action-btn action-btn-icon">
-                        <i class="bi bi-bookmark-fill fs-4"></i>
+                    <button type="submit" class="btn btn-link app-text-muted p-0 action-btn action-btn-icon">
+                        <i class="bi bi-bookmark-fill fs-5"></i>
                     </button>
                     @else
-                    <button type="submit" class="btn btn-link text-dark p-0 action-btn action-btn-icon">
-                        <i class="bi bi-bookmark fs-4"></i>
+                    <button type="submit" class="btn btn-link app-text-muted p-0 action-btn action-btn-icon">
+                        <i class="bi bi-bookmark fs-5"></i>
                     </button>
                     @endif
                 </form>
             </div>
         </div>
 
-        <!-- Likes count -->
-        <div class="px-4 pt-1 likes-count-wrap {{ $post->likes_count > 0 ? '' : 'd-none' }}">
-            <span class="fw-semibold small likes-count-text">{{ number_format($post->likes_count) }} {{ Str::plural('like', $post->likes_count) }}</span>
-        </div>
-
-        <!-- Secondary stats -->
-        @if($post->views_count > 0 || $post->shares_count > 0 || ($post->saves_count ?? 0) > 0)
-        <div class="px-4 pt-1">
-            <div class="d-flex gap-3 text-muted small">
-                @if($post->views_count > 0)
-                <span><i class="bi bi-eye me-1"></i>{{ $post->views_count }}</span>
-                @endif
-                @if($post->shares_count > 0)
-                <span><i class="bi bi-send me-1"></i>{{ $post->shares_count }}</span>
-                @endif
-                @if(($post->saves_count ?? 0) > 0)
-                <span><i class="bi bi-bookmark me-1"></i>{{ $post->saves_count }}</span>
-                @endif
-            </div>
-        </div>
-        @endif
-
-        @if($post->comments_count > 0)
-        <div class="px-4 pt-2">
-            <button class="btn btn-link text-muted p-0 small text-decoration-none comment-toggle" data-post-id="{{ $post->id }}">
-                View all {{ $post->comments_count }} {{ Str::plural('comment', $post->comments_count) }}
-            </button>
+        @if($post->views_count > 0)
+        <div class="px-0 pt-1">
+            <span class="small app-text-muted"><i class="bi bi-eye me-1"></i>{{ number_format($post->views_count) }} views</span>
         </div>
         @endif
 
         <!-- Comments Section (Collapsible) -->
         <div id="comments-{{ $post->id }}" class="collapse">
-            <div class="px-4 py-3 border-top">
+            <div class="px-0 py-3 border-top">
                 <!-- Comments List -->
                 <div id="comments-list-{{ $post->id }}">
                     @foreach($post->comments->take(3) as $comment)
@@ -385,7 +385,7 @@
 
                     @if($post->comments_count > 3)
                     <div class="text-center mt-2">
-                        <button class="btn btn-link text-primary" onclick="loadMoreComments({{ $post->id }})">
+                        <button class="btn btn-link" style="color: var(--accent);" onclick="loadMoreComments({{ $post->id }})">
                             View all {{ $post->comments_count }} comments
                         </button>
                     </div>
@@ -439,7 +439,7 @@
                         @csrf
                         <textarea class="form-control mb-2" name="content" rows="3"
                             placeholder="Add a message (optional)"></textarea>
-                        <button type="submit" class="btn btn-primary w-100">
+                        <button type="submit" class="btn btn-accent w-100">
                             <i class="bi bi-send me-1"></i> Share Post
                         </button>
                     </form>
@@ -970,25 +970,28 @@ if (!window._cardInit) {
 
 <style>
     .post-card {
-        background: white;
-        border: 1px solid #e0e0e0;
-        border-radius: 12px;
-        overflow: hidden;
-        transition: box-shadow 0.2s;
+        background: transparent;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        padding-bottom: 1.25rem;
+        margin-bottom: 1.25rem;
     }
 
-    .post-card:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    [data-bs-theme="dark"] .post-card {
+        border-bottom-color: rgba(255, 255, 255, 0.06);
+    }
+
+    .post-card:last-child {
+        border-bottom: none;
     }
 
     .action-btn {
-        transition: all 0.2s;
+        transition: color 0.15s ease, transform 0.15s ease;
         border-radius: 8px;
-        padding: 8px 12px;
+        padding: 4px 6px;
     }
 
     .action-btn-icon {
-        padding: 6px 10px;
+        padding: 4px 6px;
         line-height: 1;
     }
 
@@ -1018,8 +1021,7 @@ if (!window._cardInit) {
     }
 
     .action-btn:hover {
-        background-color: rgba(0, 0, 0, 0.05);
-        transform: translateY(-1px);
+        color: var(--accent);
     }
 
     .post-content {
@@ -1215,6 +1217,6 @@ if (!window._cardInit) {
     }
 
     .gallery-dots [data-bs-target].active {
-        background-color: #0d6efd;
+        background-color: var(--accent);
     }
 </style>

@@ -129,8 +129,7 @@ window.DevDoko = {
     // Dark mode
     initDarkMode() {
         const saved = localStorage.getItem('devdoko-theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const theme = saved || (prefersDark ? 'dark' : 'light');
+        const theme = saved || 'dark';
         this.setTheme(theme);
     },
 

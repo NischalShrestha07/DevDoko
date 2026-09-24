@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
+<html lang="en" data-bs-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -46,76 +46,70 @@
         </div>
         <div class="offcanvas-body p-0 d-flex flex-column">
             <div class="flex-grow-1 overflow-auto py-2">
-                <div class="px-2 mb-3">
-                    <div class="small app-text-muted text-uppercase fw-semibold px-3 mb-2" style="font-size: 0.7rem; letter-spacing: 0.05em;">Main</div>
+                <div class="px-2">
                     <a href="{{ route('home') }}"
                         class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('home') ? 'active' : '' }}">
-                        @if(request()->routeIs('home'))<span class="nav-active-indicator"></span>@endif
                         <i class="bi bi-house-door{{ request()->routeIs('home') ? '-fill' : '' }} fs-5 me-3"></i>
                         <span>Home</span>
                     </a>
-                    <a href="{{ route('search') }}"
-                        class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('search') ? 'active' : '' }}">
-                        @if(request()->routeIs('search'))<span class="nav-active-indicator"></span>@endif
-                        <i class="bi bi-search fs-5 me-3"></i>
-                        <span>Search</span>
-                    </a>
-                    <a href="{{ route('explore') }}"
-                        class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('explore') ? 'active' : '' }}">
-                        @if(request()->routeIs('explore'))<span class="nav-active-indicator"></span>@endif
-                        <i class="bi bi-compass fs-5 me-3"></i>
-                        <span>Explore</span>
-                    </a>
-                    <a href="{{ route('posts.index', ['type' => 'article']) }}"
-                        class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('posts.index') && request('type') === 'article' ? 'active' : '' }}">
-                        @if(request()->routeIs('posts.index') && request('type') === 'article')<span class="nav-active-indicator"></span>@endif
-                        <i class="bi bi-file-text fs-5 me-3"></i>
-                        <span>Articles</span>
+                    <a href="{{ route('feed.following') }}"
+                        class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('feed.following') ? 'active' : '' }}">
+                        <i class="bi bi-inbox{{ request()->routeIs('feed.following') ? '-fill' : '' }} fs-5 me-3"></i>
+                        <span>Subscriptions</span>
                     </a>
                     <a href="{{ route('messages.index') }}"
                         class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('messages.*') ? 'active' : '' }}">
-                        @if(request()->routeIs('messages.*'))<span class="nav-active-indicator"></span>@endif
                         <i class="bi bi-chat{{ request()->routeIs('messages.*') ? '-fill' : '' }} fs-5 me-3"></i>
-                        <span>Messages</span>
+                        <span>Chat</span>
                     </a>
                     @auth
                     <a href="{{ route('notifications.index') }}"
                         class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('notifications.*') ? 'active' : '' }}">
-                        @if(request()->routeIs('notifications.index'))<span class="nav-active-indicator"></span>@endif
                         <i class="bi bi-bell{{ request()->routeIs('notifications.*') ? '-fill' : '' }} fs-5 me-3"></i>
-                        <span class="flex-grow-1">Notifications</span>
-                        <span class="badge bg-danger rounded-pill ms-auto">{{ $unreadCount }}</span>
+                        <span class="flex-grow-1">Activity</span>
+                        @if($unreadCount > 0)
+                        <span class="app-nav-badge">{{ $unreadCount }}</span>
+                        @endif
                     </a>
                     @endauth
-                    <a href="{{ route('posts.create') }}" data-composer-open="image"
-                        class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('posts.create') ? 'active' : '' }}">
-                        @if(request()->routeIs('posts.create'))<span class="nav-active-indicator"></span>@endif
-                        <i class="bi bi-plus-square{{ request()->routeIs('posts.create') ? '-fill' : '' }} fs-5 me-3"></i>
-                        <span>Create</span>
+                    <a href="{{ route('explore') }}"
+                        class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('explore') ? 'active' : '' }}">
+                        <i class="bi bi-compass fs-5 me-3"></i>
+                        <span>Explore</span>
                     </a>
-                    <a href="{{ route('posts.drafts') }}"
-                        class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('posts.drafts') ? 'active' : '' }}">
-                        @if(request()->routeIs('posts.drafts'))<span class="nav-active-indicator"></span>@endif
-                        <i class="bi bi-file-earmark-lock{{ request()->routeIs('posts.drafts') ? '-fill' : '' }} fs-5 me-3"></i>
-                        <span>My Drafts</span>
+                    @auth
+                    <a href="{{ route('profile.show', auth()->user()->profile->username ?? '') }}"
+                        class="d-flex align-items-center px-3 py-2 mt-2 pt-2 border-top app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('profile.show') && request()->route('username') === (auth()->user()->profile->username ?? null) ? 'active' : '' }}">
+                        <img src="{{ auth()->user()->profile->avatar_url }}" alt="{{ auth()->user()->name }}"
+                            class="rounded-circle me-3" style="width: 24px; height: 24px; object-fit: cover;">
+                        <span>Profile</span>
                     </a>
-                    <a href="{{ route('developers.index') }}"
-                        class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('developers.*') ? 'active' : '' }}">
-                        @if(request()->routeIs('developers.*'))<span class="nav-active-indicator"></span>@endif
-                        <i class="bi bi-people fs-5 me-3"></i>
-                        <span>Developers</span>
-                    </a>
+                    @endauth
                 </div>
-
             </div>
 
+            @auth
+            <div class="px-3 pb-2">
+                <a href="{{ route('posts.create') }}" data-composer-open="image"
+                    class="btn app-create-btn w-100 rounded-pill fw-semibold d-flex align-items-center justify-content-center gap-1">
+                    <span>Create</span>
+                    <i class="bi bi-chevron-down small"></i>
+                </a>
+                <a href="{{ route('posts.drafts') }}"
+                    class="d-flex align-items-center justify-content-center gap-1 app-text-muted text-decoration-none small mt-2 py-1">
+                    <i class="bi bi-file-earmark-lock"></i> My Drafts
+                </a>
+            </div>
+            @endauth
+
             <div class="p-3 border-top">
-                <button type="button" class="btn app-btn-outline w-100 mb-2" onclick="DevDoko.toggleTheme()">
-                    <i class="bi bi-moon-fill me-2"></i> Theme
+                <button type="button" class="d-flex align-items-center w-100 px-3 py-2 app-text-primary bg-transparent border-0 rounded-3 app-nav-item" onclick="DevDoko.toggleTheme()">
+                    <i class="bi bi-moon-fill fs-5 me-3"></i>
+                    <span>Theme</span>
                 </button>
                 @auth
                 @if(auth()->user()->isAdmin())
-                <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 mb-2 app-nav-item">
+                <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 app-nav-item">
                     <i class="bi bi-shield-check fs-5 me-3"></i>
                     <span>Admin</span>
                 </a>
@@ -252,60 +246,74 @@
                     <i class="bi bi-house-door{{ request()->routeIs('home') ? '-fill' : '' }} fs-5 me-3"></i>
                     <span>Home</span>
                 </a>
-                <a href="{{ route('search') }}"
-                    class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('search') ? 'active' : '' }}">
-                    @if(request()->routeIs('search'))<span class="nav-active-indicator"></span>@endif
-                    <i class="bi bi-search fs-5 me-3"></i>
-                    <span>Search</span>
-                </a>
-                <a href="{{ route('explore') }}"
-                    class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('explore') ? 'active' : '' }}">
-                    @if(request()->routeIs('explore'))<span class="nav-active-indicator"></span>@endif
-                    <i class="bi bi-compass fs-5 me-3"></i>
-                    <span>Explore</span>
+                <a href="{{ route('feed.following') }}"
+                    class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('feed.following') ? 'active' : '' }}">
+                    <i class="bi bi-inbox{{ request()->routeIs('feed.following') ? '-fill' : '' }} fs-5 me-3"></i>
+                    <span>Subscriptions</span>
                 </a>
                 <a href="{{ route('messages.index') }}"
                     class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('messages.*') ? 'active' : '' }}">
-                    @if(request()->routeIs('messages.*'))<span class="nav-active-indicator"></span>@endif
                     <i class="bi bi-chat{{ request()->routeIs('messages.*') ? '-fill' : '' }} fs-5 me-3"></i>
-                    <span>Messages</span>
+                    <span>Chat</span>
                 </a>
                 @auth
                 <a href="{{ route('notifications.index') }}"
                     class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('notifications.*') ? 'active' : '' }}">
-                    @if(request()->routeIs('notifications.*'))<span class="nav-active-indicator"></span>@endif
                     <i class="bi bi-bell{{ request()->routeIs('notifications.*') ? '-fill' : '' }} fs-5 me-3"></i>
-                    <span>Notifications</span>
-                    <span class="badge bg-danger rounded-pill ms-auto" id="notifBadge">{{ $unreadCount }}</span>
+                    <span class="flex-grow-1">Activity</span>
+                    @if($unreadCount > 0)
+                    <span class="app-nav-badge" id="notifBadge">{{ $unreadCount }}</span>
+                    @endif
                 </a>
                 @endauth
-                <a href="{{ route('posts.create') }}" data-composer-open="image"
-                    class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('posts.create') ? 'active' : '' }}">
-                    @if(request()->routeIs('posts.create'))<span class="nav-active-indicator"></span>@endif
-                    <i class="bi bi-plus-square{{ request()->routeIs('posts.create') ? '-fill' : '' }} fs-5 me-3"></i>
-                    <span>Create</span>
+                <a href="{{ route('explore') }}"
+                    class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('explore') ? 'active' : '' }}">
+                    <i class="bi bi-compass fs-5 me-3"></i>
+                    <span>Explore</span>
                 </a>
-                <a href="{{ route('developers.index') }}"
-                    class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('developers.*') ? 'active' : '' }}">
-                    @if(request()->routeIs('developers.*'))<span class="nav-active-indicator"></span>@endif
-                    <i class="bi bi-people fs-5 me-3"></i>
-                    <span>Developers</span>
+                @auth
+                <a href="{{ route('profile.show', auth()->user()->profile->username ?? '') }}"
+                    class="d-flex align-items-center px-3 py-2 mt-2 pt-2 border-top app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('profile.show') && request()->route('username') === (auth()->user()->profile->username ?? null) ? 'active' : '' }}">
+                    <img src="{{ auth()->user()->profile->avatar_url }}" alt="{{ auth()->user()->name }}"
+                        class="rounded-circle me-3" style="width: 24px; height: 24px; object-fit: cover;">
+                    <span>Profile</span>
                 </a>
+                @endauth
             </div>
 
         </div>
+
+        @auth
+        <div class="px-3 pb-2">
+            <a href="{{ route('posts.create') }}" data-composer-open="image"
+                class="btn app-create-btn w-100 rounded-pill fw-semibold d-flex align-items-center justify-content-center gap-1">
+                <span>Create</span>
+                <i class="bi bi-chevron-down small"></i>
+            </a>
+            <a href="{{ route('posts.drafts') }}"
+                class="d-flex align-items-center justify-content-center gap-1 app-text-muted text-decoration-none small mt-2 py-1">
+                <i class="bi bi-file-earmark-lock"></i> My Drafts
+            </a>
+        </div>
+        @endauth
 
         <!-- Bottom -->
         <div class="p-3 border-top">
             @auth
             <a href="{{ route('blocks.index') }}"
-                class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 mb-1 app-nav-item {{ request()->routeIs('blocks.*') ? 'active' : '' }}">
+                class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 app-nav-item {{ request()->routeIs('blocks.*') ? 'active' : '' }}">
                 <i class="bi bi-slash-circle fs-5 me-3"></i>
                 <span>Blocked</span>
             </a>
+            @endauth
+            <button type="button" class="d-flex align-items-center w-100 px-3 py-2 app-text-primary bg-transparent border-0 rounded-3 app-nav-item" onclick="DevDoko.toggleTheme()">
+                <i class="bi bi-moon-fill fs-5 me-3"></i>
+                <span>Theme</span>
+            </button>
+            @auth
             @if(auth()->user()->isAdmin())
             <a href="{{ route('admin.dashboard') }}"
-                class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 mb-1 app-nav-item">
+                class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 app-nav-item">
                 <i class="bi bi-shield-check fs-5 me-3"></i>
                 <span>Admin</span>
             </a>
