@@ -1713,71 +1713,6 @@
         </div>
     </section>
 
-    <!-- MARKETPLACE TEASER -->
-    <section id="marketplace" class="lp-section lp-section-alt">
-        <div class="container">
-            <div class="row align-items-center gy-5">
-                <div class="col-lg-6" data-aos="fade-right">
-                    <div class="lp-marketplace-card">
-                        <div style="position: relative; z-index: 1;">
-                            <span style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(6,182,212,0.15); color: var(--accent); padding: 0.35rem 0.9rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600; margin-bottom: 1rem; border: 1px solid rgba(6,182,212,0.25);">
-                                <i class="bi bi-shop"></i> NEW
-                            </span>
-                            <h3 style="font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.5rem;">Developer Marketplace</h3>
-                            <p style="color: var(--dark-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">Buy, sell, and trade developer tools, templates, and services within the community.</p>
-
-                            <div class="lp-marketplace-item">
-                                <div class="lp-marketplace-item-icon" style="background: rgba(102,126,234,0.15); color: var(--brand);">
-                                    <i class="bi bi-code-square"></i>
-                                </div>
-                                <div>
-                                    <h5>Templates & Boilerplates</h5>
-                                    <p>Skip the setup. Start with production-ready starters.</p>
-                                </div>
-                            </div>
-                            <div class="lp-marketplace-item">
-                                <div class="lp-marketplace-item-icon" style="background: rgba(16,185,129,0.15); color: var(--success);">
-                                    <i class="bi bi-tools"></i>
-                                </div>
-                                <div>
-                                    <h5>Developer Tools</h5>
-                                    <p>CLI tools, plugins, and extensions built by the community.</p>
-                                </div>
-                            </div>
-                            <div class="lp-marketplace-item">
-                                <div class="lp-marketplace-item-icon" style="background: rgba(245,158,11,0.15); color: var(--warning);">
-                                    <i class="bi bi-mortarboard"></i>
-                                </div>
-                                <div>
-                                    <h5>Courses & Mentoring</h5>
-                                    <p>Learn from devs who've shipped real products.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-6" data-aos="fade-left">
-                    <span class="lp-badge"><i class="bi bi-shop"></i> Marketplace</span>
-                    <h2 class="lp-section-title" style="text-align: left;">Built by Developers,<br>For Developers</h2>
-                    <p style="color: var(--light-muted); font-size: 1rem; line-height: 1.8; margin-bottom: 1.5rem;">
-                        Skip the generic marketplaces. Trade tools, templates, and services
-                        with people who actually understand what you're building.
-                    </p>
-                    <ul class="list-unstyled" style="color: #475569;">
-                        <li class="mb-3"><i class="bi bi-check-circle-fill me-2" style="color: var(--success);"></i><strong>Express Interest</strong> — tell sellers what you need</li>
-                        <li class="mb-3"><i class="bi bi-check-circle-fill me-2" style="color: var(--success);"></i><strong>Direct Messaging</strong> — negotiate and collaborate</li>
-                        <li class="mb-3"><i class="bi bi-check-circle-fill me-2" style="color: var(--success);"></i><strong>Save & Track</strong> — bookmark listings for later</li>
-                        <li class="mb-3"><i class="bi bi-check-circle-fill me-2" style="color: var(--success);"></i><strong>Category Browse</strong> — find exactly what you need</li>
-                    </ul>
-                    <a href="{{ route('marketplace.index') }}" class="lp-btn-primary mt-3" style="background: linear-gradient(135deg, var(--accent), #0891b2); box-shadow: 0 4px 20px rgba(6,182,212,0.35);">
-                        <i class="bi bi-shop"></i> Browse Marketplace
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- CTA -->
     <section class="lp-cta">
         <div class="container text-center" style="position: relative; z-index: 1;" data-aos="zoom-in">
@@ -1822,14 +1757,11 @@
                 <span>DevDoko</span>
             </div>
             <p class="lp-footer-desc">
-                The complete social platform for developers. Share code, join communities,
-                message in real-time, find jobs, and grow your career — all in one place.
+                The writing and publishing platform for developers. Share code, publish
+                articles, message in real-time, and grow your audience — all in one place.
             </p>
             <div class="lp-footer-links">
                 <a href="{{ route('explore') }}">Explore</a>
-                <a href="{{ route('jobs.index') }}">Jobs</a>
-                <a href="{{ route('marketplace.index') }}">Marketplace</a>
-                <a href="{{ route('groups.index') }}">Groups</a>
                 <a href="{{ route('login') }}">Log In</a>
                 <a href="{{ route('register') }}">Sign Up</a>
             </div>

@@ -34,18 +34,9 @@
         <div class="col-md-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body text-center py-4">
-                    <i class="bi bi-people-fill display-4 text-info mb-3"></i>
-                    <h2 class="fw-bold mb-1">{{\App\Models\Group::count()}}</h2>
-                    <p class="app-text-muted mb-0">Total Groups</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center py-4">
-                    <i class="bi bi-shop display-4 text-warning mb-3"></i>
-                    <h2 class="fw-bold mb-1">{{\App\Models\MarketplaceListing::count()}}</h2>
-                    <p class="app-text-muted mb-0">Marketplace Listings</p>
+                    <i class="bi bi-file-earmark-text display-4 text-info mb-3"></i>
+                    <h2 class="fw-bold mb-1">{{\App\Models\Post::where('type', 'article')->count()}}</h2>
+                    <p class="app-text-muted mb-0">Articles</p>
                 </div>
             </div>
         </div>
@@ -65,11 +56,6 @@
                 <div class="col-md-4">
                     <a href="{{ route('posts.index') }}" class="btn btn-outline-success w-100 py-3">
                         <i class="bi bi-file-text me-2"></i> Manage Posts
-                    </a>
-                </div>
-                <div class="col-md-4">
-                    <a href="{{ route('groups.index') }}" class="btn btn-outline-info w-100 py-3">
-                        <i class="bi bi-people-fill me-2"></i> Manage Groups
                     </a>
                 </div>
                 <div class="col-md-4">

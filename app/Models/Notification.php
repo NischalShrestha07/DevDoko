@@ -57,21 +57,9 @@ class Notification extends Model
             'follow' => $this->getProfileUrl(),
             'mention' => $this->getMentionUrl(),
             'message' => $this->getMessageUrl(),
-            'group_invite' => $this->getGroupUrl(),
-            'event_reminder' => $this->getEventUrl(),
             'collaboration_request' => $this->getCollaborationUrl(),
-            'job_application', 'job_application_status' => $this->getJobUrl(),
             default => null,
         };
-    }
-
-    private function getJobUrl(): ?string
-    {
-        if (isset($this->data['job_id'])) {
-            return route('jobs.show', $this->data['job_id']);
-        }
-
-        return null;
     }
 
     private function getPostUrl(): ?string
@@ -126,24 +114,6 @@ class Notification extends Model
         return null;
     }
 
-    private function getGroupUrl(): ?string
-    {
-        if (isset($this->data['group_slug'])) {
-            return route('groups.show', $this->data['group_slug']);
-        }
-
-        return null;
-    }
-
-    private function getEventUrl(): ?string
-    {
-        if (isset($this->data['group_slug'])) {
-            return route('groups.events', $this->data['group_slug']);
-        }
-
-        return null;
-    }
-
     private function getCollaborationUrl(): ?string
     {
         if (isset($this->data['project_id'])) {
@@ -176,8 +146,6 @@ class Notification extends Model
             'share' => $username.' shared your post',
             'post_shared' => $username.' shared your post',
             'message' => $username.' sent you a message',
-            'group_invite' => $username.' invited you to join a group',
-            'event_reminder' => 'Reminder: '.($this->data['event_title'] ?? 'Event').' starts soon',
             'new_post' => $username.' created a new post',
             'collaboration_request' => $username.' wants to collaborate on a project',
             default => 'New notification from '.$username,

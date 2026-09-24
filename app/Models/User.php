@@ -93,11 +93,6 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
-    public function stories()
-    {
-        return $this->hasMany(Story::class);
-    }
-
     /** Users this user has blocked. */
     public function blockedUsers()
     {
@@ -153,11 +148,6 @@ class User extends Authenticatable
     public function hiddenPostIds(): array
     {
         return once(fn () => $this->hiddenPosts()->pluck('post_id')->all());
-    }
-
-    public function activeStories()
-    {
-        return $this->stories()->active()->oldest();
     }
 
     public function followers()
@@ -283,31 +273,5 @@ class User extends Authenticatable
         return $this->belongsToMany(Post::class, 'saves')
             ->withTimestamps()
             ->orderBy('saves.created_at', 'desc');
-    }
-
-    public function marketplaceReviews()
-    {
-        return $this->hasMany(MarketplaceReview::class, 'seller_id');
-    }
-
-    public function savedMarketplaceSearches()
-    {
-        return $this->hasMany(MarketplaceSavedSearch::class);
-    }
-
-    public function savedMarketplaceListings()
-    {
-        return $this->belongsToMany(MarketplaceListing::class, 'marketplace_saved_listings', 'user_id', 'listing_id')
-            ->withTimestamps();
-    }
-
-    public function marketplaceListings()
-    {
-        return $this->hasMany(MarketplaceListing::class);
-    }
-
-    public function marketplaceInterests()
-    {
-        return $this->hasMany(MarketplaceInterest::class);
     }
 }

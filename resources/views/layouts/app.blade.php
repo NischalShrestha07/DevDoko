@@ -72,12 +72,6 @@
                         <i class="bi bi-file-text fs-5 me-3"></i>
                         <span>Articles</span>
                     </a>
-                    <a href="{{ route('jobs.index') }}"
-                        class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('jobs.*') ? 'active' : '' }}">
-                        @if(request()->routeIs('jobs.*'))<span class="nav-active-indicator"></span>@endif
-                        <i class="bi bi-briefcase fs-5 me-3"></i>
-                        <span>Jobs</span>
-                    </a>
                     <a href="{{ route('messages.index') }}"
                         class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('messages.*') ? 'active' : '' }}">
                         @if(request()->routeIs('messages.*'))<span class="nav-active-indicator"></span>@endif
@@ -113,44 +107,6 @@
                     </a>
                 </div>
 
-                <div class="px-2 mb-3">
-                    <div class="small app-text-muted text-uppercase fw-semibold px-3 mb-2" style="font-size: 0.7rem; letter-spacing: 0.05em;">Community</div>
-                    <a href="{{ route('groups.index') }}"
-                        class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('groups.*') ? 'active' : '' }}">
-                        @if(request()->routeIs('groups.*'))<span class="nav-active-indicator"></span>@endif
-                        <i class="bi bi-people-fill fs-5 me-3"></i>
-                        <span>Groups</span>
-                    </a>
-                </div>
-
-                @auth
-                <div class="px-2 mb-3">
-                    <div class="small app-text-muted text-uppercase fw-semibold px-3 mb-2" style="font-size: 0.7rem; letter-spacing: 0.05em;">Marketplace</div>
-                    <a href="{{ route('marketplace.index') }}"
-                        class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('marketplace.index') ? 'active' : '' }}">
-                        @if(request()->routeIs('marketplace.index'))<span class="nav-active-indicator"></span>@endif
-                        <i class="bi bi-shop fs-5 me-3"></i>
-                        <span>Browse</span>
-                    </a>
-                    <a href="{{ route('marketplace.my-listings') }}"
-                        class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('marketplace.my-listings') ? 'active' : '' }}">
-                        @if(request()->routeIs('marketplace.my-listings'))<span class="nav-active-indicator"></span>@endif
-                        <i class="bi bi-bag fs-5 me-3"></i>
-                        <span class="flex-grow-1">My Listings</span>
-                    </a>
-                    <a href="{{ route('marketplace.saved') }}"
-                        class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('marketplace.saved') ? 'active' : '' }}">
-                        @if(request()->routeIs('marketplace.saved'))<span class="nav-active-indicator"></span>@endif
-                        <i class="bi bi-bookmark fs-5 me-3"></i>
-                        <span>Saved</span>
-                    </a>
-                    <a href="{{ route('marketplace.create') }}"
-                        class="d-flex align-items-center px-3 py-2 text-decoration-none rounded-3 mt-1 app-nav-item app-accent-text">
-                        <i class="bi bi-plus-circle fs-5 me-3"></i>
-                        <span>Sell Something</span>
-                    </a>
-                </div>
-                @endauth
             </div>
 
             <div class="p-3 border-top">
@@ -308,12 +264,6 @@
                     <i class="bi bi-compass fs-5 me-3"></i>
                     <span>Explore</span>
                 </a>
-                <a href="{{ route('jobs.index') }}"
-                    class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('jobs.*') ? 'active' : '' }}">
-                    @if(request()->routeIs('jobs.*'))<span class="nav-active-indicator"></span>@endif
-                    <i class="bi bi-briefcase fs-5 me-3"></i>
-                    <span>Jobs</span>
-                </a>
                 <a href="{{ route('messages.index') }}"
                     class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('messages.*') ? 'active' : '' }}">
                     @if(request()->routeIs('messages.*'))<span class="nav-active-indicator"></span>@endif
@@ -343,46 +293,6 @@
                 </a>
             </div>
 
-            <!-- Groups -->
-            <div class="px-2 mb-3">
-                <div class="small app-text-muted text-uppercase fw-semibold px-3 mb-2" style="font-size: 0.7rem; letter-spacing: 0.05em;">Community</div>
-                <a href="{{ route('groups.index') }}"
-                    class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('groups.*') ? 'active' : '' }}">
-                    @if(request()->routeIs('groups.*'))<span class="nav-active-indicator"></span>@endif
-                    <i class="bi bi-people-fill fs-5 me-3"></i>
-                    <span>Groups</span>
-                </a>
-            </div>
-
-            @auth
-            <!-- Marketplace -->
-            <div class="px-2 mb-3">
-                <div class="small app-text-muted text-uppercase fw-semibold px-3 mb-2" style="font-size: 0.7rem; letter-spacing: 0.05em;">Marketplace</div>
-                <a href="{{ route('marketplace.index') }}"
-                    class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('marketplace.index') ? 'active' : '' }}">
-                    @if(request()->routeIs('marketplace.index'))<span class="nav-active-indicator"></span>@endif
-                    <i class="bi bi-shop fs-5 me-3"></i>
-                    <span>Browse</span>
-                </a>
-                <a href="{{ route('marketplace.my-listings') }}"
-                    class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('marketplace.my-listings') ? 'active' : '' }}">
-                    @if(request()->routeIs('marketplace.my-listings'))<span class="nav-active-indicator"></span>@endif
-                    <i class="bi bi-bag fs-5 me-3"></i>
-                    <span class="flex-grow-1">My Listings</span>
-                </a>
-                <a href="{{ route('marketplace.saved') }}"
-                    class="d-flex align-items-center px-3 py-2 app-text-primary text-decoration-none rounded-3 position-relative app-nav-item {{ request()->routeIs('marketplace.saved') ? 'active' : '' }}">
-                    @if(request()->routeIs('marketplace.saved'))<span class="nav-active-indicator"></span>@endif
-                    <i class="bi bi-bookmark fs-5 me-3"></i>
-                    <span>Saved</span>
-                </a>
-                <a href="{{ route('marketplace.create') }}"
-                    class="d-flex align-items-center px-3 py-2 text-decoration-none rounded-3 mt-1 app-nav-item app-accent-text">
-                    <i class="bi bi-plus-circle fs-5 me-3"></i>
-                    <span>Sell Something</span>
-                </a>
-            </div>
-            @endauth
         </div>
 
         <!-- Bottom -->

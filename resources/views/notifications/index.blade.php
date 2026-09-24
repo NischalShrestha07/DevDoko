@@ -108,8 +108,6 @@
                                     'post_shared' => ['icon' => 'share-fill', 'color' => 'secondary'],
                                     'new_post' => ['icon' => 'file-text', 'color' => 'primary'],
                                     'collaboration_request' => ['icon' => 'people', 'color' => 'success'],
-                                    'group_invite' => ['icon' => 'people-fill', 'color' => 'info'],
-                                    'event_reminder' => ['icon' => 'calendar-event', 'color' => 'warning'],
                                 ];
                                 $ntype = $iconMap[$notification->type] ?? ['icon' => 'bell', 'color' => 'warning'];
                             @endphp

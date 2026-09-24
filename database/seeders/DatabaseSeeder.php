@@ -8,6 +8,7 @@ use App\Models\Post;
 use App\Models\Tag;
 use App\Models\TechTag;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -184,7 +185,7 @@ class DatabaseSeeder extends Seeder
             foreach ($usersToFollow as $userToFollow) {
                 try {
                     $user->following()->attach($userToFollow->id);
-                } catch (\Illuminate\Database\QueryException $e) {
+                } catch (QueryException $e) {
                     //
                 }
             }
@@ -193,8 +194,6 @@ class DatabaseSeeder extends Seeder
         $this->call([
             NotificationSeeder::class,
             ProjectSeeder::class,
-            JobSeeder::class,
-            GroupSeeder::class,
             MessageSeeder::class,
         ]);
     }

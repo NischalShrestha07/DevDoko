@@ -31,8 +31,6 @@
                     @endif
                     @if($report->reportable instanceof \App\Models\Post)
                     <a href="{{ route('posts.show', $report->reportable) }}" class="small">View post &rarr;</a>
-                    @elseif($report->reportable instanceof \App\Models\Group)
-                    <a href="{{ route('groups.show', $report->reportable) }}" class="small">View group &rarr;</a>
                     @else
                     <span class="small app-text-muted">Reported content was deleted.</span>
                     @endif
